@@ -15,7 +15,7 @@ fi
 get_battery_status() {
     # Проверка наличия информации о батарее
     if [ ! -d /sys/class/power_supply/BAT1 ]; then
-        echo "Батарея не найдена" > /home/maaru/suckless/scripts/dwmbScripts/.carrentsBattery
+        echo "Батарея не найдена" > $HOME/suckless/scripts/dwmbScripts/.carrentsBattery
         return
     fi
 
@@ -28,7 +28,7 @@ get_battery_status() {
         if [ "$capacity" -eq 100 ]; then
             icon="󰂅"  # Иконка для батареи, которая полностью зарядилась, но продолжает заряжаться
         else
-            icon=""  # Иконка зарядки
+            icon=""  # Иконка зарядки
         fi
     elif [ "$status" = "Full" ]; then
         icon="󰁹"  # Иконка для полной батареи
@@ -56,7 +56,7 @@ get_battery_status() {
     fi
 
     # Записываем уровень заряда с иконкой в файл
-    echo "$icon $capacity%" > /home/maaru/suckless/scripts/dwmbScripts/.carrentsBattery
+    echo "$icon $capacity%" > $HOME/suckless/scripts/dwmbScripts/.carrentsBattery
 
     # Чтение последнего статуса и отправка уведомления при изменении
     last_status=$(cat "$STATUS_FILE")

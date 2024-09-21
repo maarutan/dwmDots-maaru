@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Пути к иконкам
-icon_name="/home/maaru/.icons/brightness.svg"
+icon_name="$HOME/.icons/brightness.svg"
 
 # Функция для получения текущего уровня яркости в диапазоне от 0 до 100
 get_brightness() {

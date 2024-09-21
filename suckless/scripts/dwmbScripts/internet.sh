@@ -2,7 +2,7 @@
 
 # Проверяем наличие bc
 if ! command -v bc &> /dev/null; then
-    echo "bc не установлен. Установите bc, чтобы скрипт работал правильно." > /home/maaru/suckless/scripts/dwmbScripts/currentInternet
+    echo "bc не установлен. Установите bc, чтобы скрипт работал правильно." > $HOME/suckless/scripts/dwmbScripts/.currentInternet
     exit 1
 fi
 
@@ -29,48 +29,16 @@ get_data() {
     
     total_bytes=$((rx_bytes + tx_bytes))
     
-    # Преобразуем байты в более удобный формат
-    if [ "$total_bytes" -ge 1048576 ]; then
-        total_mb=$(echo "scale=2; $total_bytes / 1048576" | bc)
-        echo "${total_mb} MB"
-    elif [ "$total_bytes" -ge 1024 ]; then
-        total_kb=$(echo "scale=2; $total_bytes / 1024" | bc)
-        echo "${total_kb} KB"
-    else
-        echo "${total_bytes} B"
-    fi
-}
-#!/bin/bash
+    # Отладочный вывод
+    echo "Интерфейс: $interface" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
+    echo "rx_bytes_before: $rx_bytes_before" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
+    echo "rx_bytes_after: $rx_bytes_after" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
+    echo "tx_bytes_before: $tx_bytes_before" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
+    echo "tx_bytes_after: $tx_bytes_after" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
+    echo "rx_bytes: $rx_bytes" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
+    echo "tx_bytes: $tx_bytes" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
+    echo "total_bytes: $total_bytes" >> $HOME/suckless/scripts/dwmbScripts/.debug.log
 
-# Проверяем наличие bc
-if ! command -v bc &> /dev/null; then
-    echo "bc не установлен. Установите bc, чтобы скрипт работал правильно." > /home/maaru/suckless/scripts/dwmbScripts/.currentInternet
-    exit 1
-fi
-
-# Интервал обновления в секундах
-INTERVAL=1
-
-# Функция для получения объема переданных данных за интервал времени
-get_data() {
-    local interface=$1
-
-    # Получаем количество байт переданных и принятых данных до интервала
-    rx_bytes_before=$(cat /sys/class/net/$interface/statistics/rx_bytes)
-    tx_bytes_before=$(cat /sys/class/net/$interface/statistics/tx_bytes)
-    
-    sleep $INTERVAL
-    
-    # Получаем количество байт переданных и принятых данных после интервала
-    rx_bytes_after=$(cat /sys/class/net/$interface/statistics/rx_bytes)
-    tx_bytes_after=$(cat /sys/class/net/$interface/statistics/tx_bytes)
-    
-    # Вычисляем количество данных, переданных за интервал времени
-    rx_bytes=$((rx_bytes_after - rx_bytes_before))
-    tx_bytes=$((tx_bytes_after - tx_bytes_before))
-    
-    total_bytes=$((rx_bytes + tx_bytes))
-    
     # Преобразуем байты в более удобный формат
     if [ "$total_bytes" -ge 1048576 ]; then
         total_mb=$(echo "scale=2; $total_bytes / 1048576" | bc)
@@ -93,9 +61,9 @@ while true; do
             if [ -n "$data" ]; then
                 # Если данные не нулевые, выводим их
                 if [[ "$data" != "0 B" ]]; then
-                    echo "$data" > /home/maaru/suckless/scripts/dwmbScripts/.currentInternet
+                    echo "$data" > $HOME/suckless/scripts/dwmbScripts/.currentInternet
                 else
-                    echo "0 B" > /home/maaru/suckless/scripts/dwmbScripts/.currentInternet
+                    echo "0 B" > $HOME/suckless/scripts/dwmbScripts/.currentInternet
                 fi
                 data_found=true
             fi
@@ -104,7 +72,7 @@ while true; do
 
     # Если нет активных интерфейсов, выводим 0
     if [ "$data_found" = false ]; then
-        echo "0 B" > /home/maaru/suckless/scripts/dwmbScripts/.currentInternet
+        echo "0 B" > $HOME/suckless/scripts/dwmbScripts/.currentInternet
     fi
     
     sleep $INTERVAL

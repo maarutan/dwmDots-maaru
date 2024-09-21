@@ -14,10 +14,11 @@ static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 //bar paddings
 static const int vertpad            = 5;       /* vertical padding of bar */
-static const int sidepad            = 30;       /* horizontal padding of bar */
+static const int sidepad            = 28;       /* horizontal padding of bar */
 
-static const char *fonts[]          = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
-static const char dmenufont[]       = "Fira Code NF:Semibold:size=16" ;
+//static const char *fonts[]          = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
+static const char *fonts[]          = { "Fira Code:size=20" };
+static const char dmenufont[]       = "Fira Code :size=20" ;
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -26,7 +27,7 @@ static const char background[]      = "#23243a";
 static const char col_borderActive[] = "#a682dc";
 static const char col_noActive[] = "#1e1e2f";
 static const char background2[] = "#2f2f49";
-static const char col_borderbar[]   = "#b195f6";
+static const char col_borderbar[]   = "#292b40";
 
 
 static const char *colors[][3]      = {
@@ -149,7 +150,13 @@ static const Key keys[] = {
 
 	//colorpicer
 	{ Mod1Mask,  			XK_p,      spawn,          SHCMD("xcolor -s clipboard") },
-	
+
+	//settings 
+	{ MODKEY,                       XK_i,      spawn,          SHCMD("kitty -e /home/maaru/suckless/dwm") },
+
+
+	//filemanager
+	{ MODKEY,                       XK_e,      spawn,          SHCMD("kitty -e yazi") },
 
 	//screen shot
 	{ MODKEY,                       XK_p,      spawn,          SHCMD("flameshot gui") },

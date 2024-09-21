@@ -1,41 +1,28 @@
-#!/bin/sh
+#!/bin/bash
 
-# Запуск Telegram
-#XDG_CURRENT_DESKTOP=gnome telegram-desktop -startintray &
-
-# Настройка курсора
+echo "Настройка курсора..."
 xsettingsd &
 
-# Запуск композитора
+echo "Запуск композитора..."
 picom &
 
-# Настройка раскладки клавиатуры и Caps Lock как Ctrl
+echo "Настройка раскладки клавиатуры..."
 setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
 
-# управление мышю из клавьятуры 
-#warpd &
-
-#infoupdate for dwmblocks
-~/suckless/scripts/updateInfo.sh & 
-
-# Запуск уведомлений
+echo "Запуск уведомлений..."
 dunst &
-# Установка фонового изображения
-feh --bg-scale "$(cat ~/.current_wallpaper | head -n 1)"
 
+echo "Установка фонового изображения..."
+if [ -f ~/.current_wallpaper ]; then
+    feh --bg-scale "$(head -n 1 ~/.current_wallpaper)"
+else
+    echo "Файл ~/.current_wallpaper не найден."
+fi
 
-
-#строка состояния
+echo "Запуск строки состояния..."
 dwmblocks &
 
-# Запуск dwm
+$HOME/suckless/scripts/dwmbScripts/blocks.sh &
 while true; do
-    dwm 2>~/.dwm.log
+	dwm 2>~/.dwm.log
 done
-
-while true; do
-	~/suckless/scripts/dwmbScripts/blocks.sh &
-	sleep 1
-done
-
-

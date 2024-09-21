@@ -342,10 +342,6 @@ desc = "run lazygit"
 
 
 [[manager.prepend_keymap]]
-on = ["c","c"]
-run = ["plugin system-clipboard"]
-
-[[manager.prepend_keymap]]
 on   = "o"
 run  = "plugin open-with-cmd --args=block"
 desc = "Open with command in the terminal"

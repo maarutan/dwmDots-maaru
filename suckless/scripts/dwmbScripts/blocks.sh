@@ -1,9 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
-    /home/maaru/suckless/scripts/dwmbScripts/batteryInfo.sh
-    /home/maaru/suckless/scripts/dwmbScripts/internet.sh 
-    /home/maaru/suckless/scripts/dwmbScripts/showinternet.sh 
-    /home/maaru/suckless/scripts/dwmbScripts/updateInfo.sh 
-    /home/maaru/suckless/scripts/dwmbScripts/weather.sh 
+$HOME/suckless/scripts/dwmbScripts/batteryInfo.sh &
 
+$HOME/suckless/scripts/dwmbScripts/internet.sh &
+
+$HOME/suckless/scripts/dwmbScripts/showInternet.sh &
+
+#$HOME/suckless/scripts/dwmbScripts/updateInfo.sh &
+
+# $HOME/suckless/scripts/dwmbScripts/weather.sh  &
 

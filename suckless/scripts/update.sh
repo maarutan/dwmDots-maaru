@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Пути к иконкам
-ICON_PACMAN="$HOME/.icons/pacman.svg"
-ICON_PARU="$HOME/.icons/Paruyay.svg"
-ICON_FLATPAK="$HOME/.icons/flatpak.png"
-ICON_SUCCESS="$HOME/.icons/success.svg"
-ICON_ERROR="$HOME/.icons/error.svg"
-
 # Цвета для вывода текста
 COLOR_YELLOW='\033[1;33m'
 COLOR_GREEN='\033[0;32m'
@@ -15,7 +8,26 @@ COLOR_CYAN='\033[0;36m'
 COLOR_RED='\033[0;31m'
 COLOR_RESET='\033[0m'
 
-# Функция обновления
+# Функция для проверки обновлений
+check_updates() {
+    # Проверка обновлений pacman
+    pacman_updates=$(pacman -Qu 2>/dev/null | wc -l)
+    echo -e "${COLOR_YELLOW}===> pacman     󰮯   ~~> : ${pacman_updates}${COLOR_RESET}"
+
+    # Проверка обновлений yay
+    yay_updates=$(yay -Qu 2>/dev/null | wc -l)
+    echo -e "${COLOR_GREEN}===> yay        󰣇   ~~> : ${yay_updates}${COLOR_RESET}"
+
+    # Проверка обновлений flatpak
+    flatpak_updates=$(flatpak remote-ls --updates 2>/dev/null | wc -l)
+    echo -e "${COLOR_CYAN}===> flatpak       ~~> : ${flatpak_updates}${COLOR_RESET}"
+
+    # Вывод общего количества обновлений
+    total_updates=$((pacman_updates + yay_updates + flatpak_updates))
+    echo -e "${COLOR_BLUE}Общее количество обновлений: ${total_updates}${COLOR_RESET}"
+}
+
+# Функция обновления системы
 update_system() {
     echo -e "${COLOR_YELLOW}\n=== Обновление pacman ===${COLOR_RESET}"
     if ! sudo pacman -Syu --noconfirm; then
@@ -23,9 +35,9 @@ update_system() {
         return 1
     fi
 
-    echo -e "${COLOR_GREEN}\n=== Обновление paru ===${COLOR_RESET}"
-    if ! paru -Syu --noconfirm; then
-        echo -e "${COLOR_RED}Ошибка обновления через paru!${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}\n=== Обновление yay 󰣇 ===${COLOR_RESET}"
+    if ! yay -Syu --noconfirm; then
+        echo -e "${COLOR_RED}Ошибка обновления через yay!${COLOR_RESET}"
         return 1
     fi
 
@@ -39,42 +51,15 @@ update_system() {
 }
 
 # Вызов startFetch.sh в начале
+$HOME/.config/neofetch/startFetch.sh
 
-/home/maaru/.config/neofetch/startFetch.sh
 # Основной цикл
 while true; do
 
-    echo -e "\nДоступные обновления:"
+    echo -e "\nПроверка доступных обновлений..."
+    check_updates
 
-    # Проверка обновлений для pacman
-    pacman_updates=$(pacman -Qu)
-    if [ -n "$pacman_updates" ]; then
-        echo -e "${COLOR_YELLOW}  ===> pacman -----> 󰮯 :"
-        echo "$pacman_updates" | awk '{print "       " $1}'
-    else
-        echo -e "${COLOR_YELLOW}  ===> pacman -----> нет обновлений${COLOR_RESET}"
-    fi
-
-    # Проверка обновлений для paru
-    paru_updates=$(paru -Qu)
-    if [ -n "$paru_updates" ]; then
-        echo -e "${COLOR_GREEN}  ===> paru -------> 󰣇 :"
-        echo "$paru_updates" | awk '{print "       " $1}'
-    else
-        echo -e "${COLOR_GREEN}  ===> paru -------> нет обновлений${COLOR_RESET}"
-    fi
-
-    # Проверка обновлений для flatpak
-    flatpak_updates=$(flatpak remote-ls --updates)
-    if [ -n "$flatpak_updates" ]; then
-        echo -e "${COLOR_CYAN}  ===> flatpak ---->  :"
-        echo "$flatpak_updates" | awk '{print "       " $1}'
-    else
-        echo -e "${COLOR_CYAN}  ===> flatpak ----> нет обновлений${COLOR_RESET}"
-    fi
-
-    echo -e "\nНачало обновления системы..."
-
+    echo -e "\nНачать обновление системы?"
     read -p "Нажмите Enter для продолжения или Ctrl+C для выхода."
 
     if update_system; then
@@ -87,8 +72,8 @@ while true; do
     read
 
     clear
-    # Вызов startFetch.sh в конце, перед figlet
-    /home/maaru/.config/neofetch/startFetch.sh
+    # Вызов startFetch.sh в конце
+    $HOME/.config/neofetch/startFetch.sh
 
     figlet -f mini "' -->  bye  <-- '"
     echo "' -->  bye  <-- '"

@@ -14,6 +14,6 @@ else
 fi
 
 # Запуск rofi с содержимым буфера обмена
-echo "$clip_content" | /home/maaru/.config/rofi/launchers/type-2/bufer.sh
+echo "$clip_content" | $HOME/.config/rofi/launchers/type-2/bufer.sh
 
 
