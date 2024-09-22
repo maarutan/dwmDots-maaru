@@ -6,6 +6,10 @@ xsettingsd &
 echo "Запуск композитора..."
 picom &
 
+echo "Запуск свайпов для таспада"
+libinput-gestures &
+
+
 echo "Настройка раскладки клавиатуры..."
 setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
 
