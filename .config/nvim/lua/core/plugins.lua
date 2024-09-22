@@ -19,10 +19,19 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Setup lazy.nvim
 require("lazy").setup({
-  spec = {
-    -- import your plugins
-    { import = "plugins" },
-  },
- install = { colorscheme = { "habamax" } },
-  checker = { enabled = true },
+	{ "phaazon/hop.nvim" },
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+	{ "nvim-treesitter/nvim-treesitter" },
+	{
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "MunifTanjim/nui.nvim",
+      -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+    }
+},
+	{ "nvim-tree/nvim-web-devicons" },
+    { "neovim/nvim-lspconfig" }
 })
