@@ -25,9 +25,10 @@ export XMODIFIERS="@im=none"
 export ZSH="$HOME/.oh-my-zsh"
 
 #----- theme -----
-ZSH_THEME="powerlevel10k/powerlevel10k"
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+#ZSH_THEME="powerlevel10k/powerlevel10k"
 
-lugins=(
+plugins=(
     git
     zsh-syntax-highlighting
     zsh-autosuggestions
