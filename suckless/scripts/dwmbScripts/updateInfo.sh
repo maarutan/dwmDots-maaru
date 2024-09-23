@@ -33,6 +33,6 @@ check_updates() {
 
 while true; do
     check_updates
-    sleep 10  
+    sleep 40  
 done
 

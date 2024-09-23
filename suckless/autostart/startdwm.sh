@@ -7,7 +7,8 @@ echo "Запуск композитора..."
 picom &
 
 echo "Запуск свайпов для таспада"
-libinput-gestures &
+pkill -f libinput-gestures
+libinput-gestures-setup start &
 
 
 echo "Настройка раскладки клавиатуры..."
