@@ -1,36 +1,36 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 2;        /* border pixel of windows */
-static const unsigned int snap      = 32;       /* snap pixel */
+static const unsigned int borderpx   = 2;        /* border pixel of windows */
+static const unsigned int snap       = 32;       /* snap pixel */
 
-static const unsigned int gappih    = 20;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 20;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 30;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 30;       /* vert outer gap between windows and screen edge */
+static const unsigned int gappih     = 20;       /* horiz inner gap between windows */
+static const unsigned int gappiv     = 20;       /* vert inner gap between windows */
+static const unsigned int gappoh     = 30;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov     = 30;       /* vert outer gap between windows and screen edge */
 
-static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
-static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 1;        /* 0 means bottom bar */
+static       int smartgaps           = 0;        /* 1 means no outer gap when there is only one window */
+static const int showbar             = 1;        /* 0 means no bar */
+static const int topbar              = 1;        /* 0 means bottom bar */
 //bar paddings
-static const int vertpad            = 5;       /* vertical padding of bar */
-static const int sidepad            = 28;       /* horizontal padding of bar */
+static const int vertpad             = 5;       /* vertical padding of bar */
+static const int sidepad             = 28;       /* horizontal padding of bar */
 
-//static const char *fonts[]          = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
-static const char *fonts[]          = { "Fira Code:size=20" };
-static const char dmenufont[]       = "Fira Code :size=20" ;
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char background[]      = "#23243a";
+//static const char *fonts[]         = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
+static const char *fonts[]           = { "Fira Code:size=20" };
+static const char dmenufont[]        = "Fira Code :size=20" ;
+static const char col_gray1[]        = "#222222";
+static const char col_gray2[]        = "#444444";
+static const char col_gray3[]        = "#bbbbbb";
+static const char col_gray4[]        = "#eeeeee";
+static const char background[]       = "#23243a";
 static const char col_borderActive[] = "#a682dc";
-static const char col_noActive[] = "#1e1e2f";
-static const char background2[] = "#2f2f49";
-static const char col_borderbar[]   = "#292b40";
+static const char col_noActive[]     = "#1e1e2f";
+static const char background2[]      = "#2f2f49";
+static const char col_borderbar[]    = "#292b40";
 
 
-static const char *colors[][3]      = {
+static const char *colors[][3]       = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, background, col_noActive, },
 	[SchemeSel]  = { col_gray4, background2 , col_borderActive },
@@ -121,24 +121,27 @@ static const Key keys[] = {
 	{ 0,                            0,      spawn,          {.v = dmenucmd } },
 
 	//kitty ------------------------
-	{ ALTKEY,                       XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY,                      XK_Return, spawn,          {.v = termcmd } },
 	
 	//killActive ------------------------
-	{ ALTKEY,                       XK_q,      killclient,     {0} },
+	{ MODKEY,                      XK_q,      killclient,     {0} },
 
 	//firefoox
-	{ MODKEY,                       XK_f,      spawn,          {.v = browser } },
+	{ MODKEY|ShiftMask,            XK_f,      spawn,          {.v = browser } },
+
+	//vesktop
+	{ MODKEY|ShiftMask,            XK_v,      spawn,          SHCMD("vesktop") },
 
 	//vscode
-	{ MODKEY,                       XK_c,      spawn,          {.v = codeEditor } },
+	{ MODKEY,                      XK_c,      spawn,          {.v = codeEditor } },
 	
 
 	//update system
-	{ Mod1Mask|ControlMask,		XK_u,            spawn,          SHCMD("kitty -e  /home/maaru/suckless/scripts/update.sh")},
+	{ MODKEY|ControlMask,		       XK_u,            spawn,          SHCMD("kitty -e  /home/maaru/suckless/scripts/update.sh")},
 
 
 	//dwmblocks
-	{ ControlMask,		        0xffe9,          spawn,          SHCMD("pkill -RTMIN+1 dwmblocks")},
+	{ ControlMask,     		         0xffe9,          spawn,          SHCMD("pkill -RTMIN+1 dwmblocks")},
 	
 
 	//rofi
@@ -149,7 +152,7 @@ static const Key keys[] = {
 
 
 	//colorpicer
-	{ Mod1Mask,  			XK_p,      spawn,          SHCMD("xcolor -s clipboard") },
+	{ ALTKEY,   		     				  	XK_p,      spawn,          SHCMD("xcolor -s clipboard") },
 
 	//settings 
 	{ MODKEY,                       XK_i,      spawn,          SHCMD("kitty -e /home/maaru/suckless/dwm") },
@@ -162,28 +165,28 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          SHCMD("flameshot gui") },
 	
 	//wallpapers control
-	{ ControlMask,	 		0x5b, 	   spawn,	   {.v = walL } },   
-    	{ ControlMask, 			0x5d, 	   spawn, 	   {.v = walR } },  
+	{ ControlMask,	 		0x5b, 	   spawn,	   	 {.v = walL } },   
+  { ControlMask, 			0x5d, 	   spawn, 	   {.v = walR } },  
 
 	/* Управление Ярсотью */
 	{ Mod1Mask|ShiftMask, 		0x5b, 	   spawn,	   {.v = brgup   } },   
-    	{ Mod1Mask|ShiftMask, 		0x5d, 	   spawn, 	   {.v = brgdown } },
+  { Mod1Mask|ShiftMask, 		0x5d, 	   spawn, 	   {.v = brgdown } },
 
-    	/* Управление Громкостью */
-    	{ Mod1Mask, 			0x5b, 	   spawn,	   {.v = volup   } },   
-    	{ Mod1Mask, 			0x5d,      spawn,	   {.v = voldown } },  
-    	{ Mod1Mask, 			0x5c,      spawn,	   {.v = volmute } },
+  /* Управление Громкостью */
+  { Mod1Mask, 			0x5b, 	   spawn,	   {.v = volup   } },   
+  { Mod1Mask, 			0x5d,      spawn,	   {.v = voldown } },  
+  { Mod1Mask, 			0x5c,      spawn,	   {.v = volmute } },
 	
 
 
 	//toggleBar ------------------------
-	{ MODKEY|ShiftMask,             XK_w,      togglebar,      {0} },
+	{ MODKEY|ShiftMask,               XK_w,      togglebar,      {0} },
 
 	//focusStack ------------------------
-	{ ALTKEY|ShiftMask,               XK_j,      focusstack,     {.i = +1 } },
-	{ ALTKEY|ShiftMask,               XK_k,      focusstack,     {.i = -1 } },
-	{ ALTKEY|ShiftMask, 		  XK_h,	     setmfact,	     {.f = -0.05} },
-	{ ALTKEY|ShiftMask,             XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY|ShiftMask,               XK_j,      focusstack,     {.i = +1 } },
+	{ MODKEY|ShiftMask,               XK_k,      focusstack,     {.i = -1 } },
+	{ MODKEY|ShiftMask, 		          XK_h,	     setmfact,	     {.f = -0.05} },
+	{ MODKEY|ShiftMask,               XK_l,      setmfact,       {.f = +0.05} },
 
 
 	// tileStack modes I, D ------------------------
@@ -191,12 +194,12 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
 	
 	//MoveStack ------------------------
-	{ ALTKEY|ControlMask,             XK_j,      movestack,      {.i = +1 } },
-	{ ALTKEY|ControlMask,             XK_k,      movestack,      {.i = -1 } },
-	{ ALTKEY|ControlMask,             XK_Return, zoom,           {0} },
+	{ MODKEY|ControlMask,             XK_j,      movestack,      {.i = +1 } },
+	{ MODKEY|ControlMask,             XK_k,      movestack,      {.i = -1 } },
+	{ MODKEY|ControlMask,             XK_Return, zoom,           {0} },
  
 	//fullscreen
-	{ ALTKEY,             XK_f,      togglefullscr,  {0} },
+	{ MODKEY,             XK_f,      togglefullscr,  {0} },
 
 	//Gaps resize ------------------------
 	{ 0,		             0,      setcfact,       {.f = +0.25} },
@@ -205,21 +208,21 @@ static const Key keys[] = {
 
 	//Gaps ------------------------
 	{ 0,	             		0,      incrgaps,       {.i = +1 } },
-	{ 0,    			0,      incrgaps,       {.i = -1 } },
+	{ 0,    							0,      incrgaps,       {.i = -1 } },
 	{ 0,              		0,      incrigaps,      {.i = +1 } },
-	{ 0,    			0,      incrigaps,      {.i = -1 } },
+	{ 0,    							0,      incrigaps,      {.i = -1 } },
 	{ 0,              		0,      incrogaps,      {.i = +1 } },
-	{ 0,    			0,      incrogaps,      {.i = -1 } },
+	{ 0,    							0,      incrogaps,      {.i = -1 } },
 	{ 0,              		0,      incrihgaps,     {.i = +1 } },
-	{ 0,    			0,      incrihgaps,     {.i = -1 } },
+	{ 0,    							0,      incrihgaps,     {.i = -1 } },
 	{ 0,              		0,      incrivgaps,     {.i = +1 } },
-	{ 0,    			0,      incrivgaps,     {.i = -1 } },
+	{ 0,    							0,      incrivgaps,     {.i = -1 } },
 	{ 0,              		0,      incrohgaps,     {.i = +1 } },
-	{ 0,                            0,      incrohgaps,     {.i = -1 } },
-	{ 0,			        0,      incrovgaps,     {.i = +1 } },
-	{ 0,				0,      incrovgaps,     {.i = -1 } },
+	{ 0,                  0,      incrohgaps,     {.i = -1 } },
+	{ 0,			        	  0,      incrovgaps,     {.i = +1 } },
+	{ 0,							  	0,      incrovgaps,     {.i = -1 } },
 	{ 0,              		0,      togglegaps,     {0} },
-	{ 0,			        0,      defaultgaps,    {0} },
+	{ 0,			        		0,      defaultgaps,    {0} },
 
 	// view window ------------------------ 
 	{ MODKEY,                       XK_Tab,    view,           {0} },
@@ -229,7 +232,7 @@ static const Key keys[] = {
 	//{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
-	{ MODKEY,	                XK_w,  togglefloating, {0} },
+	{ MODKEY,	                      XK_w,      togglefloating, {0} },
 
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
@@ -267,16 +270,16 @@ static const Key keys[] = {
 	// 12 { ">M>",      centeredfloatingmaster },
 	// 13 { "><>",      NULL },    /* no layout function means floating behavior */
 	
-	{ MODKEY|ALTKEY,                XK_1,                  setlayout,      {.v = &layouts[0]} },
-	{ MODKEY|ALTKEY,                XK_2,                  setlayout,      {.v = &layouts[3]} },
-	{ MODKEY|ALTKEY,                XK_3,                  setlayout,      {.v = &layouts[1]} }, 
-	{ MODKEY|ALTKEY,                XK_4,                  setlayout,      {.v = &layouts[5]} },
-	{ MODKEY|ALTKEY,                XK_5,                  setlayout,      {.v = &layouts[7]} }, 
-	{ MODKEY|ALTKEY,                XK_6,                  setlayout,      {.v = &layouts[8]} }, 
-	{ MODKEY|ALTKEY,                XK_7,                  setlayout,      {.v = &layouts[9]} }, 
-	{ MODKEY|ALTKEY,                XK_8,                  setlayout,      {.v = &layouts[10]} }, 
-	{ MODKEY|ALTKEY,                XK_9,                  setlayout,      {.v = &layouts[4]} }, 
-	{ MODKEY|ALTKEY,                XK_0,                  setlayout,      {.v = &layouts[12]} }, 
+	{ MODKEY|ALTKEY,                XK_1,                  setlayout,      {.v = &layouts[0]} },  //spiral
+	{ MODKEY|ALTKEY,                XK_2,                  setlayout,      {.v = &layouts[3]} },  //dwindle
+	{ MODKEY|ALTKEY,                XK_3,                  setlayout,      {.v = &layouts[1]} },  //tile
+	{ MODKEY|ALTKEY,                XK_4,                  setlayout,      {.v = &layouts[5]} },  //bstack
+	{ MODKEY|ALTKEY,                XK_5,                  setlayout,      {.v = &layouts[11]} }, //centeredmaster
+	{ MODKEY|ALTKEY,                XK_6,                  setlayout,      {.v = &layouts[8]} },  //nrowgrid
+	{ MODKEY|ALTKEY,                XK_7,                  setlayout,      {.v = &layouts[7]} },  //grid
+	{ MODKEY|ALTKEY,                XK_8,                  setlayout,      {.v = &layouts[10]} }, //gaplessgrid
+	{ MODKEY|ALTKEY,                XK_9,                  setlayout,      {.v = &layouts[6]} },  //bstackhoriz
+	{ MODKEY|ALTKEY,                XK_0,                  setlayout,      {.v = &layouts[4]} },  //desk 
 
 };
 
