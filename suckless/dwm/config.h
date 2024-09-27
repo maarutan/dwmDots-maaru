@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx   = 2;        /* border pixel of windows */
+static const unsigned int borderpx   = 4;        /* border pixel of windows */
 static const unsigned int snap       = 32;       /* snap pixel */
 
 static const unsigned int gappih     = 20;       /* horiz inner gap between windows */
@@ -24,8 +24,8 @@ static const char col_gray2[]        = "#444444";
 static const char col_gray3[]        = "#bbbbbb";
 static const char col_gray4[]        = "#eeeeee";
 static const char background[]       = "#23243a";
-static const char col_borderActive[] = "#a682dc";
-static const char col_noActive[]     = "#1e1e2f";
+static const char col_borderActive[] = "#8aadf4";
+static const char col_noActive[]     = "#868eba";
 static const char background2[]      = "#2f2f49";
 static const char col_borderbar[]    = "#292b40";
 
@@ -148,7 +148,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_r,      spawn,          SHCMD("/home/maaru/.config/rofi/launchers/type-2/launcher.sh") },
 	{ MODKEY,                       XK_v,      spawn,          SHCMD("/home/maaru/suckless/scripts/buferRofi.sh") },
 	{ MODKEY|Mod1Mask,              XK_a,      spawn,          SHCMD("/home/maaru/.config/rofi/launchers/type-2/emoji.sh") },
-	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("/home/maaru/.config/rofi/powermenu/type-4/powermenu.sh") },
+	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("/home/maaru/.config/rofi/powermenu/type-2/powermenu.sh") },
 
 
 	//colorpicer

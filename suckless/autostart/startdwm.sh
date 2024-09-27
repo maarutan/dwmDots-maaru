@@ -17,6 +17,7 @@ setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
 echo "Запуск уведомлений..."
 dunst &
 
+sleep  0.5
 echo "Установка фонового изображения..."
 if [ -f ~/.current_wallpaper ]; then
     feh --bg-scale "$(head -n 1 ~/.current_wallpaper)"

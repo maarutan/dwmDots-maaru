@@ -32,7 +32,7 @@ keymap = [
 	{ on = "<PageUp>",     run = "arrow -100%", desc = "Move cursor up one page" },
 	{ on = "<PageDown>",   run = "arrow 100%",  desc = "Move cursor down one page" },
 
-	{ on = [ "z", "g" ], run = "arrow -99999999", desc = "Move cursor to the top" },
+	{ on = [ "g", "g" ], run = "arrow -99999999", desc = "Move cursor to the top" },
 	{ on = "G",          run = "arrow 99999999",  desc = "Move cursor to the bottom" },
 
 	# Navigation
@@ -78,7 +78,7 @@ keymap = [
 	{ on = ":",         run = "shell --block --interactive", desc = "Run a shell command (block until finishes)" },
 	{ on = "<C-h>",     run = "hidden toggle",           desc = "Toggle the visibility of hidden files" },
 	{ on = "<C-s>",     run = "escape --search",             desc = "Cancel the ongoing search" },
-	{ on = ["g", "g"],    run = "plugin zoxide",          desc = "Jump to a directory using zoxide" },
+	{ on = ["g", "o"],    run = "plugin zoxide",          desc = "Jump to a directory using zoxide" },
 	{ on = "F",         run = "plugin fzf",                  desc = "Jump to a directory or reveal a file using fzf" },
 
 	# Linemode
