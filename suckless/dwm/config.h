@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx   = 4;        /* border pixel of windows */
+static const unsigned int borderpx   = 5;        /* border pixel of windows */
 static const unsigned int snap       = 32;       /* snap pixel */
 
 static const unsigned int gappih     = 20;       /* horiz inner gap between windows */
@@ -14,7 +14,7 @@ static const int showbar             = 1;        /* 0 means no bar */
 static const int topbar              = 1;        /* 0 means bottom bar */
 //bar paddings
 static const int vertpad             = 5;       /* vertical padding of bar */
-static const int sidepad             = 28;       /* horizontal padding of bar */
+static const int sidepad             = 27;       /* horizontal padding of bar */
 
 //static const char *fonts[]         = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
 static const char *fonts[]           = { "Fira Code:size=20" };
