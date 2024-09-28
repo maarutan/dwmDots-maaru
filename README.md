@@ -65,7 +65,7 @@ also a dunst script for brightness control<br/>
 
 # Picom Simple Animation
 
-[AUR - picom-simpeleanims-git ](https://aur.archlinux.org/packages/picom-simpleanims-git)
+[AUR -  picom-simpleanims-git  ](https://aur.archlinux.org/packages/picom-simpleanims-git)
 <br/>
 this picom have a best animations
 
