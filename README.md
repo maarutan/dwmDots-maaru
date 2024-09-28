@@ -77,6 +77,7 @@ this picom have a best animations
 `super + shift + w` - toggle bar<br/>
 `super + shift + f` - firefox<br/>
 `super + shift + v` - vencord<br/>
+`super + shift + t` - telegram<br/>
 `super + c` - code <br/>
 
 `super + ctrl + u` - updatesystem<br/>
