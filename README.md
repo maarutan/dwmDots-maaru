@@ -63,7 +63,7 @@ also a dunst script for brightness control<br/>
 
 [brightnessControl.sh](https://github.com/maarutan/dwmDots-maaru/blob/main/suckless/scripts/brightnessControl.sh)
 
-# Picom Siple Animation
+# Picom Simple Animation
 
 [AUR - picom-simpeleanims-git ](https://aur.archlinux.org/packages/picom-simpleanims-git)
 <br/>

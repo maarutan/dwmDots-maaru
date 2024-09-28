@@ -135,6 +135,9 @@ static const Key keys[] = {
 	//vscode
 	{ MODKEY,                      XK_c,      spawn,          {.v = codeEditor } },
 	
+	//toggleBar ------------------------
+	{ MODKEY|ShiftMask,            XK_t,      spawn,          SHCMD("telegram-desktop") },
+
 
 	//update system
 	{ MODKEY|ControlMask,		       XK_u,            spawn,          SHCMD("kitty -e  /home/maaru/suckless/scripts/update.sh")},

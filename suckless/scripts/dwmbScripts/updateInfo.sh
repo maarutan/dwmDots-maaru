@@ -1,7 +1,6 @@
 #!/bin/bash
 
 check_updates() {
-  sudo pacman -Sy >/dev/null 2>&1
   pacman_updates=$(pacman -Qu 2>/dev/null | wc -l)
   pacman_updates=${pacman_updates:-0}
 
