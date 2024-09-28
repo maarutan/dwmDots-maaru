@@ -116,16 +116,16 @@ this picom have a best animations
 
 `super + w` - toggle flouting<br/>
 
-`super + alt + 1` - stacType (spiral)
-`super + alt + 2` - stacType (dwindle)
-`super + alt + 3` - stacType (tile)
-`super + alt + 4` - stacType (bstack)
-`super + alt + 5` - stacType (centeredmaster)
-`super + alt + 6` - stacType (nrowgrid)
-`super + alt + 7` - stacType (grid)
-`super + alt + 8` - stacType (gaplessgrid)
-`super + alt + 9` - stacType (bstackkhoriz)
-`super + alt + 0` - stacType (desk)
+`super + alt + 1` - stacType (spiral) <br/>
+`super + alt + 2` - stacType (dwindle) <br/>
+`super + alt + 3` - stacType (tile) <br/>
+`super + alt + 4` - stacType (bstack) <br/>
+`super + alt + 5` - stacType (centeredmaster) <br/>
+`super + alt + 6` - stacType (nrowgrid) <br/>
+`super + alt + 7` - stacType (grid) <br/>
+`super + alt + 8` - stacType (gaplessgrid) <br/>
+`super + alt + 9` - stacType (bstackkhoriz) <br/>
+`super + alt + 0` - stacType (desk) <br/>
 
 # install
 
