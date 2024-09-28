@@ -139,7 +139,7 @@ $ git clone https://github.com/maarutan/dwmDots-maaru.git
 $ cd dwmDots-maaru
 
 # starting scripts
-$ ./start.sh
-
+# $ ./start.sh
+#There is no script in development yet
 #installing...
 ```
