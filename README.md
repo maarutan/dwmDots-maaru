@@ -90,7 +90,7 @@ this picom have a best animations
 `super + alt + p` - colorpicker (xcolor)<br/>
 `super + p` - flameshot gui (screenshot)<br/>
 
-`super + i` - cd ~suckless/dwm/ (settings)<br/>
+`super + i` - cd ~/suckless/dwm/ (settings)<br/>
 `super + e` - yazi (explorer)<br/>
 
 `super + ctrl + [` - change wallpaper (left)<br/>
