@@ -152,7 +152,7 @@ static const Key keys[] = {
 
 
 	//colorpicer
-	{ ALTKEY,   		     				  	XK_p,      spawn,          SHCMD("xcolor -s clipboard") },
+	{ MODKEY|ALTKEY,   		     				  	XK_p,      spawn,          SHCMD("xcolor -s clipboard") },
 
 	//settings 
 	{ MODKEY,                       XK_i,      spawn,          SHCMD("kitty -e /home/maaru/suckless/dwm") },
@@ -165,17 +165,17 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          SHCMD("flameshot gui") },
 	
 	//wallpapers control
-	{ ControlMask,	 		0x5b, 	   spawn,	   	 {.v = walL } },   
-  { ControlMask, 			0x5d, 	   spawn, 	   {.v = walR } },  
+	{ MODKEY|ControlMask,	 		0x5b, 	   spawn,	   	 {.v = walL } },   
+  { MODKEY|ControlMask, 			0x5d, 	   spawn, 	   {.v = walR } },  
 
 	/* Управление Ярсотью */
-	{ Mod1Mask|ShiftMask, 		0x5b, 	   spawn,	   {.v = brgup   } },   
-  { Mod1Mask|ShiftMask, 		0x5d, 	   spawn, 	   {.v = brgdown } },
+	{ MODKEY|ShiftMask, 		0x5b, 	   spawn,	   {.v = brgup   } },   
+  { MODKEY|ShiftMask, 		0x5d, 	   spawn, 	   {.v = brgdown } },
 
   /* Управление Громкостью */
-  { Mod1Mask, 			0x5b, 	   spawn,	   {.v = volup   } },   
-  { Mod1Mask, 			0x5d,      spawn,	   {.v = voldown } },  
-  { Mod1Mask, 			0x5c,      spawn,	   {.v = volmute } },
+  { MODKEY, 			0x5b, 	   spawn,	   {.v = volup   } },   
+  { MODKEY, 			0x5d,      spawn,	   {.v = voldown } },  
+  { MODKEY, 			0x5c,      spawn,	   {.v = volmute } },
 	
 
 
@@ -289,7 +289,6 @@ static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
-	//{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },

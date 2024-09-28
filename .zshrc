@@ -1,11 +1,11 @@
 #----- term with -----
-
 #ufetch
 #cowsay "welcome maaru^^"
-#pokeget random  --hide-name 
 #
+small_pokemon=(595 669 742 790 854)
+pokeget $(shuf -e "${small_pokemon[@]}" -n 1) --hide-name
 #
-#
+
 #
 #
 export QT_QPA_PLATFORMTHEME=qt5ct
@@ -35,7 +35,7 @@ plugins=(
     z
     )
 source $ZSH/oh-my-zsh.sh
-
+bindkey -v
 #----- alias -----
 
 
@@ -50,6 +50,7 @@ source $ZSH/oh-my-zsh.sh
  alias vim="nvim"
  alias nzsh="nvim ~/.zshrc"
  alias neofetch="$HOME/.config/neofetch/startFetch.sh"
+ alias neo="$HOME/.config/neofetch/startFetch.sh"
  alias cls="clear"
  alias ex="exit"
  

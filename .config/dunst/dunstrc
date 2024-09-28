@@ -1,8 +1,8 @@
 [global]
-    background  = "#25263d"
+    background  = "#23243a"
 	#background = "#1e1e1e44"
     foreground  = "#C1CDE6"
-    frame_color = "#AE91E4"
+    frame_color = "#809ee0"
     origin      =	 top-center
 	width = 480
     timeout = 2
@@ -12,10 +12,9 @@
 	notification_limit = 5
 	corner_radius = 10
 	icon_position = left
-	icon_theme = Dracula
 	alignment = left
 	enable_recursive_icon_lookup = true
-    gap_size = 10 
+    gap_size = 30 
 	line_height = 10
 	browser = /usr/bin/xdg-open
 	frame_width = 3
