@@ -143,7 +143,7 @@ static const Key keys[] = {
 	{ MODKEY|ControlMask,		       XK_u,            spawn,          SHCMD("kitty -e  /home/maaru/suckless/scripts/update.sh")},
 
 
-	//dwmblocks
+	//signal dwmblocks change keyboard
 	{ ControlMask,     		         0xffe9,          spawn,          SHCMD("pkill -RTMIN+1 dwmblocks")},
 	
 
@@ -233,8 +233,11 @@ static const Key keys[] = {
 	//{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	//{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	//{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-
+  //
+  // setlayout
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
+
+  // togglefloating
 	{ MODKEY,	                      XK_w,      togglefloating, {0} },
 
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
