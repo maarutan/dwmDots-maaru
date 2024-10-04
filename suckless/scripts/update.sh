@@ -11,7 +11,7 @@ COLOR_RESET='\033[0m'
 # Функция для проверки обновлений
 check_updates() {
   # Проверка обновлений pacman
-  pacman_updates=$(pacman -Qu 2>/dev/null | wc -l)
+  pacman_updates=$(checkupdates 2>/dev/null | awk '/ERROR/{exit} {print}' | wc -l)
   echo -e "${COLOR_YELLOW}===> pacman     󰮯   ~~> : ${pacman_updates}${COLOR_RESET}"
 
   # Проверка обновлений yay

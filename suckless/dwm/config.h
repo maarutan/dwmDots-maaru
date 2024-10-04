@@ -13,12 +13,12 @@ static       int smartgaps           = 0;        /* 1 means no outer gap when th
 static const int showbar             = 1;        /* 0 means no bar */
 static const int topbar              = 1;        /* 0 means bottom bar */
 //bar paddings
-static const int vertpad             = 5;       /* vertical padding of bar */
-static const int sidepad             = 27;       /* horizontal padding of bar */
+static const int vertpad             = 0;       /* vertical padding of bar */
+static const int sidepad             = 0;       /* horizontal padding of bar */
 
 //static const char *fonts[]         = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
-static const char *fonts[]           = { "Fira Code:size=20" };
-static const char dmenufont[]        = "Fira Code :size=20" ;
+static const char *fonts[]           = { "Fira Code:size=17" };
+static const char dmenufont[]        = "Fira Code :size=17" ;
 static const char col_gray1[]        = "#222222";
 static const char col_gray2[]        = "#444444";
 static const char col_gray3[]        = "#bbbbbb";
@@ -123,6 +123,11 @@ static const Key keys[] = {
 	//kitty ------------------------
 	{ MODKEY,                      XK_Return, spawn,          {.v = termcmd } },
 	
+  //clock
+	{ MODKEY|ALTKEY,            XK_l,      spawn,          SHCMD("/home/maaru/suckless/scripts/clock.sh") },
+
+
+
 	//killActive ------------------------
 	{ MODKEY,                      XK_q,      killclient,     {0} },
 
