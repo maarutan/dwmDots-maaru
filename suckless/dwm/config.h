@@ -2,12 +2,12 @@
 
 /* appearance */
 static const unsigned int borderpx   = 4;        /* border pixel of windows */
-static const unsigned int snap       = 32;       /* snap pixel */
+static const unsigned int snap       = 0;       /* snap pixel */
 
-static const unsigned int gappih     = 20;       /* horiz inner gap between windows */
-static const unsigned int gappiv     = 20;       /* vert inner gap between windows */
-static const unsigned int gappoh     = 25;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov     = 25;       /* vert outer gap between windows and screen edge */
+static const unsigned int gappiv     = 13;       /* vert inner gap between windows */
+static const unsigned int gappih     = 13;       /* horiz inner gap between windows */
+static const unsigned int gappoh     = 13;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov     = 13;       /* vert outer gap between windows and screen edge */
 
 static       int smartgaps           = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar             = 1;        /* 0 means no bar */
@@ -23,11 +23,12 @@ static const char col_gray1[]        = "#222222";
 static const char col_gray2[]        = "#444444";
 static const char col_gray3[]        = "#bbbbbb";
 static const char col_gray4[]        = "#eeeeee";
-static const char background[]       = "#23243a";
+static const char background[]       = "#1e1e2e";
 static const char col_borderActive[] = "#8aadf4";
 static const char col_noActive[]     = "#868eba";
 static const char background2[]      = "#2f2f49";
-static const char col_borderbar[]    = "#292b40";
+//color barborder
+static const char col_borderbar[]    = "#1e1e2e";
 
 
 static const char *colors[][3]       = {
@@ -37,7 +38,8 @@ static const char *colors[][3]       = {
 };
 
 /* tagging */
-static const char *tags[] = { "󱍢","", "󰈹", "", "" };
+//static const char *tags[] = { "󱍢","", "󰈹", "", "" };
+static const char *tags[] = { "1","2", "3", "4", "5","6","7","8","9" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -124,7 +126,7 @@ static const Key keys[] = {
 	{ MODKEY,                      XK_Return, spawn,          {.v = termcmd } },
 	
   //clock
-	{ MODKEY|ALTKEY,            XK_l,      spawn,          SHCMD("/home/maaru/suckless/scripts/clock.sh") },
+	{ MODKEY|ALTKEY,            XK_c,      spawn,          SHCMD("/home/maaru/suckless/scripts/clock.sh") },
 
 
 
@@ -185,6 +187,29 @@ static const Key keys[] = {
   { MODKEY, 			0x5d,      spawn,	   {.v = voldown } },  
   { MODKEY, 			0x5c,      spawn,	   {.v = volmute } },
 	
+  // move flouting window
+	{ MODKEY,                       XK_j,     moveresize,     {.v = "0x 25y 0w 0h" } },
+	{ MODKEY,                       XK_k,     moveresize,     {.v = "0x -25y 0w 0h" } },
+	{ MODKEY,                       XK_l,     moveresize,     {.v = "25x 0y 0w 0h" } },
+	{ MODKEY,                       XK_h,     moveresize,     {.v = "-25x 0y 0w 0h" } },
+ 
+  //resize flouting widnow
+	{ MODKEY|ShiftMask|ALTKEY,             XK_j,     moveresize,     {.v = "0x 0y 0w 25h" } },
+	{ MODKEY|ShiftMask|ALTKEY,             XK_k,     moveresize,     {.v = "0x 0y 0w -25h" } },
+	{ MODKEY|ShiftMask|ALTKEY,             XK_l,     moveresize,     {.v = "0x 0y 25w 0h" } },
+	{ MODKEY|ShiftMask|ALTKEY,             XK_h,     moveresize,     {.v = "0x 0y -25w 0h" } },
+
+  // move flouting window ALTKEY
+	{ MODKEY|ControlMask,           XK_k,   moveresizeedge, {.v = "t"} },
+	{ MODKEY|ControlMask,           XK_j,   moveresizeedge, {.v = "b"} },
+	{ MODKEY|ControlMask,           XK_h,   moveresizeedge, {.v = "l"} },
+	{ MODKEY|ControlMask,           XK_l,   moveresizeedge, {.v = "r"} },
+ 
+  //move flouting wondow
+	{ MODKEY|ControlMask|ShiftMask, XK_k,   moveresizeedge, {.v = "T"} },
+	{ MODKEY|ControlMask|ShiftMask, XK_j,   moveresizeedge, {.v = "B"} },
+	{ MODKEY|ControlMask|ShiftMask, XK_h,   moveresizeedge, {.v = "L"} },
+	{ MODKEY|ControlMask|ShiftMask, XK_l,   moveresizeedge, {.v = "R"} },
 
 
 	//toggleBar ------------------------

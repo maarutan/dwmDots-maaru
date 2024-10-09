@@ -2,8 +2,8 @@
 echo "Настройка курсора..."
 xsettingsd &
 
-echo "Запуск композитора..."
-picom &
+#echo "Запуск композитора..."
+#picom &
 
 echo "Запуск свайпов для таспада"
 pkill -f libinput-gestures
@@ -23,8 +23,8 @@ else
   echo "Файл ~/.current_wallpaper не найден."
 fi
 
-echo "mechvibes"
-$HOME/suckless/scripts/keyvolume.sh
+#echo "mechvibes"
+#$HOME/suckless/scripts/keyvolume.sh
 
 echo "Запуск строки состояния..."
 dwmblocks &
