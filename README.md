@@ -34,6 +34,10 @@ welcome this is my dotfile form dwm
 10. [Tiledmove](https://dwm.suckless.org/patches/tiledmove/)<br/>Patch to make the function movemouse not force clients to float.
     Tiled clients when moved will swap with other tiled clients that overlap with the cursor, and snap to other monitors.
     <br/><br/>
+11. [resizemove](https://dwm.suckless.org/patches/moveresize/)<br/>
+    This changes allows you to move and resize dwm's clients using keyboard bindings.
+    (move flouting winodw and resize)
+    <br/><br/>
 
 # ScreenShots
 
@@ -65,7 +69,7 @@ also a dunst script for brightness control<br/>
 
 # Picom Simple Animation
 
-[AUR -  picom-simpleanims-git  ](https://aur.archlinux.org/packages/picom-simpleanims-git)
+[AUR - picom-simpleanims-git ](https://aur.archlinux.org/packages/picom-simpleanims-git)
 <br/>
 this picom have a best animations
 
@@ -108,6 +112,11 @@ this picom have a best animations
 `super + shift + k` - focusstack -1 (down)<br/>
 `super + shift + h` - resizeWin + (up)<br/>
 `super + shift + l` - resizeWin - (down)<br/>
+
+`super + shift + j` - moveresize (up)<br/>
+`super + shift + k` - moveresize (down)<br/>
+`super + shift + h` - moveresize (up)<br/>
+`super + shift + l` - moveresize (down)<br/>
 
 `super + ctrl + j` - movestack +1 (up)<br/>
 `super + ctrl + k` - movestack -1 (down)<br/>
