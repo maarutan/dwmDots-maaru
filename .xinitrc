@@ -1,3 +1,1 @@
- exec $HOME/suckless/autostart/startdwm.sh
-
-
+/home/maaru/.xinitrc
