@@ -5,16 +5,39 @@ INTERVAL=1
 
 # Файл для хранения последнего уровня заряда
 STATUS_FILE="/tmp/battery_status.txt"
+PREVIOUS_CAPACITY_FILE="/tmp/previous_capacity.txt"
 
-# Инициализация файла, если он не существует
+# Инициализация файлов, если они не существуют
 if [ ! -f "$STATUS_FILE" ]; then
   echo "init" >"$STATUS_FILE"
 fi
 
+if [ ! -f "$PREVIOUS_CAPACITY_FILE" ]; then
+  echo 100 >"$PREVIOUS_CAPACITY_FILE" # Инициализация значением, чтобы уведомления не срабатывали сразу
+fi
+
+# Функция для получения иконки батареи
+get_battery_icon() {
+  case $1 in
+  100) echo "󰁹" ;; # Полная батарея
+  90) echo "󰂂" ;;  # Батарея 90%
+  80) echo "󰂁" ;;  # Батарея 80%
+  70) echo "󰂀" ;;  # Батарея 70%
+  60) echo "󰁿" ;;  # Батарея 60%
+  50) echo "󰁾" ;;  # Батарея 50%
+  40) echo "󰁽" ;;  # Батарея 40%
+  30) echo "󰁼" ;;  # Батарея 30%
+  20) echo "󰁺" ;;  # Батарея 20%
+  *) echo "󰂎" ;;   # Очень низкий заряд
+  esac
+}
+
 # Функция для получения заряда батареи и отображения соответствующей иконки
 get_battery_status() {
   # Проверка наличия информации о батарее
-  if [ ! -d /sys/class/power_supply/BAT1 ]; then
+  if [ ! -d /sys/class/power_supply/BAT1 ] ||
+    [ ! -f /sys/class/power_supply/BAT1/capacity ] ||
+    [ ! -f /sys/class/power_supply/BAT1/status ]; then
     echo "Батарея не найдена" >$HOME/suckless/scripts/dwmbScripts/.carrentsBattery
     return
   fi
@@ -23,51 +46,56 @@ get_battery_status() {
   capacity=$(cat /sys/class/power_supply/BAT1/capacity)
   status=$(cat /sys/class/power_supply/BAT1/status)
 
-  # Логика для состояния заряда
+  # Получаем иконку батареи
   if [ "$status" = "Charging" ]; then
     if [ "$capacity" -eq 100 ]; then
-      icon="󰂅" # Иконка для батареи, которая полностью зарядилась, но продолжает заряжаться
+      icon="󰂅" # Полностью заряженная батарея
     else
       icon="" # Иконка зарядки
     fi
-  elif [ "$status" = "Full" ]; then
-    icon="󰁹" # Иконка для полной батареи
   else
-    # Логика для разрядки батареи
-    if [ "$capacity" -ge 100 ]; then
-      icon="󰁹" # Иконка для полной батареи
-    elif [ "$capacity" -ge 90 ]; then
-      icon="󰂂" # Батарея 90%
-    elif [ "$capacity" -ge 80 ]; then
-      icon="󰂁" # Батарея 80%
-    elif [ "$capacity" -ge 70 ]; then
-      icon="󰂀" # Батарея 70%
-    elif [ "$capacity" -ge 60 ]; then
-      icon="󰁿" # Батарея 60%
-    elif [ "$capacity" -ge 50 ]; then
-      icon="󰁾" # Батарея 50%
-    elif [ "$capacity" -ge 40 ]; then
-      icon="󰁽" # Батарея 40%
-    elif [ "$capacity" -ge 30 ]; then
-      icon="󰁼" # Батарея 30%
-    elif [ "$capacity" -ge 20 ]; then
-      icon="󰁺" # Батарея 20%
-    else
-      icon="󰂎" # Очень низкий заряд
-    fi
+    icon=$(get_battery_icon "$capacity")
   fi
 
   # Записываем уровень заряда с иконкой в файл
   echo "$icon $capacity%" >$HOME/suckless/scripts/dwmbScripts/.carrentsBattery
 
-  # Чтение последнего статуса и отправка уведомления при изменении
+  # Чтение предыдущего уровня заряда и последнего статуса
+  previous_capacity=$(cat "$PREVIOUS_CAPACITY_FILE")
   last_status=$(cat "$STATUS_FILE")
-  if [ "$capacity" -lt 10 ] && [ "$last_status" != "low" ]; then
-    notify-send "Батарея" "Очень низкий заряд батареи: $capacity%" -u critical
-    echo "low" >"$STATUS_FILE"
-  elif [ "$capacity" -ge 30 ] && [ "$last_status" = "low" ]; then
+
+  # Логика уведомлений
+  if [ "$capacity" -le 5 ]; then
+    if [ "$last_status" != "critical" ]; then
+      notify-send "Батарея" "Критически низкий заряд: $capacity%" -u critical
+      echo "critical" >"$STATUS_FILE"
+    fi
+
+  elif [ "$capacity" -lt 30 ]; then
+    if [ "$last_status" != "low" ]; then
+      notify-send "Батарея" "Предупреждение: заряд всего $capacity%" -u normal
+      echo "low" >"$STATUS_FILE"
+    fi
+
+  elif [ "$capacity" -ge 50 ]; then
+    # Проверка, работает ли picom
+    if pgrep picom >/dev/null; then
+      pkill picom
+      notify-send "Батарея" "Picom отключен. Уровень заряда: $capacity%" -u normal
+    fi
     echo "normal" >"$STATUS_FILE"
   fi
+
+  # Уведомление при достаточном заряде (80% и выше, если идет зарядка)
+  if [ "$capacity" -ge 80 ] && [ "$status" = "Charging" ]; then
+    if [ "$last_status" != "sufficient" ]; then
+      notify-send "Батарея" "Заряд достаточный: $capacity%" -u normal
+      echo "sufficient" >"$STATUS_FILE"
+    fi
+  fi
+
+  # Обновляем предыдущий уровень заряда
+  echo "$capacity" >"$PREVIOUS_CAPACITY_FILE"
 }
 
 # Основной цикл для обновления информации каждые $INTERVAL секунд

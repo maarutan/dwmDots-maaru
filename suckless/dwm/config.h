@@ -151,7 +151,7 @@ static const Key keys[] = {
 
 
 	//signal dwmblocks change keyboard
-	{ ControlMask,     		         0xffe9,          spawn,          SHCMD("pkill -RTMIN+1 dwmblocks")},
+	{ ControlMask,     		         0xffe9,          spawn,          SHCMD("pkill -RTMIN+1 dwmblocks && /home/maaru/suckless/scripts/changeKeyboard.sh")},
 	
 
 	//rofi
