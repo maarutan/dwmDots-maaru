@@ -1,35 +1,37 @@
 #!/bin/bash
-echo "Настройка курсора..."
+
+# Настройка курсора с помощью xsettingsd
 xsettingsd &
 
-#echo "Запуск композитора..."
-#picom &
+# Запуск композитора для управления окнами
+picom &
 
-echo "Запуск свайпов для таспада"
+# Остановка предыдущих процессов libinput-gestures и их перезапуск
 pkill -f libinput-gestures
 libinput-gestures-setup start &
 
-echo "Настройка раскладки клавиатуры..."
+# Настройка раскладки клавиатуры: переключение между us и ru при помощи Ctrl + Alt
 setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
 
-echo "Запуск уведомлений..."
+# Запуск менеджера уведомлений dunst
 dunst &
 
+# Небольшая пауза перед установкой фонового изображения
 sleep 0.5
-echo "Установка фонового изображения..."
+
+# Установка фонового изображения из файла ~/.current_wallpaper, если он существует
 if [ -f ~/.current_wallpaper ]; then
   feh --bg-scale "$(head -n 1 ~/.current_wallpaper)"
 else
+  # Если файл не найден, сообщаем об этом
   echo "Файл ~/.current_wallpaper не найден."
 fi
 
-#echo "mechvibes"
-#$HOME/suckless/scripts/keyvolume.sh
-
-echo "Запуск строки состояния..."
+# Запуск строки состояния dwmblocks и пользовательских скриптов
 dwmblocks &
 $HOME/suckless/scripts/dwmbScripts/blocks.sh &
 
+# Запуск оконного менеджера dwm в бесконечном цикле с перенаправлением ошибок в лог-файл
 while true; do
   dwm 2>~/.dwm.log
 done
