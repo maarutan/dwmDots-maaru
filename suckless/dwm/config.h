@@ -140,7 +140,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,            XK_v,      spawn,          SHCMD("vesktop") },
 
 	//vscode
-	{ MODKEY,                      XK_c,      spawn,          {.v = codeEditor } },
+	{ MODKEY|ShiftMask,                      XK_c,      spawn,          {.v = codeEditor } },
 	
 	//toggleBar ------------------------
 	{ MODKEY|ShiftMask,            XK_t,      spawn,          SHCMD("telegram-desktop") },

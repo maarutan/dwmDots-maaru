@@ -82,7 +82,7 @@ this picom have a best animations
 `super + shift + f` - firefox<br/>
 `super + shift + v` - vencord<br/>
 `super + shift + t` - telegram<br/>
-`super + c` - code <br/>
+`super + shift+ c` - code <br/>
 
 `super + ctrl + u` - updatesystem<br/>
 `caps + alt` - change keyboard<br/>
