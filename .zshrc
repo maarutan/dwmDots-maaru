@@ -59,7 +59,7 @@ bindkey -v
  alias cls="clear"
  alias ex="exit"
  alias clock="peaclock"
- 
+ alias pushDots=" $HOME/.dwmSync-maaru/pushDots.sh"
 
 
 #----- function -----

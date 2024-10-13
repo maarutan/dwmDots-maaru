@@ -153,3 +153,11 @@ $ cd dwmDots-maaru
 #There is no script in development yet
 #installing...
 ```
+
+# dwmSync-maaru
+
+<p>
+this repository works with symbols for synchronizing dot files
+</p>
+
+[dwmSync-maaru](htts:/github.com/maarutan/dwmSync-maaru.git)
