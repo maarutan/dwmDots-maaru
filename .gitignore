@@ -1,4 +1,7 @@
+# Игнорировать логи скриптов
 suckless/scripts/dwmbScripts/update_log.txt
 suckless/scripts/dwmbScripts/.debug.log
+
+# Игнорировать директорию OBS-видео
 Videos/OBS-videos/
 
