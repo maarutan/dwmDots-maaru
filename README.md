@@ -160,4 +160,4 @@ $ cd dwmDots-maaru
 this repository works with symbols for synchronizing dot files
 </p>
 
-[dwmSync-maaru](https:/github.com/maarutan/dwmSync-maaru.git)
+[dwmSync-maaru](https://github.com/maarutan/dwmSync-maaru)
