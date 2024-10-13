@@ -1,1 +1,2 @@
-/home/maaru/.xsession
+#!/bin/sh
+exec $HOME/suckless/autostart/startdwm.sh
