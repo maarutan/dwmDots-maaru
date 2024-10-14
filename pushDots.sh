@@ -70,7 +70,16 @@ if [ $? -ne 0 ]; then
     echo "Ошибка при добавлении файлов в Git"
     exit 1
 fi
-
+ 
+# ASCII арт
+ascii_art=$(cat << 'EOF'
+                    _ _   
+ __ ___ _ __  _ __ (_) |_ 
+/ _/ _ \ '  \| '  \| |  _|
+\__\___/_|_|_|_|_|_|_|\__|
+ 
+EOF
+)
 echo "Введите сообщение для коммита (по умолчанию: 'add'):"
 read -t 10 COMMIT_MSG
 COMMIT_MSG=${COMMIT_MSG:-add}
@@ -79,6 +88,16 @@ if [ $? -ne 0 ]; then
     echo "Ошибка при создании коммита"
     exit 1
 fi
+
+
+ascii_art=$(cat << 'EOF'
+              _    
+ _ __ _  _ __| |_  
+| '_ \ || (_-< ' \ 
+| .__/\_,_/__/_||_|
+|_|           
+EOF
+)
 
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then

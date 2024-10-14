@@ -314,7 +314,7 @@ static const Key keys[] = {
 	{ MODKEY|ALTKEY,                XK_6,                  setlayout,      {.v = &layouts[8]} },  //nrowgrid
 	{ MODKEY|ALTKEY,                XK_7,                  setlayout,      {.v = &layouts[7]} },  //grid
 	{ MODKEY|ALTKEY,                XK_8,                  setlayout,      {.v = &layouts[10]} }, //gaplessgrid
-	{ MODKEY|ALTKEY,                XK_9,                  setlayout,      {.v = &layouts[6]} },  //bstackhoriz
+	{ MODKEY|ALTKEY,                XK_9,                  setlayout,      {.v = &layouts[2]} },  //monocle
 	{ MODKEY|ALTKEY,                XK_0,                  setlayout,      {.v = &layouts[4]} },  //desk 
 
 };

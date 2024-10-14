@@ -58,6 +58,7 @@ bindkey -v
  alias neo="$HOME/.config/neofetch/startFetch.sh"
  alias cls="clear"
  alias ex="exit"
+ alias нфяш="yazi"
  alias clock="peaclock"
  alias pushDots=" $HOME/.dwmSync-maaru/pushDots.sh"
 
