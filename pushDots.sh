@@ -21,8 +21,16 @@ rainbow_text() {
     echo -e "$colored_text"
 }
 
-# ASCII арт
-ascii_art=$(cat << 'EOF'
+# Функция для вывода ASCII-арта с радужным текстом
+display_ascii_art() {
+    local ascii_art="$1"
+    while IFS= read -r line; do
+        rainbow_text "$line"
+    done <<< "$ascii_art"
+}
+
+# ASCII арт 1
+ascii_art_1=$(cat << 'EOF'
   ___ _ _      ___ _          _           
  / __(_) |_   / __| |___ _ _ (_)_ _  __ _ 
 | (_ | |  _| | (__| / _ \ ' \| | ' \/ _` |
@@ -31,10 +39,27 @@ ascii_art=$(cat << 'EOF'
 EOF
 )
 
+# ASCII арт 2
+ascii_art_2=$(cat << 'EOF'
+                    _ _   
+ __ ___ _ __  _ __ (_) |_ 
+/ _/ _ \ '  \| '  \| |  _|
+\__\___/_|_|_|_|_|_|_|\__|
+EOF
+)
+
+# ASCII арт 3
+ascii_art_3=$(cat << 'EOF'
+              _    
+ _ __ _  _ __| |_  
+| '_ \ || (_-< ' \ 
+| .__/\_,_/__/_||_|
+|_|           
+EOF
+)
+
 # Шаг 1: Вывод радужного ASCII-арта
-while IFS= read -r line; do
-    rainbow_text "$line"
-done <<< "$ascii_art"
+display_ascii_art "$ascii_art_1"
 
 # Шаг 2: Объявление переменных
 REPO_SSH="git@github.com:maarutan/dwmDots-maaru.git"  # Ссылка на репозиторий
@@ -70,16 +95,10 @@ if [ $? -ne 0 ]; then
     echo "Ошибка при добавлении файлов в Git"
     exit 1
 fi
- 
-# ASCII арт
-ascii_art=$(cat << 'EOF'
-                    _ _   
- __ ___ _ __  _ __ (_) |_ 
-/ _/ _ \ '  \| '  \| |  _|
-\__\___/_|_|_|_|_|_|_|\__|
- 
-EOF
-)
+
+# Вывод второго ASCII-арта
+display_ascii_art "$ascii_art_2"
+
 echo "Введите сообщение для коммита (по умолчанию: 'add'):"
 read -t 10 COMMIT_MSG
 COMMIT_MSG=${COMMIT_MSG:-add}
@@ -89,15 +108,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-
-ascii_art=$(cat << 'EOF'
-              _    
- _ __ _  _ __| |_  
-| '_ \ || (_-< ' \ 
-| .__/\_,_/__/_||_|
-|_|           
-EOF
-)
+# Вывод третьего ASCII-арта
+display_ascii_art "$ascii_art_3"
 
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then
