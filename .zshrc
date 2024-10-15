@@ -6,12 +6,10 @@ echo "       /)＿/)☆
 "
 #ufetch
 #cowsay "welcome maaru^^"
+tabs 4
 #
 #small_pokemon=(595 669 742 790 854)
 #pokeget $(shuf -e "${small_pokemon[@]}" -n 1) --hide-name
-#
-
-#
 #
 export QT_QPA_PLATFORMTHEME=qt5ct
 export NVM_DIR="$HOME/.nvm"
@@ -50,6 +48,7 @@ bindkey -v
  alias df="duf"
  #alias find="fd"
  alias g="z"
+ alias 󱞩=""
  alias matrix="unimatrix -b -s 95  -c blue"
  alias teri="yetris"
  alias vim="nvim"
@@ -60,6 +59,7 @@ bindkey -v
  alias ex="exit"
  alias нфяш="yazi"
  alias clock="peaclock"
+ alias pingG="ping google.com"
  alias pushDots=" $HOME/.dwmSync-maaru/pushDots.sh"
 
 
