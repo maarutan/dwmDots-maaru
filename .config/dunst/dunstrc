@@ -1,5 +1,6 @@
 [global]
     background  = "#23243a"
+    highlight = "#82a1e3"
 	#background = "#1e1e1e44"
     foreground  = "#C1CDE6"
     frame_color = "#809ee0"
@@ -19,8 +20,16 @@
 	browser = /usr/bin/xdg-open
 	frame_width = 3
 	transparency = 20
-	
-    [ignore_flameshot_warning]
+
+    progress_bar_height = 25  
+    progress_bar_min_width = 150  
+#   progress_bar_max_width = 300  
+    progress_bar_horizontal_alignment = center  
+    progress_bar_frame_width = 4  
+    progress_bar_corner_radius = 10  
+    progress_bar_corners = all  
+
+[ignore_flameshot_warning]
         body = "grim's screenshot component is implemented based on wlroots, it may not be used in GNOME or similar desktop environments"
          format = ""
 

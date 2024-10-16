@@ -27,7 +27,8 @@ function send_notification {
     fi
 
     # Отправка уведомления
-    $DIR/notify-send.sh "$volume%" -i "$icon_name" -t 2000 -h int:value:"$volume" --replace=555
+    #$DIR/notify-send.sh "$volume%" -i "$icon_name" -t 2000 -h int:value:"$volume" --replace=555
+    $DIR/notify-send.sh "  [-=-=-=-=- $volume% -=-=-=-=-=-]" -i "$icon_name" -t 2000 -h int:value:"$volume" --replace=555
 }
 
 function adjust_volume {
@@ -59,7 +60,7 @@ case $1 in
         pactl set-sink-mute @DEFAULT_SINK@ toggle
         if is_mute; then
             DIR=$(dirname "$0")
-            $DIR/notify-send.sh -i "/usr/share/icons/Faba/48x48/notifications/notification-audio-volume-muted.svg" --replace=555 -u normal "Mute" -t 2000
+            $DIR/notify-send.sh -i "/usr/share/icons/Faba/48x48/notifications/notification-audio-volume-muted.svg" --replace=555 -u normal "  [-=-=-=-=- Mute =-=-=-=-=-]" -t 2000
         else
             send_notification
         fi

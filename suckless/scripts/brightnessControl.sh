@@ -25,7 +25,7 @@ send_notification() {
     [ -z "$brightness" ] && brightness=0
 
     # Отправляем уведомление
-    "$DIR/notify-send.sh" -i "$icon_name" -t 2000 -h int:value:"$brightness" --replace=555 "$brightness%"
+    "$DIR/notify-send.sh" -i "$icon_name" -t 2000 -h int:value:"$brightness" --replace=555 "  [-=-=-=-=- $brightness% -=-=-=-=-=-]"
 }
 
 # Основной блок обработки аргументов
