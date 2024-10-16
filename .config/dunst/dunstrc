@@ -21,13 +21,13 @@
 	frame_width = 3
 	transparency = 20
 
-    progress_bar_height = 25  
-    progress_bar_min_width = 150  
-#   progress_bar_max_width = 300  
-    progress_bar_horizontal_alignment = center  
-    progress_bar_frame_width = 4  
-    progress_bar_corner_radius = 10  
-    progress_bar_corners = all  
+    progress_bar_height = 25
+    progress_bar_min_width = 150
+#   progress_bar_max_width = 300
+    progress_bar_horizontal_alignment = center
+    progress_bar_frame_width = 4
+    progress_bar_corner_radius = 10
+    progress_bar_corners = all
 
 [ignore_flameshot_warning]
         body = "grim's screenshot component is implemented based on wlroots, it may not be used in GNOME or similar desktop environments"

@@ -41,13 +41,17 @@ welcome this is my dotfile form dwm
 
 # ScreenShots
 
-![rice](./Images/screenshots/dwm1.png)
+![rice](./Images/screenshots/rice/dwm1.png)
 
-![rice](./Images/screenshots/Mydwm.png)
+![rice](./Images/screenshots/rice/dwm2.png)
+
+![rice](./Images/screenshots/rice/dwm3.png)
+
+![rice](./Images/screenshots/rice/dwm4.png)
 
 # dunst volume control
 
-![rice](./Images/screenshots/dunst.png)
+![rice](./Images/screenshots/rice/dunst.png)
 
 <p>
 I wrote a script that runs volume control in dunst <br/>
@@ -58,7 +62,7 @@ I wrote a script that runs volume control in dunst <br/>
 
 # dunst brightness control
 
-![rice](./Images/screenshots/dunst2.png)
+![rice](./Images/screenshots/rice/dunst2.png)
 
 <p>
 also a dunst script for brightness control<br/>
