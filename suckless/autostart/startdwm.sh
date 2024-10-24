@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# настройка  qt5
+export QT_QPA_PLATFORMTHEME=qt5ct
+
 # Настройка курсора с помощью xsettingsd
 xsettingsd &
 

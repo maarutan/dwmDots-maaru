@@ -77,4 +77,3 @@ function yazi() {
 
     rm -f -- "$tmp"
 }
-

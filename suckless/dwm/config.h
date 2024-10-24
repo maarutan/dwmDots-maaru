@@ -17,7 +17,7 @@ static const int vertpad             = 0;       /* vertical padding of bar */
 static const int sidepad             = 0;       /* horizontal padding of bar */
 
 //static const char *fonts[]         = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
-static const char *fonts[]           = { "Fira Code:size=15" };
+static const char *fonts[]           = { "FiraCode Nerd Font:size=15" };
 static const char dmenufont[]        = "Fira Code :size=15" ;
 static const char col_gray1[]        = "#222222";
 static const char col_gray2[]        = "#444444";

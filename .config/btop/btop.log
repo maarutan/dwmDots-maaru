@@ -1,0 +1,17 @@
+
+2024/10/21 (15:22:17) | ===> btop++ v.1.4.0
+2024/10/21 (15:22:17) | WARNING: NVML: Failed to get maximum GPU power draw, defaulting to 225W: Not Supported
+
+2024/10/22 (00:16:14) | ===> btop++ v.1.4.0
+2024/10/22 (00:16:14) | WARNING: NVML: Failed to get maximum GPU power draw, defaulting to 225W: Not Supported
+
+2024/10/24 (15:52:45) | ===> btop++ v.1.4.0
+2024/10/24 (15:52:45) | WARNING: NVML: Failed to get maximum GPU power draw, defaulting to 225W: Not Supported
+2024/10/24 (15:53:33) | ERROR: Exception during Config::unlock() : unordered_map::at
+
+2024/10/24 (15:53:35) | ===> btop++ v.1.4.0
+2024/10/24 (15:53:35) | WARNING: NVML: Failed to get maximum GPU power draw, defaulting to 225W: Not Supported
+2024/10/24 (15:53:39) | ERROR: Exception during Config::unlock() : unordered_map::at
+
+2024/10/24 (15:53:42) | ===> btop++ v.1.4.0
+2024/10/24 (15:53:42) | WARNING: NVML: Failed to get maximum GPU power draw, defaulting to 225W: Not Supported
