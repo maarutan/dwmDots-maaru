@@ -76,8 +76,8 @@ while true; do
   $HOME/.config/neofetch/startFetch.sh
 
   figlet -f mini "' -->  bye  <-- '"
-  echo "' -->  bye  <-- '"
-  echo "' -->  maaru ^^  <-- '"
+  figlet -f mini "' -->  bye  <-- '"
+  figlet -f mini "' -->  maaru ^^  <-- '"
 
   sleep 5
   break
