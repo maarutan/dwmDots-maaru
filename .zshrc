@@ -46,9 +46,28 @@ bindkey -v
  alias ls='exa --icons --color'
  alias la='exa -a --icons --color'
  alias df="duf"
+ #pacman 
+ alias paman="pacman"
+ alias pacamn="pacman"
+ alias pacaman="pacman"
+ alias pacmn="pacman"
+ alias paman="pacman"
+ alias pamcn="pacman"
+ alias pacan="pacman"
+
+# yay
+ alias aya="yay"
+ alias ayy="yay"
+ alias yaa="yay"
+ alias yayy="yay"
+ alias yyay="yay"
+ alias ya="yay"
+ alias ay="yay"
+
+ # new order
+ alias 󱞩=""
  #alias find="fd"
  alias g="z"
- alias 󱞩=""
  alias matrix="unimatrix -b -s 95  -c blue"
  alias teri="yetris"
  alias vim="nvim"
@@ -61,6 +80,7 @@ bindkey -v
  alias clock="peaclock"
  alias pingG="ping google.com"
  alias pushDots=" $HOME/.dwmSync-maaru/pushDots.sh"
+ alias n="python"
 
 
 #----- function -----
