@@ -74,6 +74,7 @@ bindkey -v
  alias nzsh="nvim ~/.zshrc"
  alias neofetch="$HOME/.config/neofetch/startFetch.sh"
  alias neo="$HOME/.config/neofetch/startFetch.sh"
+ alias fetch="$HOME/suckless/scripts/fetch.sh"
  alias cls="clear"
  alias ex="exit"
  alias нфяш="yazi"
