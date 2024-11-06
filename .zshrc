@@ -82,6 +82,7 @@ bindkey -v
  alias pingG="ping google.com"
  alias pushDots=" $HOME/.dwmSync-maaru/pushDots.sh"
  alias n="python"
+ alias maaruKey="screenkey --bg-color "#1e1e2e" --font-color "#7da5e4" -f "Sans 15" --position fixed --geometry 800x80-80-20"
 
 
 #----- function -----

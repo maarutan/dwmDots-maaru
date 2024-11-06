@@ -7,19 +7,18 @@
  * Rofi Version: 1.7.3
  **/
 
-/*****----- Configuration -----*****/
 configuration {
-	modi:                       "drun,run,filebrowser,ssh,window";
+    modi:                       "drun,run,filebrowser,ssh,window";
     show-icons:                 false;
-    display-drun:               " Apps";
-    display-run:                " Run";
-    display-filebrowser:        " Files";
-    display-window:             " Windows";
-	display-ssh:                " SSH";
-	drun-display-format:        "{name}";
-	window-format:              "{w} · {c} · {t}";
-}
+    display-drun:               "  Apps";
+    display-run:                "  Run";
+    display-filebrowser:        "  Files";
+    display-window:             "  Windows";
+    display-ssh:                "  SSH";
+    drun-display-format:        "{name}";
+    window-format:              "{w} · {c} · {t}";
 
+    }
 /*****----- Global Properties -----*****/
 @import                          "shared/colors.rasi"
 @import                          "shared/fonts.rasi"
@@ -126,7 +125,7 @@ textbox-prompt-colon {
     enabled:                     true;
     padding:                     5px 0px;
     expand:                      false;
-    str:                         "";
+    str:                         "~~>";
     background-color:            inherit;
     text-color:                  inherit;
 }
@@ -136,7 +135,7 @@ entry {
     background-color:            inherit;
     text-color:                  inherit;
     cursor:                      text;
-    placeholder:                 "Search...";
+    placeholder:                 "...";
     placeholder-color:           inherit;
 }
 num-filtered-rows {
@@ -324,3 +323,5 @@ error-message {
     background-color:            @background-colour;
     text-color:                  @foreground-colour;
 }
+
+

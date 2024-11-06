@@ -28,6 +28,7 @@
   /* color of status indicators and window controls */
   --online-indicator: #a6e3a1;
   /* change to #23a55a for default green */
+
   --dnd-indicator: #f38ba8;
   /* change to #f23f43 for default red */
   --idle-indicator: #f9e2af;

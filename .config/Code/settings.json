@@ -1,0 +1,359 @@
+{
+	// main editor  settings
+	"editor.suggestSelection": "first",
+	"editor.detectIndentation": true,
+	"editor.minimap.enabled": false,
+	"editor.smoothScrolling": true,
+	"editor.folding": true,
+	"window.menuBarVisibility": "toggle",
+	"window.openFilesInNewWindow": "off",
+	"window.commandCenter": false,
+	"workbench.layoutControl.enabled": false,
+	// icon and theme
+	"workbench.iconTheme": "vscode-icons",
+	"workbench.colorTheme": "Catppuccin Mocha",
+	//будет ли редактор крутить ниже строки
+	"editor.scrollBeyondLastLine": true,
+	//мульни курсор
+	"editor.multiCursorModifier": "ctrlCmd",
+	// тэги
+	"editor.linkedEditing": true,
+	//быстрые подсказки
+	"editor.quickSuggestionsDelay": 0,
+	//scrollbar
+	"editor.scrollbar.vertical": "hidden",
+	"editor.scrollbar.horizontal": "hidden",
+	//minimal tab
+	"window.density.editorTabHeight": "compact",
+	//cursor
+	"editor.cursorBlinking": "expand",
+	"editor.cursorStyle": "line",
+	"editor.cursorSmoothCaretAnimation": "on",
+	"editor.hideCursorInOverviewRuler": true,
+	//font
+	"editor.fontLigatures": true,
+	"editor.inlayHints.fontFamily": "JetBrains mono",
+	"editor.fontFamily": "JetBrains mono",
+	"editor.letterSpacing": 0.7,
+	"editor.tokenColorCustomizations": {
+		"textMateRules": [
+			{
+				"scope": [
+					"comment",
+					"entity.name.type.class",
+					"keyword",
+					"constant",
+					"storage.modifier",
+					"storage.type.class.js"
+				],
+				"settings": {
+					"fontStyle": "italic"
+				}
+			},
+			{
+				"scope": [
+					"invalid",
+					"keyword.operator",
+					"constant.numeric.css",
+					"keyword.other.unit.px.css",
+					"constant.numeric.decimal.js",
+					"constant.numeric.json"
+				],
+				"settings": {
+					"fontStyle": ""
+				}
+			}
+		]
+	},
+
+	// terminal
+	"terminal.integrated.fontFamily": "FiraCode Nerd Font",
+	"terminal.integrated.fontSize": 11,
+	"terminal.integrated.tabs.enabled": false,
+
+	//tree
+	"explorer.confirmDelete": false,
+	"explorer.compactFolders": false,
+	"explorer.confirmDragAndDrop": false,
+
+	// уменьшить размер вкладок когда нет места
+	"workbench.editor.tabSizing": "shrink",
+	"workbench.startupEditor": "newUntitledFile",
+	//formatter
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"prettier.singleQuote": true,
+	"prettier.jsxSingleQuote": true,
+	//круглые скобки вокруг стрелочной фунции
+	"prettier.arrowParens": "avoid",
+	"editor.inlineSuggest.enabled": true,
+	// Настройки для Breadcrumbs
+	"breadcrumbs.enabled": false,
+	"breadcrumbs.icons": false,
+	"breadcrumbs.showKeys": false,
+	"breadcrumbs.showFiles": false,
+	"breadcrumbs.symbolPath": "off",
+	"breadcrumbs.showArrays": false,
+	"breadcrumbs.showEvents": false,
+	"breadcrumbs.showFields": false,
+	"breadcrumbs.showClasses": false,
+	"breadcrumbs.showMethods": false,
+	"breadcrumbs.showBooleans": false,
+	"breadcrumbs.showFunctions": false,
+	"breadcrumbs.showEnumMembers": false,
+	"breadcrumbs.showConstructors": false,
+	// Настройки для JS и TS
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"typescript.preferences.quoteStyle": "single",
+	"javascript.preferences.quoteStyle": "single",
+	"javascript.format.semicolons": "remove",
+	"typescript.format.semicolons": "remove",
+	"js/ts.implicitProjectConfig.experimentalDecorators": true,
+
+	"git.enableSmartCommit": true,
+	"fiveServer.browser": ["stable-google-chrome"],
+	"open-in-browser.default": "stable-google-chrome",
+	//neovim
+	// "extensions.experimental.affinity": {
+	// "asvetliakov.vscode-neovim": 1
+	// },
+	"vscode-neovim.neovimInitVimPaths.linux": "/home/maaru/suckless/nvim/init.lua",
+	"vscode-neovim.afterInitConfig": [
+		"set clipboard=unnamedplus",
+		"set relativenumber",
+		"set wrap = false"
+	],
+	"vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+	"vscode-neovim.compositeKeys": {
+		"jk": {
+			// Use lua to execute any logic
+			"command": "vscode-neovim.lua",
+			"args": [
+				[
+					"local code = require('vscode')",
+					"code.action('vscode-neovim.escape')"
+					// "code.action('workbench.action.files.save')"
+				]
+			]
+		},
+		"jj": {
+			// Use lua to execute any logic
+			"command": "vscode-neovim.lua",
+			"args": [
+				[
+					"local code = require('vscode')",
+					"code.action('vscode-neovim.escape')"
+					// "code.action('workbench.action.files.save')"
+				]
+			]
+		}
+	},
+
+	"prettier.useTabs": true,
+	"prettier.tabWidth": 4,
+	//линия таба
+	"indentRainbow.indicatorStyle": "light",
+	"indentRainbow.colorOnWhiteSpaceOnly": true,
+	"indentRainbow.lightIndicatorStyleLineWidth": 1.4,
+	"indentRainbow.errorColor": "rgba(128,32,32,1)",
+	"indentRainbow.tabmixColor": "rgba(128,32,96,1)",
+	"indentRainbow.colors": [
+		"rgba(255,255,64,1)",
+		"rgba(127,255,127,1)",
+		"rgba(255,127,255,1)",
+		"rgba(79,236,236,1)"
+	],
+	"editor.renderWhitespace": "none",
+	// "workbench.editor.tabSizingFixedMaxWidth": 100,
+	"notebook.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.lineNumbers": "relative",
+	"diffEditor.hideUnchangedRegions.enabled": true,
+	"code-runner.runInTerminal": true,
+	"code-runner.preserveFocus": false,
+	"editor.glyphMargin": true,
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.black-formatter"
+	},
+	"security.workspace.trust.untrustedFiles": "open",
+	"glassit.alpha": 220,
+	"warmUp.changeTypingMode": "code snippets",
+	"warmUp.changeCount": "15",
+	"git.confirmSync": false,
+	"git.autofetch": true,
+	"window.zoomLevel": 3,
+	"git.openRepositoryInParentFolders": "always",
+	"security.workspace.trust.startupPrompt": "never",
+	"security.workspace.trust.banner": "never",
+	"security.workspace.trust.enabled": false,
+	"inline-parameters.fontSize": "0.75em",
+	"inline-parameters.hideRedundantAnnotations": false,
+	"inline-parameters.enabled": false,
+	"inline-parameters.python.ignoreFunctions": [
+		"print",
+		"input",
+		"sum",
+		"max",
+		"min",
+		"round",
+		"tuple",
+		"int",
+		"str",
+		"map",
+		"filter"
+	],
+	"editor.wordWrapColumn": 120,
+	"editor.wordWrap": "wordWrapColumn",
+	"html.format.wrapAttributesIndentSize": 120,
+	"workbench.activityBar.location": "hidden",
+
+	"codeium.enableSearch": true,
+	"codeium.enableConfig": {
+		"*": true
+	},
+	"liveServer.settings.donotShowInfoMsg": true,
+	"codeium.enableCodeLens": false,
+	"liveServer.settings.port": 5501,
+	"vscode-pets.theme": "castle",
+	"github.copilot.enable": {
+		"*": true,
+		"plaintext": true,
+		"markdown": true,
+		"scminput": false,
+		"python": true
+	},
+
+	// комбинации клашив для vim ------------------]
+	"vim.easymotion": true,
+	"vim.incsearch": true,
+	"vim.useSystemClipboard": true,
+	"vim.useCtrlKeys": true,
+	"vim.hlsearch": true,
+	"vim.insertModeKeyBindings": [
+		{
+			"before": ["j", "j"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["j", "k"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["о", "л"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["л", "л"],
+			"after": ["<Esc>"]
+		}
+	], // комбинации в режиме вставки
+	"vim.normalModeKeyBindingsNonRecursive": [
+		{
+			"key": "alt+shift+l",
+			"command": "workbench.action.increaseViewSize",
+			"when": "editorFocus"
+		},
+		{
+			"key": "alt+shift+h",
+			"command": "workbench.action.decreaseViewSize",
+			"when": "editorFocus"
+		},
+		{
+			"before": ["L"],
+			"commands": ["editor.action.indentLines"]
+		},
+		{
+			"before": ["H"],
+			"commands": ["editor.action.outdentLines"]
+		},
+		{
+			"before": ["<leader>", "d"],
+			"after": ["d", "d"]
+		},
+		// переход по вкладкам
+		{
+			"before": ["<S-j>"],
+			"commands": ["workbench.action.nextEditor"]
+		},
+		{
+			"before": ["<S-k>"],
+			"commands": ["workbench.action.previousEditor"]
+		},
+		// фокус по окнам
+		{
+			"before": ["<C-l>"],
+			"commands": ["workbench.action.focusNextGroup"]
+		},
+		{
+			"before": ["<C-h>"],
+			"commands": ["workbench.action.focusPreviousGroup"]
+		},
+		// изменение размера панелей
+		{
+			"before": ["<A-l>"],
+			"commands": ["workbench.action.increaseViewSize"]
+		},
+		{
+			"before": ["<A-h>"],
+			"commands": ["workbench.action.decreaseViewSize"]
+		},
+		// опустить курсор ниже на 2 строки
+
+		{
+			"before": ["<leader>", "o"],
+
+			"after": ["o"],
+
+			"commands": ["editor.action.insertLineAfter"]
+		},
+		{
+			"before": ["<leader>", "t"],
+
+			"after": ["t"],
+
+			"commands": ["workbench.action.terminal.toggleTerminal"]
+		},
+		// убрать фокус с поиска
+		{
+			"before": ["<C-n>"],
+			"commands": [":nohl"]
+		},
+		// оставлять отсупы в низ
+		{
+			"before": ["<C-o>"],
+			"commands": ["lineBreakInsert"],
+			"silent": true
+		}
+	], //leader key
+	"vim.leader": "<space>",
+	"vim.handleKeys": {
+		"<C-a>": false,
+		"<C-f>": false
+	},
+	"vim.visualModeKeyBindings": [
+		{
+			"before": ["L"],
+			"commands": ["editor.action.indentLines"]
+		},
+		{
+			"before": ["H"],
+			"commands": ["editor.action.outdentLines"]
+		}
+	],
+
+	"terminal.integrated.allowChords": false,
+	"code-runner.temporaryFileName": "",
+	"code-runner.respectShebang": false,
+	"code-runner.showRunCommandInEditorContextMenu": false,
+	"code-runner.showRunCommandInExplorerContextMenu": false,
+	"code-runner.showRunIconInEditorTitleMenu": false,
+	"code-runner.showStopIconInEditorTitleMenu": false,
+	"code-runner.customCommand": "",
+	"code-runner.enableAppInsights": false,
+	"code-runner.showExecutionMessage": false,
+	"workbench.editorAssociations": {
+		"*.copilotmd": "vscode.markdown.preview.editor",
+		"{git,gitlens}:/**/*.{md,csv,svg}": "default"
+	},
+	"liveServer.settings.donotVerifyTags": true
+}
