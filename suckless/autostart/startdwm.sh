@@ -34,7 +34,11 @@ fi
 dwmblocks &
 $HOME/suckless/scripts/dwmbScripts/blocks.sh &
 
+#старт телеги
+$HOME/suckless/scripts/telegram.sh &
+
 # Запуск оконного менеджера dwm в бесконечном цикле с перенаправлением ошибок в лог-файл
 while true; do
-  dwm 2>~/.dwm.log
+  dwm 2>~/.dwm.log  &
 done
+
