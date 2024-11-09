@@ -9,7 +9,7 @@ static const Block blocks[] = {
         //  {" ", "curl -s 'wttr.in/Tashkent?format=%t'", 300, 0},
 	{"  ", "date '+%H:%M' &", 1, 0},
 	//{"         ", "", 0,},
-	{"   ", "", 0,},
+	{"  ", "", 0,},
 };
 static char delim[] = "  ┇  ";
 static unsigned int delimLen = 5;

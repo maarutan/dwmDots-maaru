@@ -5,9 +5,9 @@ static const unsigned int borderpx   = 4;        /* border pixel of windows */
 static const unsigned int snap       = 0;       /* snap pixel */
 
 //systray
-static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
-static const unsigned int systrayonleft = 0;    /* 0: systray in the right corner, >0: systray on left of status text */
-static const unsigned int systrayspacing = 2;   /* systray spacing */
+static const unsigned int systraypinning = 1;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
+static const unsigned int systrayonleft = 1;    /* 0: systray in the right corner, >0: systray on left of status text */
+static const unsigned int systrayspacing = 12;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray        = 1;        /* 0 means no systray */
 
@@ -21,8 +21,8 @@ static const int showbar             = 1;        /* 0 means no bar */
 static const int topbar              = 1;        /* 0 means bottom bar */
 
 //bar paddings
-static const int vertpad             = 0;       /* vertical padding of bar */
-static const int sidepad             = 0;       /* horizontal padding of bar */
+static const int vertpad             = 13;       /* vertical padding of bar */
+static const int sidepad             = 7;       /* horizontal padding of bar */
 
 //static const char *fonts[]         = { "FiraCode Nerd Font:size=16","Font Awesome 6 Free Solid:size=16","Fira Code:size=16" };
 static const char *fonts[]           = { "FiraCode Nerd Font:size=18" };
@@ -44,8 +44,8 @@ static const char *colors[][3]       = {
 };
 
 /* tagging */
-//static const char *tags[] = { "󱍢","", "󰈹", "", "" };
-static const char *tags[] = { "1","2", "3", "4", "5","6","7","8","9" };
+static const char *tags[] = {   "󱍢", "", "󰈹", "", "󰣇", "", "", "", "" };
+//static const char *tags[] = { "1","2", "3", "4", "5","6","7","8","9" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -53,8 +53,11 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+    { "telegram-desktop",  NULL,       NULL,       1 << 1,       0,           -1 },
+    { "TelegramDesktop", NULL, NULL, 1 << 1, 0, -1 },
+
+
 };
 
 /* layout(s) */
@@ -159,7 +162,8 @@ static const Key keys[] = {
 	
 
 	//rofi
-	{ MODKEY,                       XK_r,      spawn,          SHCMD("/home/maaru/.config/rofi/launchers/type-2/launcher.sh") },
+	{ MODKEY,                       XK_a,      spawn,          SHCMD("/home/maaru/.config/rofi/launchers/type-2/launcher.sh") },
+    { MODKEY,                       XK_r,      spawn,          SHCMD("/home/maaru/.config/rofi/launchers/type-3/launcher_1.sh") },
 	{ MODKEY,                       XK_v,      spawn,          SHCMD("/home/maaru/suckless/scripts/buferRofi.sh") },
 	{ MODKEY|Mod1Mask,              XK_a,      spawn,          SHCMD("/home/maaru/.config/rofi/launchers/type-2/emoji.sh") },
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("/home/maaru/.config/rofi/powermenu/type-2/powermenu.sh") },

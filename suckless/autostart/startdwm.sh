@@ -34,8 +34,22 @@ fi
 dwmblocks &
 $HOME/suckless/scripts/dwmbScripts/blocks.sh &
 
+#bluethooth
+blueman-applet &
+
+
 #старт телеги
-$HOME/suckless/scripts/telegram.sh &
+telegram-desktop &
+
+#старт firefix
+firefox &
+
+
+# auto hello
+sleep 3 && kitty --title "neofetch_terminal" -e bash -c 'neofetch --config /home/maaru/.config/neofetch/myProfile.conf; exec bash' &
+sleep 2 && xdotool key super+1
+
+
 
 # Запуск оконного менеджера dwm в бесконечном цикле с перенаправлением ошибок в лог-файл
 while true; do

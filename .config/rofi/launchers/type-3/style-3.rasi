@@ -11,8 +11,18 @@
 configuration {
 	modi:                       "drun";
     show-icons:                 true;
-    display-drun:               "";
+    display-drun:               "~~> ";
 	drun-display-format:        "{name}";
+
+    kb-row-up: "Up,Control+k,Shift+Tab,Shift+ISO_Left_Tab";
+    kb-row-down: "Down,Control+j";
+    kb-accept-entry: "Control+m,Return,KP_Enter";
+    terminal: "mate-terminal";
+    kb-remove-to-eol: "Control+Shift+e";
+    /*kb-mode-next: "Shift+Right,Control+Tab,Control+l";*/
+    kb-mode-previous: "Shift+Left,Control+Shift+Tab,Control+h";
+    kb-remove-char-back: "BackSpace";
+
 }
 
 /*****----- Global Properties -----*****/
@@ -56,11 +66,11 @@ mainbox {
 /*****----- Inputbar -----*****/
 inputbar {
     enabled:                     true;
-    spacing:                     10px;
+    spacing:                     20px;
     margin:                      0% 28%;
-    padding:                     10px;
+    padding:                     20px;
     border:                      1px solid;
-    border-radius:               6px;
+    border-radius:               20px;
     border-color:                white / 25%;
     background-color:            white / 5%;
     text-color:                  @foreground;
@@ -84,7 +94,7 @@ entry {
     background-color:            transparent;
     text-color:                  inherit;
     cursor:                      text;
-    placeholder:                 "Search";
+    placeholder:                 "...";
     placeholder-color:           inherit;
 }
 

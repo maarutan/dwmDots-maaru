@@ -11,7 +11,8 @@
 	horizontal_padding = 20
 	font = FiraCode NerdFont 13
 	notification_limit = 5
-	corner_radius = 10
+	corner_radius = 15 
+
 	icon_position = left
 	alignment = left
 	enable_recursive_icon_lookup = true

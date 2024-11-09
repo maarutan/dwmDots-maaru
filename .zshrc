@@ -1,16 +1,16 @@
 #----- term with -----
-echo "       /)＿/)☆
-     ／(๑^᎑^๑)っ ＼
-    |￣∪￣  ￣|＼／
-    |＿＿_＿＿|／
-"
+# echo "       /)＿/)☆
+#      ／(๑^᎑^๑)っ ＼
+#     |￣∪￣  ￣|＼／
+#     |＿＿_＿＿|／
+# "
 #ufetch
 #cowsay "welcome maaru^^"
 tabs 4
-#
-#small_pokemon=(595 669 742 790 854)
-#pokeget $(shuf -e "${small_pokemon[@]}" -n 1) --hide-name
-#
+
+small_pokemon=(595 669 742 790 854)
+pokeget $(shuf -e "${small_pokemon[@]}" -n 1) --hide-name
+
 export QT_QPA_PLATFORMTHEME=qt5ct
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -72,7 +72,6 @@ bindkey -v
  alias teri="yetris"
  alias vim="nvim"
  alias nzsh="nvim ~/.zshrc"
- alias neofetch="$HOME/.config/neofetch/startFetch.sh"
  alias neo="$HOME/.config/neofetch/startFetch.sh"
  alias fetch="$HOME/suckless/scripts/fetch.sh"
  alias cls="clear"
