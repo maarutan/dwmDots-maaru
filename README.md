@@ -16,29 +16,29 @@ welcome this is my dotfile form dwm
    Actually toggle fullscreen for a window, instead of toggling the status bar and the monocle layout. <br/> <br/>
 2. [alwayscenter](https://dwm.suckless.org/patches/alwayscenter/)<br/>All floating windows are centered, like the center patch, but without a rule.
    <br/> <br/>
-3. [barpadding](https://dwm.suckless.org/patches/barpadding/)<br/>This patch adds variables for verticle and horizontal space between the statusbar and the edge of the screen;
+
+3. [systray](https://dwm.suckless.org/patches/systray/)<br/>
+   A simple system tray implementation. For dwm
    <br/><br/>
-4. [borderbar](https://github.com/maarutan/dwmDots-maaru/blob/main/suckless/dwm/patches/barpadding.diff)<br/>
-   adding border bar<br/><br/>
-5. [movestack](https://dwm.suckless.org/patches/movestack/)<br/>
+4. [movestack](https://dwm.suckless.org/patches/movestack/)<br/>
    This plugin allows you to move clients around in the stack and swap them with the master.<br/><br/>
-6. [notitle](https://dwm.suckless.org/patches/notitle/)<br/>
+5. [notitle](https://dwm.suckless.org/patches/notitle/)<br/>
    Doesn't show the title. <br/><br/>
-7. [pertag](https://dwm.suckless.org/patches/pertag/)<br/>
+6. [pertag](https://dwm.suckless.org/patches/pertag/)<br/>
    Этот патч сохраняет макет, mwfact, barpos и nmaster для каждого тега. <br/><br/>
-8. [resizehere](https://dwm.suckless.org/patches/resizehere/)<br/>
+7. [resizehere](https://dwm.suckless.org/patches/resizehere/)<br/>
    Changes the resizing behaviour. Instead of warping the pointer to the bottom right corner, the pointer will stay in the same place and the window will resize as you move your mouse.
    <br/><br/>
-9. [vanitygaps](https://dwm.suckless.org/patches/vanitygaps/)<br/>ability to control all intervals simultaneously
+8. [vanitygaps](https://dwm.suckless.org/patches/vanitygaps/)<br/>ability to control all intervals simultaneously
    <br/><br/>
-10. [Tiledmove](https://dwm.suckless.org/patches/tiledmove/)<br/>Patch to make the function movemouse not force clients to float.
-    Tiled clients when moved will swap with other tiled clients that overlap with the cursor, and snap to other monitors.
-    <br/><br/>
-11. [resizemove](https://dwm.suckless.org/patches/moveresize/)<br/>
+9. [Tiledmove](https://dwm.suckless.org/patches/tiledmove/)<br/>Patch to make the function movemouse not force clients to float.
+   Tiled clients when moved will swap with other tiled clients that overlap with the cursor, and snap to other monitors.
+   <br/><br/>
+10. [resizemove](https://dwm.suckless.org/patches/moveresize/)<br/>
     This changes allows you to move and resize dwm's clients using keyboard bindings.
     (move flouting winodw and resize)
     <br/><br/>
-12. [focusonnetactive.diff](http://dwm.suckless.org/patches/focusonnetactive/)<br/>
+11. [focusonnetactive.diff](http://dwm.suckless.org/patches/focusonnetactive/)<br/>
     move to active stack
     <br/><br/>
 
