@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Объявление переменных
+REPO_SSH=${REPO_SSH:-"git@github.com:maarutan/dwmDots-maaru.git"}
+BRANCH=${BRANCH:-"main"}
+SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwmSync-maaru"}
+TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-maaru"}
+
 # Функция для установки цвета текста
 color() {
     echo -e "\033[$1m$2\033[0m"
@@ -58,23 +64,23 @@ ascii_art_3=$(cat << 'EOF'
 EOF
 )
 
-clear
-# Шаг 2: Объявление переменных
-REPO_SSH="git@github.com:maarutan/dwmDots-maaru.git"  # Ссылка на репозиторий
-BRANCH="main"  # Ветка для пуша
-SOURCE_DIR="$HOME/.dwmSync-maaru"  # Рабочая директория с файлами
-TARGET_DIR="$HOME/.dwmDots-maaru"  # Директория для пуша
-
-
+# ASCII арт 4 (если .git существует)
+ascii_art_git_exists=$(cat << 'EOF'
+          _ _   
+     __ _(_) |_ 
+ _  / _` | |  _|
+(_) \__, |_|\__|
+    |___/       
+EOF
+)
 
 # Шаг 1: Очистка экрана и запуск neofetch перед выводом ASCII-арта
-
 clear
 $HOME/.config/neofetch/startFetch.sh
-display_ascii_art "$ascii_art_1"
 
 # Проверка наличия .git в целевой директории
 if [ -d "$TARGET_DIR/.git" ]; then
+    display_ascii_art "$ascii_art_git_exists"
     echo "Репозиторий уже клонирован. Обновляем его..."
     cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
     git pull origin "$BRANCH"
