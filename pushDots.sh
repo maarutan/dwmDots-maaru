@@ -58,17 +58,20 @@ ascii_art_3=$(cat << 'EOF'
 EOF
 )
 
-# Шаг 1: Вывод радужного ASCII-арта
-display_ascii_art "$ascii_art_1"
-
+clear
 # Шаг 2: Объявление переменных
 REPO_SSH="git@github.com:maarutan/dwmDots-maaru.git"  # Ссылка на репозиторий
 BRANCH="main"  # Ветка для пуша
 SOURCE_DIR="$HOME/.dwmSync-maaru"  # Рабочая директория с файлами
 TARGET_DIR="$HOME/.dwmDots-maaru"  # Директория для пуша
 
-# Запуск neofetch перед клонированием
+
+
+# Шаг 1: Очистка экрана и запуск neofetch перед выводом ASCII-арта
+
+clear
 $HOME/.config/neofetch/startFetch.sh
+display_ascii_art "$ascii_art_1"
 
 # Проверка наличия .git в целевой директории
 if [ -d "$TARGET_DIR/.git" ]; then
@@ -92,7 +95,8 @@ rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-er
 # Шаг 4: Добавление файлов в Git, коммит и пуш
 cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
 
-# Запуск neofetch перед добавлением файлов
+# Очистка экрана и запуск neofetch перед добавлением файлов
+clear
 $HOME/.config/neofetch/startFetch.sh
 git add .
 if [ $? -ne 0 ]; then
@@ -100,10 +104,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Вывод второго ASCII-арта
+# Очистка экрана и запуск neofetch перед выводом второго ASCII-арта
+clear
+$HOME/.config/neofetch/startFetch.sh
 display_ascii_art "$ascii_art_2"
 
-# Запуск neofetch перед коммитом
+# Очистка экрана и запуск neofetch перед коммитом
+clear
 $HOME/.config/neofetch/startFetch.sh
 echo "Введите сообщение для коммита (по умолчанию: 'add'):"
 read -t 10 COMMIT_MSG
@@ -114,10 +121,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Вывод третьего ASCII-арта
+# Очистка экрана и запуск neofetch перед выводом третьего ASCII-арта
+clear
+$HOME/.config/neofetch/startFetch.sh
 display_ascii_art "$ascii_art_3"
 
-# Запуск neofetch перед пушем
+# Очистка экрана и запуск neofetch перед пушем
+clear
 $HOME/.config/neofetch/startFetch.sh
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then
@@ -139,3 +149,4 @@ if [[ "$DELETE_TEMP" == "y" ]]; then
 else
     echo "Временная директория сохранена."
 fi
+
