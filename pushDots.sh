@@ -38,9 +38,9 @@ display_ascii_art() {
 # Функция для анимации загрузки
 loading_animation() {
     echo -n "Loading"
-    for i in {1..3}; do
+    for i in {1..6}; do
         echo -n "."
-        sleep 0.5
+        sleep 0.3
     done
     echo ""
 }
@@ -121,7 +121,11 @@ fi
 
 # Шаг 3: Копирование символьных ссылок и файлов
 start_time=$(date +%s)
-rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors
+loading_animation &
+LOADING_PID=$!
+rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors >/dev/null 2>&1
+kill $LOADING_PID
+wait $LOADING_PID 2>/dev/null
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
 
