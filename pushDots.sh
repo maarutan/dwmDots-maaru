@@ -6,6 +6,21 @@ BRANCH=${BRANCH:-"main"}
 SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwmSync-maaru"}
 TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-maaru"}
 
+# Проверка наличия необходимых приложений
+required_apps=(git rsync neofetch bc)
+missing_apps=()
+
+for app in "${required_apps[@]}"; do
+    if ! command -v $app &> /dev/null; then
+        missing_apps+=($app)
+    fi
+done
+
+if [ ${#missing_apps[@]} -ne 0 ]; then
+    echo "Ошибка: Для корректной работы скрипта необходимо установить следующие приложения: ${missing_apps[*]}"
+    exit 1
+fi
+
 # Функция для установки цвета текста
 color() {
     echo -e "\033[$1m$2\033[0m"
@@ -87,7 +102,11 @@ EOF
 # Шаг 1: Очистка экрана и запуск neofetch перед выводом ASCII-арта
 start_time=$(date +%s)
 clear
-$HOME/.config/neofetch/startFetch.sh
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
 
