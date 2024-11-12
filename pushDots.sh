@@ -35,6 +35,16 @@ display_ascii_art() {
     done <<< "$ascii_art"
 }
 
+# Функция для анимации загрузки
+loading_animation() {
+    echo -n "Loading"
+    for i in {1..3}; do
+        echo -n "."
+        sleep 0.5
+    done
+    echo ""
+}
+
 # ASCII арт 1
 ascii_art_1=$(cat << 'EOF'
   ___ _ _      ___ _          _           
@@ -75,8 +85,15 @@ EOF
 )
 
 # Шаг 1: Очистка экрана и запуск neofetch перед выводом ASCII-арта
+start_time=$(date +%s)
 clear
 $HOME/.config/neofetch/startFetch.sh
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+
+if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+    loading_animation
+fi
 
 # Проверка наличия .git в целевой директории
 if [ -d "$TARGET_DIR/.git" ]; then
@@ -87,23 +104,44 @@ if [ -d "$TARGET_DIR/.git" ]; then
     git checkout HEAD .
 else
     echo "Репозиторий не найден. Клонируем его..."
+    start_time=$(date +%s)
     git clone --branch "$BRANCH" "$REPO_SSH" "$TARGET_DIR"
+    end_time=$(date +%s)
+    elapsed_time=$((end_time - start_time))
+    
     if [ $? -ne 0 ]; then
         echo "Ошибка при клонировании репозитория"
         exit 1
     fi
+    
+    if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+        loading_animation
+    fi
 fi
 
 # Шаг 3: Копирование символьных ссылок и файлов
-# Используем rsync для копирования, преобразуя символьные ссылки в обычные файлы
+start_time=$(date +%s)
 rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+
+if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+    loading_animation
+fi
 
 # Шаг 4: Добавление файлов в Git, коммит и пуш
 cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
 
 # Очистка экрана и запуск neofetch перед добавлением файлов
+start_time=$(date +%s)
 clear
 $HOME/.config/neofetch/startFetch.sh
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+
+if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+    loading_animation
+fi
 git add .
 if [ $? -ne 0 ]; then
     echo "Ошибка при добавлении файлов в Git"
@@ -111,13 +149,27 @@ if [ $? -ne 0 ]; then
 fi
 
 # Очистка экрана и запуск neofetch перед выводом второго ASCII-арта
+start_time=$(date +%s)
 clear
 $HOME/.config/neofetch/startFetch.sh
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+
+if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+    loading_animation
+fi
 display_ascii_art "$ascii_art_2"
 
 # Очистка экрана и запуск neofetch перед коммитом
+start_time=$(date +%s)
 clear
 $HOME/.config/neofetch/startFetch.sh
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+
+if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+    loading_animation
+fi
 echo "Введите сообщение для коммита (по умолчанию: 'add'):"
 read -t 10 COMMIT_MSG
 COMMIT_MSG=${COMMIT_MSG:-add}
@@ -128,13 +180,27 @@ if [ $? -ne 0 ]; then
 fi
 
 # Очистка экрана и запуск neofetch перед выводом третьего ASCII-арта
+start_time=$(date +%s)
 clear
 $HOME/.config/neofetch/startFetch.sh
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+
+if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+    loading_animation
+fi
 display_ascii_art "$ascii_art_3"
 
 # Очистка экрана и запуск neofetch перед пушем
+start_time=$(date +%s)
 clear
 $HOME/.config/neofetch/startFetch.sh
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+
+if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
+    loading_animation
+fi
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then
     echo "Ошибка при пуше. Попробовать снова? (y/n)"
