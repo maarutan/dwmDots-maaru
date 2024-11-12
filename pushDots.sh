@@ -218,7 +218,8 @@ fi
 
 # Шаг 6: Удаление временной директории
 echo "Удалить временную директорию? (y/n) (по умолчанию: 'n')"
-read -r DELETE_TEMP
+read -t 5 -r DELETE_TEMP
+DELETE_TEMP=${DELETE_TEMP:-n}
 if [[ "$DELETE_TEMP" == "y" ]]; then
     rm -rf "$TARGET_DIR"
     echo "Временная директория удалена."
