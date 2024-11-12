@@ -4,10 +4,10 @@
 REPO_SSH=${REPO_SSH:-"git@github.com:maarutan/dwmDots-maaru.git"}
 BRANCH=${BRANCH:-"main"}
 SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwmSync-maaru"}
-TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-maaru"}
+TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
 
 # Проверка наличия необходимых приложений
-required_apps=(git rsync neofetch bc)
+required_apps=(git rsync neofetch bc figlet)
 missing_apps=()
 
 for app in "${required_apps[@]}"; do
@@ -60,6 +60,18 @@ loading_animation() {
     echo ""
 }
 
+# Функция для обработки выхода из скрипта
+trap_exit() {
+    clear
+    ascii_art_exit=$(figlet -f small "bye bye $USER ^^")
+    display_ascii_art "$ascii_art_exit"
+    sleep 1.3
+    exit 0
+}
+
+# Установка обработчика прерывания
+trap trap_exit SIGINT
+
 # ASCII арт 1
 ascii_art_1=$(cat << 'EOF'
   ___ _ _      ___ _          _           
@@ -99,20 +111,15 @@ ascii_art_git_exists=$(cat << 'EOF'
 EOF
 )
 
-# Шаг 1: Очистка экрана и запуск neofetch перед выводом ASCII-арта
-start_time=$(date +%s)
+# Шаг 1: Очистка экрана, запуск neofetch, вывод ASCII-арта и анимация загрузки
 clear
 if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
     $HOME/.config/neofetch/startFetch.sh
 else
     neofetch
 fi
-end_time=$(date +%s)
-elapsed_time=$((end_time - start_time))
-
-if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
-    loading_animation
-fi
+display_ascii_art "$ascii_art_1"
+loading_animation
 
 # Проверка наличия .git в целевой директории
 if [ -d "$TARGET_DIR/.git" ]; then
@@ -155,10 +162,16 @@ fi
 # Шаг 4: Добавление файлов в Git, коммит и пуш
 cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
 
-# Очистка экрана и запуск neofetch перед добавлением файлов
-start_time=$(date +%s)
+# Очистка экрана, запуск neofetch, вывод ASCII-арта и анимация загрузки перед добавлением файлов
+tart_time=$(date +%s)
 clear
-$HOME/.config/neofetch/startFetch.sh
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
+display_ascii_art "$ascii_art_2"
+loading_animation
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
 
@@ -171,22 +184,16 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Очистка экрана и запуск neofetch перед выводом второго ASCII-арта
+# Очистка экрана, запуск neofetch, вывод ASCII-арта и анимация загрузки перед коммитом
 start_time=$(date +%s)
 clear
-$HOME/.config/neofetch/startFetch.sh
-end_time=$(date +%s)
-elapsed_time=$((end_time - start_time))
-
-if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
-    loading_animation
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
 fi
-display_ascii_art "$ascii_art_2"
-
-# Очистка экрана и запуск neofetch перед коммитом
-start_time=$(date +%s)
-clear
-$HOME/.config/neofetch/startFetch.sh
+display_ascii_art "$ascii_art_3"
+loading_animation
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
 
@@ -202,28 +209,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Очистка экрана и запуск neofetch перед выводом третьего ASCII-арта
+# Очистка экрана, запуск neofetch и анимация загрузки перед пушем
 start_time=$(date +%s)
 clear
-$HOME/.config/neofetch/startFetch.sh
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
+loading_animation
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
 
-if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
-    loading_animation
-fi
-display_ascii_art "$ascii_art_3"
-
-# Очистка экрана и запуск neofetch перед пушем
-start_time=$(date +%s)
-clear
-$HOME/.config/neofetch/startFetch.sh
-end_time=$(date +%s)
-elapsed_time=$((end_time - start_time))
-
-if (( $(echo "$elapsed_time < 1.5" | bc -l) )); then
-    loading_animation
-fi
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then
     echo "Ошибка при пуше. Попробовать снова? (y/n)"
