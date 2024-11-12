@@ -65,31 +65,35 @@ display_ascii_art "$ascii_art_1"
 REPO_SSH="git@github.com:maarutan/dwmDots-maaru.git"  # Ссылка на репозиторий
 BRANCH="main"  # Ветка для пуша
 SOURCE_DIR="$HOME/.dwmSync-maaru"  # Рабочая директория с файлами
-TEMP_DIR="/tmp/dotfiles_sync"  # Временная директория для пуша
+TARGET_DIR="$HOME/.dwmDots-maaru"  # Директория для пуша
 
-# Шаг 2: Создание временной папки и клонирование репозитория
-rm -rf "$TEMP_DIR"
-mkdir -p "$TEMP_DIR"
+# Запуск neofetch перед клонированием
+$HOME/.config/neofetch/startFetch.sh
 
-# Клонируем репозиторий в временную директорию
-git clone --branch "$BRANCH" "$REPO_SSH" "$TEMP_DIR"
-if [ $? -ne 0 ]; then
-    echo "Ошибка при клонировании репозитория"
-    exit 1
+# Проверка наличия .git в целевой директории
+if [ -d "$TARGET_DIR/.git" ]; then
+    echo "Репозиторий уже клонирован. Обновляем его..."
+    cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
+    git pull origin "$BRANCH"
+    git checkout HEAD .
+else
+    echo "Репозиторий не найден. Клонируем его..."
+    git clone --branch "$BRANCH" "$REPO_SSH" "$TARGET_DIR"
+    if [ $? -ne 0 ]; then
+        echo "Ошибка при клонировании репозитория"
+        exit 1
+    fi
 fi
-
-# Удаляем все, кроме .git
-rm -rf "$TEMP_DIR"/*  # Удаляем все содержимое
-mv "$TEMP_DIR/.git" "$TEMP_DIR/.git_temp"  # Временно перемещаем .git
-rm -rf "$TEMP_DIR"/*  # Удаляем все
-mv "$TEMP_DIR/.git_temp" "$TEMP_DIR/.git"  # Возвращаем .git обратно
 
 # Шаг 3: Копирование символьных ссылок и файлов
 # Используем rsync для копирования, преобразуя символьные ссылки в обычные файлы
-rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TEMP_DIR/" --ignore-errors
+rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors
 
 # Шаг 4: Добавление файлов в Git, коммит и пуш
-cd "$TEMP_DIR" || { echo "Не удалось перейти в директорию $TEMP_DIR"; exit 1; }
+cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
+
+# Запуск neofetch перед добавлением файлов
+$HOME/.config/neofetch/startFetch.sh
 git add .
 if [ $? -ne 0 ]; then
     echo "Ошибка при добавлении файлов в Git"
@@ -99,6 +103,8 @@ fi
 # Вывод второго ASCII-арта
 display_ascii_art "$ascii_art_2"
 
+# Запуск neofetch перед коммитом
+$HOME/.config/neofetch/startFetch.sh
 echo "Введите сообщение для коммита (по умолчанию: 'add'):"
 read -t 10 COMMIT_MSG
 COMMIT_MSG=${COMMIT_MSG:-add}
@@ -111,6 +117,8 @@ fi
 # Вывод третьего ASCII-арта
 display_ascii_art "$ascii_art_3"
 
+# Запуск neofetch перед пушем
+$HOME/.config/neofetch/startFetch.sh
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then
     echo "Ошибка при пуше. Попробовать снова? (y/n)"
@@ -123,12 +131,11 @@ if [ $? -ne 0 ]; then
 fi
 
 # Шаг 6: Удаление временной директории
-echo "Удалить временную директорию? (y/n)"
+echo "Удалить временную директорию? (y/n) (по умолчанию: 'n')"
 read -r DELETE_TEMP
-if [[ "$DELETE_TEMP" == "y" ]] || [[ -z "$DELETE_TEMP" ]]; then
-    rm -rf "$TEMP_DIR"
+if [[ "$DELETE_TEMP" == "y" ]]; then
+    rm -rf "$TARGET_DIR"
     echo "Временная директория удалена."
 else
     echo "Временная директория сохранена."
 fi
-

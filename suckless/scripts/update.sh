@@ -3,82 +3,122 @@
 # Цвета для вывода текста
 COLOR_YELLOW='\033[1;33m'
 COLOR_GREEN='\033[0;32m'
-COLOR_BLUE='\033[0;34m'
 COLOR_CYAN='\033[0;36m'
+COLOR_BLUE='\033[1;34m'
 COLOR_RED='\033[0;31m'
 COLOR_RESET='\033[0m'
 
+# Файл для текущего значения обновлений pacman
+current_file=~/suckless/scripts/dwmbScripts/.currentInfoUpDate
+mkdir -p "$(dirname "$current_file")"  # Создаем директорию, если она не существует
+
+# Функция для подсчета обновлений с обработкой ошибок
+count_updates() {
+  local command="$1"
+  local updates
+  updates=$(eval "$command" 2>/dev/null | awk '/ERROR/{exit} {print}' | wc -l)
+
+  # Если произошла ошибка, возвращаем пустую строку
+  echo ${updates:-}
+}
+
+# Функция уведомления о необходимости ввода пароля
+notify_password() {
+  echo -e "${COLOR_BLUE}Требуется ввести пароль для продолжения выполнения команд с правами суперпользователя.${COLOR_RESET}"
+  notify-send "Требуется пароль" "Введите пароль для продолжения работы"
+}
+
 # Функция для проверки обновлений
 check_updates() {
-  # Проверка обновлений pacman
-  pacman_updates=$(checkupdates 2>/dev/null | awk '/ERROR/{exit} {print}' | wc -l)
-  echo -e "${COLOR_YELLOW}===> pacman     󰮯   ~~> : ${pacman_updates}${COLOR_RESET}"
+  while true; do
+    # Подсчет обновлений pacman с учетом возможных ошибок
+    pacman_updates=$(count_updates "checkupdates")
+    if [ -z "$pacman_updates" ]; then
+      # Если произошла ошибка, используем предыдущее значение из файла
+      if [ -f "$current_file" ]; then
+        formatted_pacman_updates=$(cat "$current_file")
+      else
+        formatted_pacman_updates="0"
+      fi
+    else
+      # Сохраняем текущее значение и обновляем файл
+      formatted_pacman_updates=$(printf "%2s" "$pacman_updates")
+      echo "$formatted_pacman_updates" > "$current_file"
+    fi
+    echo -e "${COLOR_YELLOW}===> pacman     󰮯   ~~> : $formatted_pacman_updates${COLOR_RESET}"
 
-  # Проверка обновлений yay
-  yay_updates=$(yay -Qu 2>/dev/null | wc -l)
-  echo -e "${COLOR_GREEN}===> yay        󰣇   ~~> : ${yay_updates}${COLOR_RESET}"
+    # Подсчет обновлений yay
+    yay_updates=$(count_updates "yay -Qu")
+    formatted_yay_updates=${yay_updates:-0}
+    echo -e "${COLOR_GREEN}===> yay        󰣇   ~~> :  $formatted_yay_updates${COLOR_RESET}"
 
-  # Проверка обновлений flatpak
-  flatpak_updates=$(flatpak remote-ls --updates 2>/dev/null | wc -l)
-  echo -e "${COLOR_CYAN}===> flatpak       ~~> : ${flatpak_updates}${COLOR_RESET}"
+    # Подсчет обновлений flatpak
+    flatpak_updates=$(count_updates "flatpak remote-ls --updates")
+    formatted_flatpak_updates=${flatpak_updates:-0}
+    echo -e "${COLOR_CYAN}===> flatpak       ~~> :  $formatted_flatpak_updates${COLOR_RESET}"
+    sleep 2
 
-  # Вывод общего количества обновлений
-  total_updates=$((pacman_updates + yay_updates + flatpak_updates))
-  echo -e "${COLOR_BLUE}Общее количество обновлений: ${total_updates}${COLOR_RESET}"
+    # Общий подсчет обновлений
+    total_updates=$((pacman_updates + yay_updates + flatpak_updates))
+    echo -e "${COLOR_YELLOW}Общее количество обновлений: ${total_updates}${COLOR_RESET}"
+
+    # Уведомление через notify-send об общем количестве обновлений
+    notify-send "Обновления системы" "Доступно $total_updates обновлений"
+    break
+  done
 }
 
 # Функция обновления системы
 update_system() {
-  echo -e "${COLOR_YELLOW}\n=== Обновление pacman ===${COLOR_RESET}"
-  if ! sudo pacman -Syu --noconfirm; then
-    echo -e "${COLOR_RED}Ошибка обновления через pacman!${COLOR_RESET}"
-    return 1
+  # Обновление pacman
+  if [ "$pacman_updates" -gt 0 ]; then
+    notify_password
+    echo -e "${COLOR_YELLOW}\n=== Обновление pacman ===${COLOR_RESET}"
+    if ! sudo pacman -Syu --noconfirm; then
+      echo -e "${COLOR_RED}Ошибка обновления через pacman!${COLOR_RESET}"
+      notify-send "Ошибка обновления" "Pacman не смог обновиться"
+    fi
   fi
 
-  echo -e "${COLOR_GREEN}\n=== Обновление yay 󰣇 ===${COLOR_RESET}"
-  if ! yay -Syu --noconfirm; then
-    echo -e "${COLOR_RED}Ошибка обновления через yay!${COLOR_RESET}"
-    return 1
+  # Обновление yay
+  if [ "$yay_updates" -gt 0 ]; then
+    notify_password
+    echo -e "${COLOR_GREEN}\n=== Обновление yay ===${COLOR_RESET}"
+    if ! yay -Syu --noconfirm; then
+      echo -e "${COLOR_RED}Ошибка обновления через yay!${COLOR_RESET}"
+      notify-send "Ошибка обновления" "Yay не смог обновиться"
+    fi
   fi
 
-  echo -e "${COLOR_CYAN}\n=== Обновление flatpak ===${COLOR_RESET}"
-  if ! flatpak update -y; then
-    echo -e "${COLOR_RED}Ошибка обновления через flatpak!${COLOR_RESET}"
-    return 1
+  # Обновление flatpak
+  if [ "$flatpak_updates" -gt 0 ]; then
+    notify_password
+    echo -e "${COLOR_CYAN}\n=== Обновление flatpak ===${COLOR_RESET}"
+    if ! flatpak update -y; then
+      echo -e "${COLOR_RED}Ошибка обновления через flatpak!${COLOR_RESET}"
+      notify-send "Ошибка обновления" "Flatpak не смог обновиться"
+    fi
   fi
-
-  return 0
 }
 
-# Вызов startFetch.sh в начале
+# Вызов скрипта neofetch в начале
 $HOME/.config/neofetch/startFetch.sh
 
-# Основной цикл
-while true; do
+# Проверка обновлений
+check_updates
 
-  echo -e "\nПроверка доступных обновлений..."
-  check_updates
+# Обновление системы
+update_system
 
-  echo -e "\nНачать обновление системы?"
-  read -p "Нажмите Enter для продолжения или Ctrl+C для выхода."
+# Очистка терминала и вызов neofetch после обновления
+clear
+$HOME/.config/neofetch/startFetch.sh
 
-  if update_system; then
-    echo -e "${COLOR_GREEN}\nОбновление завершено успешно!${COLOR_RESET}"
-  else
-    echo -e "${COLOR_RED}\nОбновление прервано!${COLOR_RESET}"
-  fi
+# Вывод прощального сообщения с использованием figlet и радужного окраса
 
-  echo -e "\nНажмите Enter для завершения."
-  read
+figlet -f mini "' -->  bye  <-- '" 
+figlet -f mini "' -->  bye  <-- '" 
+figlet -f mini "' -->  $(echo $USER) ^^  <-- '" 
 
-  clear
-  # Вызов startFetch.sh в конце
-  $HOME/.config/neofetch/startFetch.sh
-
-  figlet -f mini "' -->  bye  <-- '"
-  figlet -f mini "' -->  bye  <-- '"
-  figlet -f mini "' -->  maaru ^^  <-- '"
-
-  sleep 5
-  break
-done
+# Ожидание перед завершением
+sleep 5

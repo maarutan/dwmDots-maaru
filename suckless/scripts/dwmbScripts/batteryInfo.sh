@@ -26,9 +26,9 @@ get_battery_status() {
   # Логика для состояния заряда
   if [ "$status" = "Charging" ]; then
     if [ "$capacity" -eq 100 ]; then
-      icon="󰂅" # Иконка для батареи, которая полностью зарядилась, но продолжает заряжаться
+      icon="󰂅" # Иконка для батареи, которая полностью зарядилась и заряжается
     else
-      icon=" " # Иконка зарядки
+      icon="" # Иконка зарядки
     fi
   elif [ "$status" = "Full" ]; then
     icon="󰁹" # Иконка для полной батареи
@@ -73,3 +73,4 @@ while true; do
   get_battery_status
   sleep $INTERVAL
 done
+
