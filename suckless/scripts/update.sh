@@ -8,6 +8,21 @@ COLOR_BLUE='\033[1;34m'
 COLOR_RED='\033[0;31m'
 COLOR_RESET='\033[0m'
 
+# Проверка наличия необходимых приложений
+required_apps=(neofetch figlet notify-send)
+missing_apps=()
+
+for app in "${required_apps[@]}"; do
+    if ! command -v $app &> /dev/null; then
+        missing_apps+=($app)
+    fi
+done
+
+if [ ${#missing_apps[@]} -ne 0 ]; then
+    echo -e "${COLOR_RED}Ошибка: Для корректной работы скрипта необходимо установить следующие приложения: ${missing_apps[*]}${COLOR_RESET}"
+    exit 1
+fi
+
 # Файл для текущего значения обновлений pacman
 current_file=~/suckless/scripts/dwmbScripts/.currentInfoUpDate
 mkdir -p "$(dirname "$current_file")"  # Создаем директорию, если она не существует
@@ -101,8 +116,37 @@ update_system() {
   fi
 }
 
+# Функция для вызова neofetch или альтернативных fetch
+fetch_alternative() {
+  if [ -f "$HOME/.config/neofetch/startFetch.py" ]; then
+    python $HOME/.config/neofetch/startFetch.py &>/dev/null &  # Фоновый запуск startFetch.py
+    wait $!  # Ожидание завершения фонового процесса
+    if command -v neofetch &> /dev/null; then
+      neofetch
+    elif command -v fetch &> /dev/null; then
+      fetch
+    elif [ -f "/home/maaru/suckless/scripts/fetch.sh" ]; then
+      /home/maaru/suckless/scripts/fetch.sh
+    elif command -v fastfetch &> /dev/null; then
+      fastfetch
+    else
+      echo -e "${COLOR_RED}Ошибка: Не удалось найти ни одну из программ для вывода системной информации.${COLOR_RESET}"
+    fi
+  elif command -v neofetch &> /dev/null; then
+    neofetch
+  elif command -v fetch &> /dev/null; then
+    fetch
+  elif [ -f "/home/maaru/suckless/scripts/fetch.sh" ]; then
+    /home/maaru/suckless/scripts/fetch.sh
+  elif command -v fastfetch &> /dev/null; then
+    fastfetch
+  else
+    echo -e "${COLOR_RED}Ошибка: Не удалось найти ни одну из программ для вывода системной информации.${COLOR_RESET}"
+  fi
+}
+
 # Вызов скрипта neofetch в начале
-$HOME/.config/neofetch/startFetch.sh
+fetch_alternative
 
 # Проверка обновлений
 check_updates
@@ -112,13 +156,16 @@ update_system
 
 # Очистка терминала и вызов neofetch после обновления
 clear
-$HOME/.config/neofetch/startFetch.sh
+fetch_alternative
 
 # Вывод прощального сообщения с использованием figlet и радужного окраса
+bye_message=$(figlet -f mini "' -->  bye  <-- '")
+bye_user_message=$(figlet -f mini "' -->  $(echo $USER) ^^  <-- '")
 
-figlet -f mini "' -->  bye  <-- '" 
-figlet -f mini "' -->  bye  <-- '" 
-figlet -f mini "' -->  $(echo $USER) ^^  <-- '" 
+echo "$bye_message"
+echo "$bye_message"
+echo "$bye_user_message"
 
 # Ожидание перед завершением
 sleep 5
+
