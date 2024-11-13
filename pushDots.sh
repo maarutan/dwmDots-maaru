@@ -131,12 +131,20 @@ if [ -d "$TARGET_DIR/.git" ]; then
     git checkout HEAD .
 else
     clear
-    if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
-        $HOME/.config/neofetch/startFetch.sh
-    else
-        neofetch
-    fi
-    
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
+display_ascii_art "$(cat << 'EOF'
+  _   _      ___   _                    
+ __ _  (_) | |_   / __| | |  ___   _ _    ___ 
+/ _` | | | |  _| | (__  | | / _ \ | ' \  / -_)
+\__, | |_|  \__|  \___| |_| \___/ |_||_| \___|
+|___/
+EOF
+)"
+sleep 1.3
 sleep 1.3
     echo "Репозиторий не найден. Клонируем его..."
     git clone --branch "$BRANCH" "$REPO_SSH" "$TARGET_DIR"
@@ -209,4 +217,3 @@ if [[ "$DELETE_TEMP" == "y" ]]; then
 else
     echo "Временная директория сохранена."
 fi
-
