@@ -82,6 +82,14 @@ ascii_arts=(
 EOF
 )"
     "$(cat << 'EOF'
+          _ _   
+     __ _(_) |_ 
+ _  / _` | |  _|
+(_) \__, |_|\__|
+    |___/       
+EOF
+)"
+    "$(cat << 'EOF'
                     _ _   
  __ ___ _ __  _ __ (_) |_ 
 / _/ _ \ '  \| '  \| |  _|
@@ -96,15 +104,16 @@ EOF
 |_|           
 EOF
 )"
-    "$(cat << 'EOF'
-          _ _   
-     __ _(_) |_ 
- _  / _` | |  _|
-(_) \__, |_|\__|
-    |___/       
-EOF
-)"
 )
+
+# Шаг 1: Очистка экрана, запуск neofetch, вывод ASCII-арта и проверка наличия репозитория
+clear
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
+display_ascii_art "${ascii_arts[0]}"
 
 # Проверка наличия .git в целевой директории
 if [ -d "$TARGET_DIR/.git" ]; then
@@ -114,7 +123,7 @@ if [ -d "$TARGET_DIR/.git" ]; then
     else
         neofetch
     fi
-    display_ascii_art "${ascii_arts[3]}"
+    display_ascii_art "${ascii_arts[1]}"
     echo "Репозиторий уже клонирован. Обновляем его..."
     cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
     git pull origin "$BRANCH"
@@ -128,11 +137,7 @@ else
     fi
     display_ascii_art "${ascii_arts[0]}"
     echo "Репозиторий не найден. Клонируем его..."
-    start_time=$(date +%s)
     git clone --branch "$BRANCH" "$REPO_SSH" "$TARGET_DIR"
-    end_time=$(date +%s)
-    elapsed_time=$((end_time - start_time))
-    
     if [ $? -ne 0 ]; then
         echo "Ошибка при клонировании репозитория"
         exit 1
@@ -140,22 +145,16 @@ else
 fi
 
 # Шаг 3: Копирование символьных ссылок и файлов
-start_time=$(date +%s)
-rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors >/dev/null 2>&1
-end_time=$(date +%s)
-elapsed_time=$((end_time - start_time))
-
-# Шаг 4: Добавление файлов в Git, коммит и пуш
-cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
-
-# Очистка экрана, запуск neofetch, вывод ASCII-арта перед добавлением файлов
 clear
 if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
     $HOME/.config/neofetch/startFetch.sh
 else
     neofetch
 fi
-display_ascii_art "${ascii_arts[1]}"
+rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors >/dev/null 2>&1
+
+# Шаг 4: Добавление файлов в Git
+cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
 git add .
 if [ $? -ne 0 ]; then
     echo "Ошибка при добавлении файлов в Git"
@@ -186,7 +185,7 @@ if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
 else
     neofetch
 fi
-display_ascii_art "${ascii_arts[1]}"
+display_ascii_art "${ascii_arts[3]}"
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then
     echo "Ошибка при пуше. Попробовать снова? (y/n)"
@@ -208,4 +207,3 @@ if [[ "$DELETE_TEMP" == "y" ]]; then
 else
     echo "Временная директория сохранена."
 fi
-
