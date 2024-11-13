@@ -1,6 +1,6 @@
 # dwmDots-maaru
 
-<img src="Images/profile/maaru.png" alt="logo" width="200"/>
+<img src="Images/profile/user.png" alt="logo" width="200"/>
 
 welcome this is my dotfile form dwm
 
