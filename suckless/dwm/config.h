@@ -1,3 +1,14 @@
+/*
+* /===========================//
+* /      _                    
+* /     | |                   
+* /   __| |_      ___ __ ___  
+* /  / _` \ \ /\ / / '_ ` _ \ 
+* / | (_| |\ V  V /| | | | | |
+* /  \__,_| \_/\_/ |_| |_| |_|
+* /
+* /===========================//
+*/
 // See LICENSE file for copyright and license details. 
 // appearance 
 static const unsigned int borderpx   = 4;       // border pixel of windows 
