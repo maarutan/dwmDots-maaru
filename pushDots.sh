@@ -7,7 +7,7 @@ SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwmSync-maaru"}
 TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
 
 # Проверка наличия необходимых приложений
-required_apps=(git rsync neofetch bc figlet)
+required_apps=(git rsync neofetch bc figlet sl)
 missing_apps=()
 
 for app in "${required_apps[@]}"; do
@@ -156,11 +156,7 @@ fi
 
 # Шаг 3: Копирование символьных ссылок и файлов
 clear
-if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
-    $HOME/.config/neofetch/startFetch.sh
-else
-    neofetch
-fi
+sl
 rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors >/dev/null 2>&1
 
 # Шаг 4: Добавление файлов в Git
