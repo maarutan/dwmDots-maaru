@@ -9,15 +9,26 @@
 
 /*****----- Configuration -----*****/
 configuration {
-	modi:                       "drun";
-    show-icons:                 true;
-    display-drun:               "";
+    modi: "clipboard:greenclip print";
+    show-icons: false;
+    display-drun:               "~~> ";
 	drun-display-format:        "{name}";
+
+kb-row-up: "Up,Control+k,Shift+Tab,Shift+ISO_Left_Tab";
+kb-row-down: "Down,Control+j";
+kb-accept-entry: "Control+m,Return,KP_Enter";
+terminal: "mate-terminal";
+kb-remove-to-eol: "Control+Shift+e";
+/*kb-mode-next: "Shift+Right,Control+Tab,Control+l";*/
+kb-mode-previous: "Shift+Left,Control+Shift+Tab,Control+h";
+kb-remove-char-back: "BackSpace";
 }
 
 /*****----- Global Properties -----*****/
 @import                          "shared/colors.rasi"
-@import                          "shared/bufer.rasi"
+* {
+    font: "Fira Code 17";
+}
 
 /*****----- Main Window -----*****/
 window {
@@ -26,14 +37,15 @@ window {
     anchor:                      center;
     fullscreen:                  false;
     width:                       400px;
-    x-offset:                    0px;
-    y-offset:                    0px;
+    
+    x-offset:                    350px;
+    y-offset:                    250px;
 
     enabled:                     true;
     margin:                      0px;
     padding:                     0px;
     border:                      0px solid;
-    border-radius:               12px;
+    border-radius:               5px;
     border-color:                @selected;
     background-color:            @background;
     cursor:                      "default";
@@ -57,7 +69,7 @@ inputbar {
     enabled:                     true;
     spacing:                     10px;
     margin:                      0px;
-    padding:                     15px;
+    padding:                     5px;
     border:                      0px solid;
     border-radius:               0px;
     border-color:                @selected;
@@ -74,7 +86,7 @@ prompt {
 textbox-prompt-colon {
     enabled:                     true;
     expand:                      false;
-    str:                         "::";
+    str:                         "==>";
     background-color:            inherit;
     text-color:                  inherit;
 }
@@ -83,7 +95,7 @@ entry {
     background-color:            inherit;
     text-color:                  inherit;
     cursor:                      text;
-    placeholder:                 "Search...";
+    placeholder:                 "...";
     placeholder-color:           inherit;
 }
 
@@ -91,7 +103,7 @@ entry {
 listview {
     enabled:                     true;
     columns:                     1;
-    lines:                       6;
+    lines:                       10;
     cycle:                       true;
     dynamic:                     true;
     scrollbar:                   false;
@@ -157,7 +169,7 @@ element-text {
 error-message {
     padding:                     15px;
     border:                      2px solid;
-    border-radius:               12px;
+    border-radius:               0px;
     border-color:                @selected;
     background-color:            @background;
     text-color:                  @foreground;

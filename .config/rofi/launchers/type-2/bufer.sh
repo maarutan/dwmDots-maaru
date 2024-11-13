@@ -14,7 +14,8 @@
 dir="$HOME/.config/rofi/launchers/type-2"
 theme='style-bufer'
 
+
 ## Run
 rofi \
-    -dmenu \
+    -show clipboard \
     -theme ${dir}/${theme}.rasi

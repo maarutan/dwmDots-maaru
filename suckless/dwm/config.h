@@ -98,23 +98,11 @@ static const Layout layouts[] = {
        &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, KEY}},           toggletag,      {.ui = 1 << TAG} }),
 // helper for spawning shell commands in the pre dwm-5.0 fashion 
 #define SHCMD(cmd) {.v = (const char*[]){"/bin/sh", "-c", cmd, NULL}}
-
-// commands 
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_borderActive, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "kitty", NULL };
 static const char *browser[]  = { "firefox", NULL };
 static const char *codeEditor[]  = { "code", NULL };
-// volume 
-static const char *volup[]   = { "/home/maaru/suckless/scripts/volume.sh", "up", NULL };
-static const char *voldown[] = { "/home/maaru/suckless/scripts/volume.sh", "down", NULL };
-static const char *volmute[] = { "/home/maaru/suckless/scripts/volume.sh", "mute", NULL };
-// brightness
-static const char *brgup[]   = { "/home/maaru/suckless/scripts/brightnessControl.sh", "up", NULL };
-static const char *brgdown[] = { "/home/maaru/suckless/scripts/brightnessControl.sh", "down", NULL };
-// wallpapers
-static const char *walL[] = { "/home/maaru/suckless/scripts/change_wallpaper.sh", "left", NULL };
-static const char *walR[] = { "/home/maaru/suckless/scripts/change_wallpaper.sh", "right", NULL };
 #include "movestack.c"
 static Keychord *keychords[] = {
 	//dmenu
@@ -122,7 +110,7 @@ static Keychord *keychords[] = {
 	//kitty 
     &((Keychord){1, {{MODKEY, XK_Return}},   spawn,          { .v = termcmd } }),
     //clock
-    &((Keychord){1, {{MODKEY|ALTKEY, XK_c}}, spawn, SHCMD("/home/maaru/suckless/scripts/clock.sh") }),
+    &((Keychord){1, {{MODKEY|ALTKEY, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }),
     //killActive 
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
 	//firefoox
@@ -134,43 +122,46 @@ static Keychord *keychords[] = {
 	//toggleBar 
     &((Keychord){1, {{MODKEY|ShiftMask, XK_t}}, spawn,  SHCMD("telegram-desktop")  }),
 	//update system
-    &((Keychord){1, {{MODKEY|ControlMask, XK_u}}, spawn,  SHCMD("kitty -e  /home/maaru/suckless/scripts/update.sh")  }),
+    &((Keychord){1, {{MODKEY|ControlMask, XK_u}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/update.sh")  }),
 	//signal dwmblocks change keyboard
-    &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks && /home/maaru/suckless/scripts/changeKeyboard.sh")  }),
+    &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks && $HOME/suckless/scripts/changeKeyboard.sh")  }),
 	//rofi
-    &((Keychord){1, {{MODKEY, XK_a}}, spawn,  SHCMD("/home/maaru/.config/rofi/launchers/type-2/launcher.sh")  }),
-    &((Keychord){1, {{MODKEY, XK_r}}, spawn,  SHCMD("/home/maaru/.config/rofi/launchers/type-3/launcher_1.sh")  }),
-    &((Keychord){1, {{MODKEY, XK_v}}, spawn, SHCMD("/home/maaru/suckless/scripts/buferRofi.sh") }),
-    &((Keychord){1, {{MODKEY|ALTKEY, XK_a}}, spawn,  SHCMD("/home/maaru/.config/rofi/launchers/type-2/emoji.sh")  }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_p}}, spawn,  SHCMD("/home/maaru/.config/rofi/powermenu/type-2/powermenu.sh")  }),
+    &((Keychord){1, {{MODKEY, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),
+    &((Keychord){1, {{MODKEY, XK_r}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),
+    &((Keychord){1, {{MODKEY, XK_v}}, spawn, SHCMD("$HOME/.config/rofi/launchers/type-2/bufer.sh") }),
+    &((Keychord){1, {{MODKEY|ALTKEY, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/emoji.sh")  }),
+    &((Keychord){1, {{MODKEY|ShiftMask, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }),
 	//colorpicer
-    &((Keychord){1, {{MODKEY|ALTKEY, XK_p}}, spawn,  SHCMD("xcolor -s clipboard")  }),
-	//settings 
-    &((Keychord){1, {{MODKEY, XK_i}}, spawn,  SHCMD("kitty -e /home/maaru/suckless/dwm")  }),
+    &((Keychord){2, {{MODKEY, XK_p}, {MODKEY,XK_c}}, spawn,  SHCMD("xcolor -s clipboard")  }),
+	//settings dwm scripts autostart 
+    &((Keychord){2, {{MODKEY, XK_i}, {MODKEY, XK_d}}, spawn,  SHCMD("kitty -e $HOME/suckless/dwm")  }),
+    &((Keychord){2, {{MODKEY, XK_i}, {MODKEY, XK_a}}, spawn,  SHCMD("kitty -e $HOME/suckless/autostart")  }),
+    &((Keychord){2, {{MODKEY, XK_i}, {MODKEY, XK_s}}, spawn,  SHCMD("kitty -e $HOME/suckless/scripts")  }),
 	//filemanager
-    &((Keychord){1, {{MODKEY, XK_e}}, spawn,  SHCMD("kitty -e yazi")  }),
+    &((Keychord){2, {{MODKEY, XK_e}, {MODKEY, XK_y}}, spawn,  SHCMD("kitty -e yazi")  }),
+    &((Keychord){2, {{MODKEY, XK_e}, {MODKEY, XK_n}}, spawn,  SHCMD("nemo")  }),
 	//screen shot
-    &((Keychord){1, {{MODKEY, XK_p}}, spawn,  SHCMD("flameshot gui")  }),
+    &((Keychord){2, {{MODKEY, XK_p}, {MODKEY, XK_p}}, spawn,  SHCMD("flameshot gui")  }),
 	//wallpapers control
-    &((Keychord){1, {{MODKEY|ControlMask, 0x5b}}, spawn, { .v = walL } }),
-    &((Keychord){1, {{MODKEY|ControlMask, 0x5d}}, spawn, { .v = walR } }),
+    &((Keychord){1, {{MODKEY|ControlMask, 0x5b}}, spawn, SHCMD("$HOME/suckless/scripts/change_wallpaper.sh left" ) }),
+    &((Keychord){1, {{MODKEY|ControlMask, 0x5d}}, spawn, SHCMD("$HOME/suckless/scripts/change_wallpaper.sh right") }),
 	// Управление Ярсотью 
-    &((Keychord){1, {{MODKEY|ShiftMask, 0x5b}}, spawn, { .v = brgup } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, 0x5d}}, spawn, { .v = brgdown } }),
+    &((Keychord){1, {{MODKEY|ShiftMask, 0x5b}}, spawn, SHCMD("$HOME/suckless/scripts/brightnessControl.sh up") }),
+    &((Keychord){1, {{MODKEY|ShiftMask, 0x5d}}, spawn, SHCMD("$HOME/suckless/scripts/brightnessControl.sh down") }),
     // Управление Громкостью 
-    &((Keychord){1, {{MODKEY, 0x5b}}, spawn, { .v = volup   } }),
-    &((Keychord){1, {{MODKEY, 0x5d}}, spawn, { .v = voldown } }),
-    &((Keychord){1, {{MODKEY, 0x5c}}, spawn, { .v = volmute } }),
+    &((Keychord){1, {{MODKEY, 0x5b}}, spawn, SHCMD("$HOME/suckless/scripts/volume.sh up"  ) }),
+    &((Keychord){1, {{MODKEY, 0x5d}}, spawn, SHCMD("$HOME/suckless/scripts/volume.sh down") }),
+    &((Keychord){1, {{MODKEY, 0x5c}}, spawn, SHCMD("$HOME/suckless/scripts/volume.sh mute") }),
     // move flouting window
-	&((Keychord){1, {{MODKEY, XK_j}}, moveresize, { .v = "0x 30y 0w 0h" } }),
-    &((Keychord){1, {{MODKEY, XK_k}}, moveresize, { .v = "0x -30y 0w 0h" } }),
-    &((Keychord){1, {{MODKEY, XK_l}}, moveresize, { .v = "30x 0y 0w 0h" } }),
-    &((Keychord){1, {{MODKEY, XK_h}}, moveresize, { .v = "-30x 0y 0w 0h" } }),
+	&((Keychord){1, {{MODKEY, XK_j}}, moveresize, { .v = "0x 40y 0w 0h"  } }),
+    &((Keychord){1, {{MODKEY, XK_k}}, moveresize, { .v = "0x -40y 0w 0h" } }),
+    &((Keychord){1, {{MODKEY, XK_l}}, moveresize, { .v = "40x 0y 0w 0h"  } }),
+    &((Keychord){1, {{MODKEY, XK_h}}, moveresize, { .v = "-40x 0y 0w 0h" } }),
     //resize flouting widnow
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 30h" } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -30h" } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 30w 0h" } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -30w 0h" } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 40h"  } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -40h" } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 40w 0h"  } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -40w 0h" } }),
     // move flouting window ALTKEY
     &((Keychord){1, {{MODKEY|ControlMask, XK_k}}, moveresizeedge, { .v = "t" } }),
     &((Keychord){1, {{MODKEY|ControlMask, XK_j}}, moveresizeedge, { .v = "b" } }),
@@ -192,7 +183,7 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY|ShiftMask, XK_l}}, setmfact, { .f = +0.05 } }),
     &((Keychord){1, {{MODKEY|ShiftMask, XK_h}}, setmfact, { .f = -0.05 } }),
 	// tileStack modes I, D 
-    &((Keychord){1, {{MODKEY, XK_i}}, incnmaster, { .i = +1 } }),
+    &((Keychord){1, {{MODKEY, XK_u}}, incnmaster, { .i = +1 } }),
     &((Keychord){1, {{MODKEY, XK_d}}, incnmaster, { .i = -1 } }),
 	//MoveStack 
     &((Keychord){1, {{MODKEY|ControlMask, XK_j}}, movestack, { .i = +1 } }),

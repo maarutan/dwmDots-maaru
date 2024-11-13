@@ -19,6 +19,10 @@ setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
 # Запуск менеджера уведомлений dunst
 dunst &
 
+# Запуск буфер обмена 
+greenclip daemon &
+
+
 # Небольшая пауза перед установкой фонового изображения
 sleep 0.5
 
