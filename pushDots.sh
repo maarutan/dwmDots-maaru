@@ -114,6 +114,7 @@ else
     neofetch
 fi
 display_ascii_art "${ascii_arts[0]}"
+sleep 1.3
 
 # Проверка наличия .git в целевой директории
 if [ -d "$TARGET_DIR/.git" ]; then
@@ -135,7 +136,8 @@ else
     else
         neofetch
     fi
-    display_ascii_art "${ascii_arts[0]}"
+    
+sleep 1.3
     echo "Репозиторий не найден. Клонируем его..."
     git clone --branch "$BRANCH" "$REPO_SSH" "$TARGET_DIR"
     if [ $? -ne 0 ]; then
@@ -207,3 +209,4 @@ if [[ "$DELETE_TEMP" == "y" ]]; then
 else
     echo "Временная директория сохранена."
 fi
+
