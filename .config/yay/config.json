@@ -2,7 +2,7 @@
   "cleanAfter": true,
   "cleanSysUpgrade": true,
   "devel": true,
-  "removemake": true,
+  "removemake": "true",
   "sudoloop": true,
   "timeUpdate": true,
   "noedit": true,
