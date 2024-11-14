@@ -116,7 +116,7 @@ static Keychord *keychords[] = {
 	//firefox
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_f}}, spawn,  {.v = browser } }),
     //pushDots
-    &((Keychord){2, {{MODKEY, XK_s},{0,XK_u}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/pushDots.sh")  }),
+    &((Keychord){2, {{MODKEY, XK_s},{0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/pushDots.sh")  }),
 	//vesktop
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_d}}, spawn,  SHCMD("vesktop")  }),
 	//vscode
@@ -134,7 +134,7 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY|ShiftMask, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),
     &((Keychord){1, {{MODKEY, XK_v}}, spawn, SHCMD("$HOME/.config/rofi/launchers/type-2/bufer.sh") }),
     &((Keychord){1, {{MODKEY|ALTKEY, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/emoji.sh")  }),
-    &((Keychord){2, {{MODKEY, XK_s},{0|ShiftMask, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }),
+    &((Keychord){2, {{MODKEY, XK_s},{0, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }),
 	//colorpicer
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("xcolor -s clipboard")  }),
 	//settings dwm scripts autostart 
