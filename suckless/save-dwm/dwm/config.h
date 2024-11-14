@@ -113,8 +113,10 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY|ALTKEY, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }),
     //killActive 
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
-	//firefoox
+	//firefox
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_f}}, spawn,  {.v = browser } }),
+    //pushDots
+    &((Keychord){2, {{MODKEY, XK_s},{0,XK_u}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/pushDots.sh")  }),
 	//vesktop
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_d}}, spawn,  SHCMD("vesktop")  }),
 	//vscode
@@ -124,7 +126,7 @@ static Keychord *keychords[] = {
 	//update system
     &((Keychord){2, {{MODKEY, XK_s},{0,XK_u}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/update.sh")  }),
     //recompile dwm
-    &((Keychord){2, {{MODKEY, XK_s},{0,XK_r}}, spawn,  SHCMD("/home/maaru/suckless/scripts/recompileDwm.sh")  }),
+    &((Keychord){2, {{MODKEY, XK_s},{0,XK_r}}, spawn,  SHCMD("$HOME/suckless/scripts/recompileDwm.sh")  }),
 	//signal dwmblocks change keyboard
     &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks && $HOME/suckless/scripts/changeKeyboard.sh")  }),
 	//rofi
