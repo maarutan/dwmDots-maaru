@@ -20,6 +20,8 @@ export NVM_DIR="$HOME/.nvm"
 export VISUAL=nvim;
 export EDITOR=nvim;
 eval "$(zoxide init zsh)"
+export PATH=$HOME/.local/bin:$PATH
+
 
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"

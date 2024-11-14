@@ -29,7 +29,7 @@ static       int smartgaps           = 0;        // 1 means no outer gap when th
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
 // font
-static const char *fonts[]           = { "FiraCode Nerd Font:size=17" };
+static const char *fonts[]           = { "FiraCode Nerd Font:size=16" };
 // color
 static const char col_gray1[]        = "#222222";
 static const char col_gray2[]        = "#444444";
@@ -114,34 +114,36 @@ static Keychord *keychords[] = {
     //killActive 
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
 	//firefoox
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_f}},spawn,  {.v = browser } }),
+    &((Keychord){2, {{MODKEY, XK_a},{0,XK_f}}, spawn,  {.v = browser } }),
 	//vesktop
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_v}}, spawn,  SHCMD("vesktop")  }),
+    &((Keychord){2, {{MODKEY, XK_a},{0,XK_d}}, spawn,  SHCMD("vesktop")  }),
 	//vscode
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_c}},spawn,  {.v = codeEditor } }),
+    &((Keychord){2, {{MODKEY, XK_a},{0,XK_c}}, spawn,  {.v = codeEditor } }),
 	//toggleBar 
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_t}}, spawn,  SHCMD("telegram-desktop")  }),
+    &((Keychord){2, {{MODKEY, XK_a},{0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }),
 	//update system
-    &((Keychord){1, {{MODKEY|ControlMask, XK_u}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/update.sh")  }),
+    &((Keychord){2, {{MODKEY, XK_s},{0,XK_u}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/update.sh")  }),
+    //recompile dwm
+    &((Keychord){2, {{MODKEY, XK_s},{0,XK_r}}, spawn,  SHCMD("/home/maaru/suckless/scripts/recompileDwm.sh")  }),
 	//signal dwmblocks change keyboard
     &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks && $HOME/suckless/scripts/changeKeyboard.sh")  }),
 	//rofi
-    &((Keychord){1, {{MODKEY, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),
-    &((Keychord){1, {{MODKEY, XK_r}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),
+    &((Keychord){1, {{MODKEY, XK_r}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),
+    &((Keychord){1, {{MODKEY|ShiftMask, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),
     &((Keychord){1, {{MODKEY, XK_v}}, spawn, SHCMD("$HOME/.config/rofi/launchers/type-2/bufer.sh") }),
     &((Keychord){1, {{MODKEY|ALTKEY, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/emoji.sh")  }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }),
+    &((Keychord){2, {{MODKEY, XK_s},{0|ShiftMask, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }),
 	//colorpicer
-    &((Keychord){2, {{MODKEY, XK_p}, {MODKEY,XK_c}}, spawn,  SHCMD("xcolor -s clipboard")  }),
+    &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("xcolor -s clipboard")  }),
 	//settings dwm scripts autostart 
-    &((Keychord){2, {{MODKEY, XK_i}, {MODKEY, XK_d}}, spawn,  SHCMD("kitty -e $HOME/suckless/dwm")  }),
-    &((Keychord){2, {{MODKEY, XK_i}, {MODKEY, XK_a}}, spawn,  SHCMD("kitty -e $HOME/suckless/autostart")  }),
-    &((Keychord){2, {{MODKEY, XK_i}, {MODKEY, XK_s}}, spawn,  SHCMD("kitty -e $HOME/suckless/scripts")  }),
+    &((Keychord){2, {{MODKEY, XK_i}, {0, XK_d}}, spawn,  SHCMD("kitty -e $HOME/suckless/dwm")  }),
+    &((Keychord){2, {{MODKEY, XK_i}, {0, XK_a}}, spawn,  SHCMD("kitty -e $HOME/suckless/autostart")  }),
+    &((Keychord){2, {{MODKEY, XK_i}, {0, XK_s}}, spawn,  SHCMD("kitty -e $HOME/suckless/scripts")  }),
 	//filemanager
-    &((Keychord){2, {{MODKEY, XK_e}, {MODKEY, XK_y}}, spawn,  SHCMD("kitty -e yazi")  }),
-    &((Keychord){2, {{MODKEY, XK_e}, {MODKEY, XK_n}}, spawn,  SHCMD("nemo")  }),
+    &((Keychord){2, {{MODKEY, XK_e}, {0, XK_y}}, spawn,  SHCMD("kitty --hold sh -c 'yazi'")  }),
+    &((Keychord){2, {{MODKEY, XK_e}, {0, XK_n}}, spawn,  SHCMD("nemo")  }),
 	//screen shot
-    &((Keychord){2, {{MODKEY, XK_p}, {MODKEY, XK_p}}, spawn,  SHCMD("flameshot gui")  }),
+    &((Keychord){2, {{MODKEY, XK_p}, {0, XK_p}}, spawn,  SHCMD("flameshot gui")  }),
 	//wallpapers control
     &((Keychord){1, {{MODKEY|ControlMask, 0x5b}}, spawn, SHCMD("$HOME/suckless/scripts/change_wallpaper.sh left" ) }),
     &((Keychord){1, {{MODKEY|ControlMask, 0x5d}}, spawn, SHCMD("$HOME/suckless/scripts/change_wallpaper.sh right") }),
