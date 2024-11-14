@@ -11,6 +11,7 @@
   "noupgrademenu": true,
   "norebuild": true,
   "answerclean": "All",
-  "answerdiff": "All"
+  "answerdiff": "None",
+  "noconfirm": true,
+  "noprovides": true
 }
-
