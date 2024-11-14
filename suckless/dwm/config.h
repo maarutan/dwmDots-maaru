@@ -137,6 +137,9 @@ static Keychord *keychords[] = {
     //filemanager [super + e ]
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_y}}, spawn,  SHCMD("kitty --hold sh -c 'yazi'")  }), // yazi
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_n}}, spawn,  SHCMD("nemo")  }), // nemo
+    // web apps
+    &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_m}}, spawn,  SHCMD("firefox --class WebApp-monkey3985 --name WebApp-monkey3985 --profile $HOME/.local/share/ice/firefox/monkey3985 --no-remote 'https://monkeytype.com'")  }), //monkeytype
+    &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_g}}, spawn,  SHCMD("firefox --class WebApp-chatG2444 --name WebApp-chatG2444 --profile /home/maaru/.local/share/ice/firefox/chatG2444 --no-remote 'https://chatgpt.com/'")  }), //chat gpt
 	//kitty 
     &((Keychord){1, {{MODKEY, XK_Return}},   spawn,          { .v = termcmd } }),
     //killActive 
