@@ -44,12 +44,6 @@ static const char *colors[][3]       = {
 	[SchemeNorm] = { col_gray3, background, col_noActive, },
 	[SchemeSel]  = { col_gray4, background2 , col_borderActive },
 };
-//=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
-static const char dmenufont[]        = "Fira Code :size=15" ;
-//bar paddings
-static const int vertpad             = 13;      // vertical padding of bar 
-static const int sidepad             = 7;       // horizontal padding of bar 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 // tagging 
 static const char *tags[] = {   " 󱍢 ", "  ", " 󰈹 ", "  ", " 󰣇 ", "  ", "  ", "  ", "  " };
 //static const char *tags[] = { " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 " };
@@ -102,15 +96,11 @@ static const Layout layouts[] = {
        &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, KEY}},           toggletag,      {.ui = 1 << TAG} }),
 // helper for spawning shell commands in the pre dwm-5.0 fashion 
 #define SHCMD(cmd) {.v = (const char*[]){"/bin/sh", "-c", cmd, NULL}}
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_borderActive, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "kitty", NULL };
 static const char *browser[]  = { "firefox", NULL };
 static const char *codeEditor[]  = { "code", NULL };
 #include "movestack.c"
 static Keychord *keychords[] = {
-	//dmenu
-    &((Keychord){1, {{0 ,0}},               spawn,          { .v = dmenucmd } }),
 	//kitty 
     &((Keychord){1, {{MODKEY, XK_Return}},   spawn,          { .v = termcmd } }),
     //clock
@@ -204,22 +194,22 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{0, 0}}, setcfact, { .f = -0.25 } }),
     &((Keychord){1, {{0, 0}}, setcfact, { .f =  0.00 } }),
 	//Gaps 
-    &((Keychord){1, {{0, 0}}, incrgaps, { .i = +1 } }),
-    &((Keychord){1, {{0, 0}}, incrgaps, { .i = -1 } }),
-    &((Keychord){1, {{0, 0}}, incrigaps, { .i = +1 } }),
-    &((Keychord){1, {{0, 0}}, incrigaps, { .i = -1 } }),
-    &((Keychord){1, {{0, 0}}, incrogaps, { .i = +1 } }),
-    &((Keychord){1, {{0, 0}}, incrogaps, { .i = -1 } }),
-    &((Keychord){1, {{0, 0}}, incrihgaps, { .i = +1 } }),
-    &((Keychord){1, {{0, 0}}, incrihgaps, { .i = -1 } }),
-    &((Keychord){1, {{0, 0}}, incrivgaps, { .i = +1 } }),
-    &((Keychord){1, {{0, 0}}, incrivgaps, { .i = -1 } }),
-    &((Keychord){1, {{0, 0}}, incrohgaps, { .i = +1 } }),
-    &((Keychord){1, {{0, 0}}, incrohgaps, { .i = -1 } }),
-    &((Keychord){1, {{0, 0}}, incrovgaps, { .i = +1 } }),
-    &((Keychord){1, {{0, 0}}, incrovgaps, { .i = -1 } }),
-    &((Keychord){1, {{0, 0}}, togglegaps, { 0 } }),
-    &((Keychord){1, {{0, 0}}, defaultgaps, { 0 } }),
+    &((Keychord){0, {{0, 0}}, incrgaps, { .i = +1 } }),
+    &((Keychord){0, {{0, 0}}, incrgaps, { .i = -1 } }),
+    &((Keychord){0, {{0, 0}}, incrigaps, { .i = +1 } }),
+    &((Keychord){0, {{0, 0}}, incrigaps, { .i = -1 } }),
+    &((Keychord){0, {{0, 0}}, incrogaps, { .i = +1 } }),
+    &((Keychord){0, {{0, 0}}, incrogaps, { .i = -1 } }),
+    &((Keychord){0, {{0, 0}}, incrihgaps, { .i = +1 } }),
+    &((Keychord){0, {{0, 0}}, incrihgaps, { .i = -1 } }),
+    &((Keychord){0, {{0, 0}}, incrivgaps, { .i = +1 } }),
+    &((Keychord){0, {{0, 0}}, incrivgaps, { .i = -1 } }),
+    &((Keychord){0, {{0, 0}}, incrohgaps, { .i = +1 } }),
+    &((Keychord){0, {{0, 0}}, incrohgaps, { .i = -1 } }),
+    &((Keychord){0, {{0, 0}}, incrovgaps, { .i = +1 } }),
+    &((Keychord){0, {{0, 0}}, incrovgaps, { .i = -1 } }),
+    &((Keychord){0, {{0, 0}}, togglegaps, { 0 } }),
+    &((Keychord){0, {{0, 0}}, defaultgaps, { 0 } }),
 	// view window  
     &((Keychord){1, {{MODKEY, XK_Tab}}, view, { 0 } }),
     // setlayout
@@ -287,4 +277,9 @@ static const Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
+//=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+//bar paddings
+static const int vertpad             = 13;      // vertical padding of bar 
+static const int sidepad             = 7;       // horizontal padding of bar 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 
