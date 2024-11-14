@@ -14,23 +14,6 @@ pkill -f libinput-gestures
 libinput-gestures-setup start &
 
 # Настройка раскладки клавиатуры: переключение между us и ru при помощи Ctrl + Alt
-# Запускаем в фоновом цикле, чтобы не блокировать основной поток
-(
-    while true; do
-        # Проверяем текущие настройки клавиатуры
-        current_layout=$(setxkbmap -query | grep layout | awk '{print $2}')
-        
-        # Если текущий расклад не "us" или сброшены опции, устанавливаем нужные настройки
-        if [[ "$current_layout" != "us" ]]; then
-            setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
-        fi
-        
-        # Ожидаем несколько секунд перед повторной проверкой
-        sleep 5
-    done
-) &
-
-# Дополнительная установка раскладки для безопасности
 setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
 
 # Запуск менеджера уведомлений dunst
