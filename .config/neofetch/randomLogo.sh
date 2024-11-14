@@ -6,14 +6,11 @@ LOGO_DIR="$HOME/.config/neofetch/pngs"
 # Путь к файлу кэша
 CACHE_FILE="$HOME/.config/neofetch/logo_cache.txt"
 
-# Массив логотипов
-LOGOS=(
-    "$LOGO_DIR/loli.png"
-    "$LOGO_DIR/aisaka.png"
-    "$LOGO_DIR/olbedo.png"
-    "$LOGO_DIR/pochita.png"
-    "$LOGO_DIR/ryuzaki.png"
-)
+# Массив логотипов (автоматическое добавление всех .png файлов из LOGO_DIR)
+LOGOS=()
+for logo in "$LOGO_DIR"/*.png; do
+    LOGOS+=("$logo")
+done
 
 # Выбрать случайный логотип
 RANDOM_LOGO="${LOGOS[$RANDOM % ${#LOGOS[@]}]}"

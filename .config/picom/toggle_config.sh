@@ -2,18 +2,18 @@
 
 # Проверка переданного режима
 if [[ "$1" == "default" ]]; then
-    CONFIG1="$HOME/.config/picom/picom_no_anims.conf"
-    CONFIG2="$HOME/.config/picom/picom_simple_anims.conf"
+    CONFIG1="$HOME/.config/picom/blur/picom_no_anims.conf"
+    CONFIG2="$HOME/.config/picom/blur/picom_simple_anims.conf"
 elif [[ "$1" == "glass" ]]; then
-    CONFIG1="$HOME/.config/picom/picom_no_anims_glass.conf"
-    CONFIG2="$HOME/.config/picom/picom_simple_anims_glass.conf"
+    CONFIG1="$HOME/.config/picom/glass/picom_no_anims_glass.conf"
+    CONFIG2="$HOME/.config/picom/glass/picom_simple_anims_glass.conf"
 else
     echo "Укажите режим: 'default' или 'glass'"
     exit 1
 fi
 
-# Файл для хранения последнего использованного конфига
-LAST_CONFIG_FILE="$HOME/.config/picom/last_config_$1.txt"
+# Файл для хранения последнего использованного конфига (один для всех режимов)
+LAST_CONFIG_FILE="$HOME/.config/picom/last_config.txt"
 
 # Проверка существования файла последней конфигурации
 if [ ! -f "$LAST_CONFIG_FILE" ]; then
@@ -30,10 +30,10 @@ else
     NEW_CONFIG="$CONFIG1"
 fi
 
-# Сохранение нового конфигурационного пути
+# Сохранение нового конфигурационного пути в один файл
 echo "$NEW_CONFIG" > "$LAST_CONFIG_FILE"
 
 # Перезапуск picom с новым конфигом
 pkill picom
-sleep .3
-picom --config "$NEW_CONFIG"
+sleep 0.3
+picom --config "$NEW_CONFIG" &

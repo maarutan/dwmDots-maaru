@@ -7,7 +7,7 @@ export QT_QPA_PLATFORMTHEME=qt5ct
 xsettingsd &
 
 # Запуск композитора для управления окнами
-picom &
+picom --config $(cat /home/maaru/.config/picom/last_config.txt) &
 
 # Остановка предыдущих процессов libinput-gestures и их перезапуск
 pkill -f libinput-gestures
@@ -43,17 +43,10 @@ blueman-applet &
 # Запуск Telegram
 telegram-desktop &
 
-# Запуск Firefox
-(
-firefox 
-xdotool key super+1
-)&
 
 # Автоматический запуск neofetch в новом терминале через 3 секунды
 (
-    sleep 2
-    kitty --title "neofetch_terminal" -e bash -c 'neofetch --config $HOME.config/neofetch/myProfile.conf; exec bash'
-    xdotool key super+1
+    kitty --title "neofetch_terminal" -e bash -c 'neofetch --config $HOME/.config/neofetch/myProfile.conf; exec bash'
 ) &
 
 # Запуск оконного менеджера dwm в бесконечном цикле с перенаправлением ошибок в лог-файл

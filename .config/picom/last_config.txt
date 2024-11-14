@@ -1,1 +1,1 @@
-/home/maaru/.config/picom/picom_no_anims_glass.conf
+/home/maaru/.config/picom/blur/picom_no_anims.conf
