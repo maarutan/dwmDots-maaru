@@ -35,5 +35,5 @@ echo "$NEW_CONFIG" > "$LAST_CONFIG_FILE"
 
 # Перезапуск picom с новым конфигом
 pkill picom
-sleep 0.3
+sleep 0.5
 picom --config "$NEW_CONFIG" &

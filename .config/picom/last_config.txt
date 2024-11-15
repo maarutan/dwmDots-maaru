@@ -1,1 +1,1 @@
-/home/maaru/.config/picom/blur/picom_no_anims.conf
+/home/maaru/.config/picom/blur/picom_simple_anims.conf
