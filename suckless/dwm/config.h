@@ -60,7 +60,7 @@ static const Rule rules[] = {
 	//	WM_CLASS(STRING) = instance, class
 	//	WM_NAME(STRING) = title
 	// class      instance    title       tags mask     isfloating   monitor 
-	{ "firefox",          NULL, NULL, 1 << 2, 0, -1 },
+	  { "firefox",          NULL, NULL, 1 << 2, 0, -1 },
     { "telegram-desktop", NULL, NULL, 1 << 3, 0, -1 },
     { "TelegramDesktop",  NULL, NULL, 1 << 3, 0, -1 },
     { "kitty", NULL, "neofetch_terminal", 1 << 0, 0, -1 },
@@ -132,7 +132,7 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_c}}, spawn,  {.v = codeEditor } }),//vscode
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
     //screen [super + p ]
-    &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("xcolor -s clipboard")  }),//	colorpicer
+    &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("$HOME/suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
     &((Keychord){2, {{MODKEY, XK_p}, {0, XK_s}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
     &((Keychord){2, {{MODKEY, XK_p},{0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }), //clock
     &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default") }), // picom blur
