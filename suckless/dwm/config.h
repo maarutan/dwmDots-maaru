@@ -18,15 +18,17 @@ static const unsigned int systraypinning = 1;    // 0: sloppy systray follows se
 static const unsigned int systrayonleft = 1;     // 0: systray in the right corner, >0: systray on left of status text 
 static const unsigned int systrayspacing = 12;   // systray spacing 
 static const int systraypinningfailfirst = 1;    // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
-static const int showsystray        = 1;         // 0 means no systray 
+static const int showsystray        = 0;         // 0 means no systray 
+//show boxes
+static int show_tag_boxes = 1;  // 1 — показывать квадратики, 0 — не показывать
 //gap
 static const unsigned int gappiv     = 20;       // vert inner gap between windows 
 static const unsigned int gappih     = 20;       // horiz inner gap between windows 
 static const unsigned int gappoh     = 20;       // horiz outer gap between windows and screen edge 
 static const unsigned int gappov     = 20;       // vert outer gap between windows and screen edge 
 static       int smartgaps           = 1;        // 1 means no outer gap when there is only one window 
-static const unsigned int single_gappov = 120; // Вертикальный внешний отступ при одном окне
-static const unsigned int single_gappoh = 55; // Горизонтальный внешний отступ при одном окне
+static const unsigned int single_gappov = 90; // Вертикальный внешний отступ при одном окне
+static const unsigned int single_gappoh = 70; // Горизонтальный внешний отступ при одном окне
 //bar
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
@@ -130,7 +132,7 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_c}}, spawn,  {.v = codeEditor } }),//vscode
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
     //screen [super + p ]
-    &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("$HOME/suckless/scripts/xcolor-picker.sh")  }),// xcolor-picker
+    &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("xcolor -s clipboard")  }),//	colorpicer
     &((Keychord){2, {{MODKEY, XK_p}, {0, XK_s}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
     &((Keychord){2, {{MODKEY, XK_p},{0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }), //clock
     &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default") }), // picom blur
@@ -249,6 +251,9 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_w}}, togglefloating, { 0 } }), //toggle floating
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}}, setlayout, { 0 } }),// setlayout
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_g}}, togglesmartgaps, { 0 } }),// togglesmartgaps
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_t}}, toggle_tag_boxes, { 0 } }),// toggle_tag_boxes
+
+
     //===================================================================================//
 	// tags 
 	TAGKEYS(            XK_1,                      0)
@@ -298,7 +303,7 @@ static const Button buttons[] = {
 };
 //=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 //bar paddings
-static const int vertpad             = 13;      // vertical padding of bar 
-static const int sidepad             = 7;       // horizontal padding of bar 
+static const int vertpad             = 20;      // vertical padding of bar 
+static const int sidepad             = 40;       // horizontal padding of bar 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 

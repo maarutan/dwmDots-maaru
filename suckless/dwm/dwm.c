@@ -1,5 +1,5 @@
 /* See LICENSE file for copyright and license details.
- *
+
  * dynamic window manager is designed like any other X client as well. It is
  * driven through handling X events. In contrast to other X clients, a window
  * manager selects for SubstructureRedirectMask on the root window, to receive
@@ -54,7 +54,8 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
-#define STATE_FILE_PATH "/tmp/smartgaps_state.txt"
+#define STATE_FILE_PATH "/tmp/.smartgaps_state.txt"
+#define SHOW_TAG_BOXES_FILE "/tmp/dwm_show_tag_boxes_state.txt"  // Путь к файлу для хранения состояния
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 /* XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY      0
@@ -213,6 +214,7 @@ static void grabkeys(void);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
+void toggle_tag_boxes(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
@@ -723,6 +725,7 @@ configure(Client *c)
 	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ce);
 }
 
+
 void
 configurenotify(XEvent *e)
 {
@@ -893,56 +896,6 @@ dirtomon(int dir)
 }
 
 void
-drawbar(Monitor *m)
-{
-	int x, w, tw = 0, stw = 0;
-	int boxs = drw->fonts->h / 9;
-	int boxw = drw->fonts->h / 6 + 2;
-	unsigned int i, occ = 0, urg = 0;
-	Client *c;
-
-	if (!m->showbar)
-		return;
-
-	if(showsystray && m == systraytomon(m) && !systrayonleft)
-		stw = getsystraywidth();
-
-	/* draw status first so it can be overdrawn by tags later */
-	if (m == selmon) { /* status is only drawn on selected monitor */
-		drw_setscheme(drw, scheme[SchemeNorm]);
-		tw = TEXTW(stext) - lrpad / 2 + 2; /* 2px extra right padding */
-		drw_text(drw, m->ww - tw - stw, 0, tw, bh, lrpad / 2 - 2, stext, 0);
-	}
-
-	resizebarwin(m);
-	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags;
-		if (c->isurgent)
-			urg |= c->tags;
-	}
-	x = 0;
-	for (i = 0; i < LENGTH(tags); i++) {
-		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
-		if (occ & 1 << i)
-			drw_rect(drw, x + boxs, boxs, boxw, boxw,
-				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-				urg & 1 << i);
-		x += w;
-	}
-	w = TEXTW(m->ltsymbol);
-	drw_setscheme(drw, scheme[SchemeNorm]);
-	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
-
-	if ((w = m->ww - tw - stw - x) > bh) {
-			drw_setscheme(drw, scheme[SchemeNorm]);
-			drw_rect(drw, x, 0, w, bh, 1, 1);
-	}
-	drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
-}
-
-void
 drawbars(void)
 {
 	Monitor *m;
@@ -1008,6 +961,30 @@ focus(Client *c)
 	selmon->pertag->sel[selmon->pertag->curtag] = c;
 	drawbars();
 }
+
+
+void
+grabbuttons(Client *c, int focused)
+{
+    updatenumlockmask();
+    {
+        unsigned int i, j;
+        unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
+        XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+        if (!focused)
+            XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
+                        BUTTONMASK, GrabModeSync, GrabModeSync, None, None);
+        for (i = 0; i < LENGTH(buttons); i++)
+            if (buttons[i].click == ClkClientWin)
+                for (j = 0; j < LENGTH(modifiers); j++)
+                    XGrabButton(dpy, buttons[i].button,
+                                buttons[i].mask | modifiers[j],
+                                c->win, False, BUTTONMASK,
+                                GrabModeAsync, GrabModeSync, None, None);
+    }
+}
+
+
 
 /* there are some broken focus acquiring clients needing extra handling */
 void
@@ -1144,26 +1121,71 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size)
 	return 1;
 }
 
+
+
+
 void
-grabbuttons(Client *c, int focused)
+drawbar(Monitor *m)
 {
-	updatenumlockmask();
-	{
-		unsigned int i, j;
-		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
-		XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-		if (!focused)
-			XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
-				BUTTONMASK, GrabModeSync, GrabModeSync, None, None);
-		for (i = 0; i < LENGTH(buttons); i++)
-			if (buttons[i].click == ClkClientWin)
-				for (j = 0; j < LENGTH(modifiers); j++)
-					XGrabButton(dpy, buttons[i].button,
-						buttons[i].mask | modifiers[j],
-						c->win, False, BUTTONMASK,
-						GrabModeAsync, GrabModeSync, None, None);
-	}
+    int x, w, tw = 0, stw = 0;
+    int boxs = drw->fonts->h / 9;
+    int boxw = drw->fonts->h / 6 + 2;
+    unsigned int i, occ = 0, urg = 0;
+    Client *c;
+
+    if (!m->showbar)
+        return;
+
+    /* Убираем padding для системного трея */
+    if (showsystray && m == systraytomon(m) && !systrayonleft)
+        stw = getsystraywidth();  /* не добавляем дополнительный отступ */
+
+    x = 0;  /* Начинаем с левого края экрана */
+
+    /* Отрисовка статуса (только для выбранного монитора) */
+    if (m == selmon) {
+        drw_setscheme(drw, scheme[SchemeNorm]);
+        tw = TEXTW(stext) - lrpad / 2 + 2;
+        drw_text(drw, m->ww - tw - stw, 0, tw, bh, lrpad / 2 - 2, stext, 0);
+    }
+
+    resizebarwin(m);
+
+    for (c = m->clients; c; c = c->next) {
+        occ |= c->tags;
+        if (c->isurgent)
+            urg |= c->tags;
+    }
+
+    /* Отрисовка тегов с квадратиками */
+    for (i = 0; i < LENGTH(tags); i++) {
+        w = TEXTW(tags[i]);
+        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+        drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+        
+        /* Рисуем квадратики только если show_tag_boxes = 1 */
+        if (show_tag_boxes && (occ & 1 << i)) {
+            drw_rect(drw, x + boxs, boxs, boxw, boxw,
+                m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
+                urg & 1 << i);  /* Рисуем квадратик для активных тегов */
+        }
+        x += w;
+    }
+
+    /* Символ компоновки */
+    w = TEXTW(m->ltsymbol);
+    drw_setscheme(drw, scheme[SchemeNorm]);
+    x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+
+    if ((w = m->ww - tw - stw - x) > bh) {
+        drw_setscheme(drw, scheme[SchemeNorm]);
+        drw_rect(drw, x, 0, w, bh, 1, 1);
+    }
+
+    /* Обновление панели без padding для системного трея */
+    drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);  /* Просто отрисовываем панель */
 }
+
 
 void
 grabkeys(void)
@@ -1795,10 +1817,10 @@ resize(Client *c, int x, int y, int w, int h, int interact)
 
 void
 resizebarwin(Monitor *m) {
-	unsigned int w = m->ww;
-	if (showsystray && m == systraytomon(m) && !systrayonleft)
-		w -= getsystraywidth();
-	XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, w, bh);
+    unsigned int w = m->ww - 2 * sp; /* Учитываем боковые отступы */
+    if (showsystray && m == systraytomon(m) && !systrayonleft)
+        w -= getsystraywidth(); /* Учитываем ширину системного трея */
+    XMoveResizeWindow(dpy, m->barwin, m->wx + sp, m->by + vp, w, bh);
 }
 
 void
@@ -2101,9 +2123,28 @@ setmfact(const Arg *arg)
 	arrange(selmon);
 }
 
+
+void save_show_tag_boxes_state(void) {
+    FILE *file = fopen(SHOW_TAG_BOXES_FILE, "w");
+    if (file) {
+        fprintf(file, "%d\n", show_tag_boxes);  // Сохраняем состояние
+        fclose(file);
+    }
+}
+
+void load_show_tag_boxes_state(void) {
+    FILE *file = fopen(SHOW_TAG_BOXES_FILE, "r");
+    if (file) {
+        fscanf(file, "%d", &show_tag_boxes);  // Загружаем состояние
+        fclose(file);
+    }
+}
+
+
 void
 setup(void)
 {
+  load_show_tag_boxes_state(); 
 	int i;
 	XSetWindowAttributes wa;
 	Atom utf8string;
@@ -2194,6 +2235,15 @@ setup(void)
 	focus(NULL);
 }
 
+
+
+void toggle_tag_boxes(const Arg *arg) {
+    show_tag_boxes = !show_tag_boxes;  // Переключаем отображение квадратиков
+    save_show_tag_boxes_state();  // Сохраняем состояние
+    drawbar(selmon);  // Перерисовываем панель
+}
+
+
 void
 seturgent(Client *c, int urg)
 {
@@ -2277,23 +2327,24 @@ tagmon(const Arg *arg)
 void
 togglebar(const Arg *arg)
 {
-	selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag] = !selmon->showbar;
-	updatebarpos(selmon);
-	resizebarwin(selmon);
-	if (showsystray) {
-		XWindowChanges wc;
-		if (!selmon->showbar)
-			wc.y = -bh;
-		else if (selmon->showbar) {
-			wc.y = 0;
-			if (!selmon->topbar)
-				wc.y = selmon->mh - bh;
-		}
-		XConfigureWindow(dpy, systray->win, CWY, &wc);
-	}
-	arrange(selmon);
-}
+    selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag] = !selmon->showbar;
+    updatebarpos(selmon);
+    resizebarwin(selmon);
 
+    if (showsystray) {
+        XWindowChanges wc;
+        if (!selmon->showbar)
+            wc.y = -bh - vp; /* Учёт вертикального отступа */
+        else {
+            wc.y = vp; /* Учёт верхнего отступа */
+            if (!selmon->topbar)
+                wc.y = selmon->mh - bh - vp; /* Учёт нижнего отступа */
+        }
+        XConfigureWindow(dpy, systray->win, CWY, &wc);
+    }
+
+    arrange(selmon);
+}
 void
 togglefloating(const Arg *arg)
 {
@@ -2462,15 +2513,17 @@ updatebars(void)
 void
 updatebarpos(Monitor *m)
 {
-	m->wy = m->my;
-	m->wh = m->mh;
-	if (m->showbar) {
-		m->wh = m->wh - vertpad - bh;
-		m->by = m->topbar ? m->wy : m->wy + m->wh + vertpad;
-		m->wy = m->topbar ? m->wy + bh + vp : m->wy;
-	} else
-		m->by = -bh - vp;
+    m->wy = m->my;
+    m->wh = m->mh;
+    if (m->showbar) {
+        m->wh -= bh + 2 * vp; /* Уменьшаем высоту на высоту панели и вертикальные отступы */
+        m->by = m->topbar ? m->wy : m->wy + m->wh + vp;
+        m->wy = m->topbar ? m->wy + bh + vp : m->wy;
+    } else {
+        m->by = -bh - vp; /* Если панель скрыта */
+    }
 }
+
 
 void
 updateclientlist(void)
@@ -2743,8 +2796,9 @@ updatesystray(void)
 	}
 	w = w ? w + systrayspacing : 1;
 	x -= w;
-	XMoveResizeWindow(dpy, systray->win, x, m->by, w, bh);
-	wc.x = x; wc.y = m->by; wc.width = w; wc.height = bh;
+
+  XMoveResizeWindow(dpy, systray->win, x - sp, m->by + vp, w, bh);
+  wc.x = x - sp; wc.y = m->by + vp; wc.width = w; wc.height = bh;
 	wc.stack_mode = Above; wc.sibling = m->barwin;
 	XConfigureWindow(dpy, systray->win, CWX|CWY|CWWidth|CWHeight|CWSibling|CWStackMode, &wc);
 	XMapWindow(dpy, systray->win);

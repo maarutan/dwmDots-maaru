@@ -18,7 +18,9 @@ static const unsigned int systraypinning = 1;    // 0: sloppy systray follows se
 static const unsigned int systrayonleft = 1;     // 0: systray in the right corner, >0: systray on left of status text 
 static const unsigned int systrayspacing = 12;   // systray spacing 
 static const int systraypinningfailfirst = 1;    // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
-static const int showsystray        = 1;         // 0 means no systray 
+static const int showsystray        = 0;         // 0 means no systray 
+//show boxes
+static int show_tag_boxes = 1;  // 1 — показывать квадратики, 0 — не показывать
 //gap
 static const unsigned int gappiv     = 20;       // vert inner gap between windows 
 static const unsigned int gappih     = 20;       // horiz inner gap between windows 
@@ -249,6 +251,9 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_w}}, togglefloating, { 0 } }), //toggle floating
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}}, setlayout, { 0 } }),// setlayout
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_g}}, togglesmartgaps, { 0 } }),// togglesmartgaps
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_t}}, toggle_tag_boxes, { 0 } }),// toggle_tag_boxes
+
+
     //===================================================================================//
 	// tags 
 	TAGKEYS(            XK_1,                      0)
@@ -298,7 +303,7 @@ static const Button buttons[] = {
 };
 //=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 //bar paddings
-static const int vertpad             = 13;      // vertical padding of bar 
-static const int sidepad             = 7;       // horizontal padding of bar 
+static const int vertpad             = 20;      // vertical padding of bar 
+static const int sidepad             = 40;       // horizontal padding of bar 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 
