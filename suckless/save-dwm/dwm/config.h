@@ -20,12 +20,13 @@ static const unsigned int systrayspacing = 12;   // systray spacing
 static const int systraypinningfailfirst = 1;    // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
 static const int showsystray        = 1;         // 0 means no systray 
 //gap
-static const unsigned int gappiv     = 13;       // vert inner gap between windows 
-static const unsigned int gappih     = 13;       // horiz inner gap between windows 
-static const unsigned int gappoh     = 13;       // horiz outer gap between windows and screen edge 
-static const unsigned int gappov     = 13;       // vert outer gap between windows and screen edge 
-static       int smartgaps           = 0;        // 1 means no outer gap when there is only one window 
-//static const int attachbelow = 1;    // 1 means attach after the currently active window 
+static const unsigned int gappiv     = 20;       // vert inner gap between windows 
+static const unsigned int gappih     = 20;       // horiz inner gap between windows 
+static const unsigned int gappoh     = 20;       // horiz outer gap between windows and screen edge 
+static const unsigned int gappov     = 20;       // vert outer gap between windows and screen edge 
+static       int smartgaps           = 1;        // 1 means no outer gap when there is only one window 
+static const unsigned int single_gappov = 90; // Вертикальный внешний отступ при одном окне
+static const unsigned int single_gappoh = 70; // Горизонтальный внешний отступ при одном окне
 //bar
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
@@ -101,6 +102,7 @@ static const char *termcmd[]  = { "kitty", NULL };
 static const char *browser[]  = { "firefox", NULL };
 static const char *codeEditor[]  = { "code", NULL };
 #include "movestack.c"
+void togglesmartgaps(const Arg *arg);
 static Keychord *keychords[] = {
 /*
 * //  _            _                      _   _    _         _ _           
@@ -246,6 +248,7 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_Tab}}, toggleAttachBelow, { 0 } }), //toggleAttachBelow
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_w}}, togglefloating, { 0 } }), //toggle floating
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}}, setlayout, { 0 } }),// setlayout
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_g}}, togglesmartgaps, { 0 } }),// togglesmartgaps
     //===================================================================================//
 	// tags 
 	TAGKEYS(            XK_1,                      0)

@@ -142,26 +142,32 @@ incrivgaps(const Arg *arg)
 void
 getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 {
-	unsigned int n, oe, ie;
-	#if PERTAG_PATCH
-	oe = ie = selmon->pertag->enablegaps[selmon->pertag->curtag];
-	#else
-	oe = ie = enablegaps;
-	#endif // PERTAG_PATCH
-	Client *c;
 
-	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if (smartgaps && n == 1) {
-		oe = 0; // outer gaps disabled when only one client
-	}
+    unsigned int n, oe, ie;
+    (void)oe; // Подавление предупреждения о неиспользуемой переменной
+            
+    #if PERTAG_PATCH
+    oe = ie = selmon->pertag->enablegaps[selmon->pertag->curtag];
+    #else
+    oe = ie = enablegaps;
+    #endif // PERTAG_PATCH
+    Client *c;
 
-	*oh = m->gappoh*oe; // outer horizontal gap
-	*ov = m->gappov*oe; // outer vertical gap
-	*ih = m->gappih*ie; // inner horizontal gap
-	*iv = m->gappiv*ie; // inner vertical gap
-	*nc = n;            // number of clients
+    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+
+    // Применение разных отступов при одном окне
+    if (smartgaps && n == 1) {
+        *oh = single_gappoh; // Горизонтальный внешний отступ при одном окне
+        *ov = single_gappov; // Вертикальный внешний отступ при одном окне
+    } else {
+        *oh = gappoh; // Горизонтальный внешний отступ при нескольких окнах
+        *ov = gappov; // Вертикальный внешний отступ при нескольких окнах
+    }
+
+    *ih = gappih; // Внутренний горизонтальный отступ
+    *iv = gappiv; // Внутренний вертикальный отступ
+    *nc = n;      // Количество окон
 }
-
 void
 getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr)
 {

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Интервал обновления в секундах
-INTERVAL=1
+INTERVAL=10
 
-# Файл для хранения последнего уровня заряда
+# Файл для хранения последнего уровня заряда и состояния
 STATUS_FILE="/tmp/battery_status.txt"
 
 # Инициализация файла, если он не существует
@@ -66,20 +66,21 @@ get_battery_status() {
 
   # Чтение последнего статуса и отправка уведомлений при изменении
   last_status=$(cat "$STATUS_FILE")
-  if [ "$status" = "Charging" ] && [ "$capacity" -ge 90 ] && [ "$last_status" != "90" ]; then
-    notify-send "Батарея" "Батарея заряжена достаточно: $capacity%" -u normal
-    echo "90" >"$STATUS_FILE"
-  elif [ "$status" = "Discharging" ]; then
-    if [ "$capacity" -ge 50 ] && [ "$last_status" != "50" ]; then
-      notify-send "Батарея" "Средний уровень заряда: $capacity%" -u normal
-      echo "50" >"$STATUS_FILE"
-    elif [ "$capacity" -ge 30 ] && [ "$last_status" != "30" ]; then
-      notify-send "Батарея" "Низкий уровень заряда: $capacity%" -u normal
-      echo "30" >"$STATUS_FILE"
-    elif [ "$capacity" -le 15 ] && [ "$last_status" != "15" ]; then
-      notify-send "Батарея" "Критический уровень заряда: $capacity%" -u critical
-      echo "15" >"$STATUS_FILE"
-    fi
+
+  # Уведомление при заряде 90% (во время зарядки)
+  if [ "$status" = "Charging" ] && [ "$capacity" -ge 90 ] && [[ "$last_status" != "Charging_90" ]]; then
+    notify-send "Батарея" "Батарея заряжена до 90%. Пора снять зарядку." -u normal
+    echo "Charging_90" >"$STATUS_FILE"
+
+  # Уведомление при заряде 50% (во время разрядки)
+  elif [ "$status" = "Discharging" ] && [ "$capacity" -le 50 ] && [ "$capacity" -gt 15 ] && [[ "$last_status" != "Discharging_50" ]]; then
+    notify-send "Батарея" "Средний уровень заряда: $capacity%. Обратите внимание, зарядка наполовину." -u normal
+    echo "Discharging_50" >"$STATUS_FILE"
+
+  # Уведомление при критическом уровне заряда 15%
+  elif [ "$status" = "Discharging" ] && [ "$capacity" -le 15 ] && [[ "$last_status" != "Discharging_15" ]]; then
+    notify-send "Батарея" "Критический уровень заряда: $capacity%. Пора подключить зарядку." -u critical
+    echo "Discharging_15" >"$STATUS_FILE"
   fi
 }
 
@@ -88,4 +89,3 @@ while true; do
   get_battery_status
   sleep $INTERVAL
 done
-

@@ -40,7 +40,6 @@
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
 #include <X11/Xft/Xft.h>
-
 #include "drw.h"
 #include "util.h"
 
@@ -55,7 +54,7 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
-
+#define STATE_FILE_PATH "./smartgaps_state.txt"
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 /* XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY      0
@@ -324,6 +323,30 @@ unsigned int currentkey = 0;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
+void saveSmartgapsState(int state) {
+    FILE *file = fopen(STATE_FILE_PATH, "w");
+    if (file != NULL) {
+        fprintf(file, "%d\n", state);
+        fclose(file);
+    } else {
+        fprintf(stderr, "Ошибка: не удалось открыть файл для записи состояния.\n");
+    }
+}
+
+
+int loadSmartgapsState() {
+    FILE *file = fopen(STATE_FILE_PATH, "r");
+    int state = 1; // Значение по умолчанию (1 = smartgaps включен)
+    if (file != NULL) {
+        fscanf(file, "%d", &state);
+        fclose(file);
+    } else {
+        fprintf(stderr, "Ошибка: не удалось открыть файл для чтения состояния. Используется значение по умолчанию.\n");
+    }
+    return state;
+}
+
+
 struct Pertag {
 	unsigned int curtag, prevtag; /* current and previous tag */
 	int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
@@ -463,6 +486,7 @@ arrangemon(Monitor *m)
 	if (m->lt[m->sellt]->arrange)
 		m->lt[m->sellt]->arrange(m);
 }
+
 
 void
 attach(Client *c)
@@ -2918,7 +2942,8 @@ zoom(const Arg *arg)
 int
 main(int argc, char *argv[])
 {
-    loadAttachBelow();  // Загружаем сохранённое состояние attachbelow при запуске dwm
+    loadAttachBelow();   
+    smartgaps = loadSmartgapsState();
 	if (argc == 2 && !strcmp("-v", argv[1]))
 		die("dwm-"VERSION);
 	else if (argc != 1)
@@ -2939,3 +2964,10 @@ main(int argc, char *argv[])
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
 }
+
+void togglesmartgaps(const Arg *arg) {
+    smartgaps = !smartgaps;      // Переключение значения smartgaps
+    saveSmartgapsState(smartgaps); // Сохранение текущего состояния
+    arrange(NULL);               // Обновление расположения окон
+}
+
