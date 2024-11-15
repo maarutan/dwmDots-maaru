@@ -25,6 +25,7 @@ static const unsigned int gappih     = 13;       // horiz inner gap between wind
 static const unsigned int gappoh     = 13;       // horiz outer gap between windows and screen edge 
 static const unsigned int gappov     = 13;       // vert outer gap between windows and screen edge 
 static       int smartgaps           = 0;        // 1 means no outer gap when there is only one window 
+//static const int attachbelow = 1;    // 1 means attach after the currently active window 
 //bar
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
@@ -62,7 +63,6 @@ static const Rule rules[] = {
     { "kitty", NULL, "neofetch_terminal", 1 << 0, 0, -1 },
 };
 /* layout(s) */
-extern int attachbelow;
 static const float mfact     = 0.55; // factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    // number of clients in master area 
 static const int resizehints = 1;    // 1 means respect size hints in tiled resizals 
@@ -140,7 +140,7 @@ static Keychord *keychords[] = {
     // web apps
     &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_m}}, spawn,  SHCMD("firefox --class WebApp-monkey3985 --name WebApp-monkey3985 --profile $HOME/.local/share/ice/firefox/monkey3985 --no-remote 'https://monkeytype.com'")  }), //monkeytype
     &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_g}}, spawn,  SHCMD("firefox --class WebApp-chatG2444 --name WebApp-chatG2444 --profile /home/maaru/.local/share/ice/firefox/chatG2444 --no-remote 'https://chatgpt.com/'")  }), //chat gpt
-	//kitty 
+    //kitty 
     &((Keychord){1, {{MODKEY, XK_Return}},   spawn,          { .v = termcmd } }),
     //killActive 
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
@@ -162,15 +162,15 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY, 0x5d}}, spawn, SHCMD("$HOME/suckless/scripts/volume.sh down") }),
     &((Keychord){1, {{MODKEY, 0x5c}}, spawn, SHCMD("$HOME/suckless/scripts/volume.sh mute") }),
     // move flouting window
-	&((Keychord){1, {{MODKEY, XK_j}}, moveresize, { .v = "0x 40y 0w 0h"  } }),
-    &((Keychord){1, {{MODKEY, XK_k}}, moveresize, { .v = "0x -40y 0w 0h" } }),
-    &((Keychord){1, {{MODKEY, XK_l}}, moveresize, { .v = "40x 0y 0w 0h"  } }),
-    &((Keychord){1, {{MODKEY, XK_h}}, moveresize, { .v = "-40x 0y 0w 0h" } }),
+	&((Keychord){1, {{MODKEY, XK_j}}, moveresize, { .v = "0x 45y 0w 0h"  } }),
+    &((Keychord){1, {{MODKEY, XK_k}}, moveresize, { .v = "0x -45y 0w 0h" } }),
+    &((Keychord){1, {{MODKEY, XK_l}}, moveresize, { .v = "45x 0y 0w 0h"  } }),
+    &((Keychord){1, {{MODKEY, XK_h}}, moveresize, { .v = "-45x 0y 0w 0h" } }),
     //resize flouting widnow
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 40h"  } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -40h" } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 40w 0h"  } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -40w 0h" } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 45h"  } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -45h" } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 45w 0h"  } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -45w 0h" } }),
     // move flouting window ALTKEY
     &((Keychord){1, {{MODKEY|ControlMask, XK_k}}, moveresizeedge, { .v = "t" } }),
     &((Keychord){1, {{MODKEY|ControlMask, XK_j}}, moveresizeedge, { .v = "b" } }),
@@ -298,3 +298,4 @@ static const Button buttons[] = {
 static const int vertpad             = 13;      // vertical padding of bar 
 static const int sidepad             = 7;       // horizontal padding of bar 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+

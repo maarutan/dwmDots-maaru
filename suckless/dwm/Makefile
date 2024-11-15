@@ -3,7 +3,7 @@
 
 include config.mk
 
-SRC = drw.c dwm.c util.c
+SRC = drw.c dwm.c util.c attachbelow.c  # Добавляем attachbelow.c в список исходных файлов
 OBJ = ${SRC:.c=.o}
 
 all: dwm

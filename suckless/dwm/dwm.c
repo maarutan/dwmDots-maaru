@@ -56,7 +56,6 @@
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 
-int attachbelow = 0;
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 /* XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY      0
@@ -487,10 +486,14 @@ attachBelow(Client *c)
 
 }
 
-void toggleAttachBelow()
-{
-	attachbelow = !attachbelow;
+
+#include "attachbelow.h"  // Подключаем заголовочный файл, где объявлена переменная и функции
+
+void toggleAttachBelow() {
+    attachbelow = !attachbelow;
+    saveAttachBelow();  // Сохраняем состояние после переключения
 }
+
 
 void
 attachstack(Client *c)
@@ -2910,9 +2913,12 @@ zoom(const Arg *arg)
 	pop(c);
 }
 
+#include "attachbelow.h"
+
 int
 main(int argc, char *argv[])
 {
+    loadAttachBelow();  // Загружаем сохранённое состояние attachbelow при запуске dwm
 	if (argc == 2 && !strcmp("-v", argv[1]))
 		die("dwm-"VERSION);
 	else if (argc != 1)

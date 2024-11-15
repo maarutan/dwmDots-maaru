@@ -1,8 +1,8 @@
 /*
 * /===========================//
-* /        __                    
-* /       | |                   
-* /    __| |_     ___ __ ___  
+* /      _                    
+* /     | |                   
+* /   __| |_      __ __ ___  
 * /  / _` \ \ /\ / / '_ ` _ \ 
 * / | (_| |\ V  V /| | | | | |
 * /  \__,_| \_/\_/ |_| |_| |_|
@@ -25,6 +25,7 @@ static const unsigned int gappih     = 13;       // horiz inner gap between wind
 static const unsigned int gappoh     = 13;       // horiz outer gap between windows and screen edge 
 static const unsigned int gappov     = 13;       // vert outer gap between windows and screen edge 
 static       int smartgaps           = 0;        // 1 means no outer gap when there is only one window 
+//static const int attachbelow = 1;    // 1 means attach after the currently active window 
 //bar
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
@@ -44,11 +45,6 @@ static const char *colors[][3]       = {
 	[SchemeNorm] = { col_gray3, background, col_noActive, },
 	[SchemeSel]  = { col_gray4, background2 , col_borderActive },
 };
-//=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
-//bar paddings
-static const int vertpad             = 13;      // vertical padding of bar 
-static const int sidepad             = 7;       // horizontal padding of bar 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 // tagging 
 static const char *tags[] = {   " 󱍢 ", "  ", " 󰈹 ", "  ", " 󰣇 ", "  ", "  ", "  ", "  " };
 //static const char *tags[] = { " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 " };
@@ -133,12 +129,18 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
     //screen [super + p ]
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("xcolor -s clipboard")  }),//	colorpicer
-    &((Keychord){2, {{MODKEY, XK_p}, {0, XK_p}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
-    &((Keychord){2, {{MODKEY, XK_s},{0, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }), //clock
+    &((Keychord){2, {{MODKEY, XK_p}, {0, XK_s}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
+    &((Keychord){2, {{MODKEY, XK_p},{0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }), //clock
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default") }), // picom blur
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_g},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh glass") }), // picom glass
+    &((Keychord){3, {{MODKEY, XK_p},{0, XK_p},{0, XK_c}}, spawn, SHCMD("kitty -e $HOME/.config/picom/") }), // picom glass
     //filemanager [super + e ]
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_y}}, spawn,  SHCMD("kitty --hold sh -c 'yazi'")  }), // yazi
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_n}}, spawn,  SHCMD("nemo")  }), // nemo
-	//kitty 
+    // web apps
+    &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_m}}, spawn,  SHCMD("firefox --class WebApp-monkey3985 --name WebApp-monkey3985 --profile $HOME/.local/share/ice/firefox/monkey3985 --no-remote 'https://monkeytype.com'")  }), //monkeytype
+    &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_g}}, spawn,  SHCMD("firefox --class WebApp-chatG2444 --name WebApp-chatG2444 --profile /home/maaru/.local/share/ice/firefox/chatG2444 --no-remote 'https://chatgpt.com/'")  }), //chat gpt
+    //kitty 
     &((Keychord){1, {{MODKEY, XK_Return}},   spawn,          { .v = termcmd } }),
     //killActive 
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
@@ -160,15 +162,15 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY, 0x5d}}, spawn, SHCMD("$HOME/suckless/scripts/volume.sh down") }),
     &((Keychord){1, {{MODKEY, 0x5c}}, spawn, SHCMD("$HOME/suckless/scripts/volume.sh mute") }),
     // move flouting window
-	&((Keychord){1, {{MODKEY, XK_j}}, moveresize, { .v = "0x 40y 0w 0h"  } }),
-    &((Keychord){1, {{MODKEY, XK_k}}, moveresize, { .v = "0x -40y 0w 0h" } }),
-    &((Keychord){1, {{MODKEY, XK_l}}, moveresize, { .v = "40x 0y 0w 0h"  } }),
-    &((Keychord){1, {{MODKEY, XK_h}}, moveresize, { .v = "-40x 0y 0w 0h" } }),
+	&((Keychord){1, {{MODKEY, XK_j}}, moveresize, { .v = "0x 45y 0w 0h"  } }),
+    &((Keychord){1, {{MODKEY, XK_k}}, moveresize, { .v = "0x -45y 0w 0h" } }),
+    &((Keychord){1, {{MODKEY, XK_l}}, moveresize, { .v = "45x 0y 0w 0h"  } }),
+    &((Keychord){1, {{MODKEY, XK_h}}, moveresize, { .v = "-45x 0y 0w 0h" } }),
     //resize flouting widnow
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 40h"  } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -40h" } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 40w 0h"  } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -40w 0h" } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 45h"  } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -45h" } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 45w 0h"  } }),
+    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -45w 0h" } }),
     // move flouting window ALTKEY
     &((Keychord){1, {{MODKEY|ControlMask, XK_k}}, moveresizeedge, { .v = "t" } }),
     &((Keychord){1, {{MODKEY|ControlMask, XK_j}}, moveresizeedge, { .v = "b" } }),
@@ -241,6 +243,7 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY,XK_w}, {0,XK_9}}, setlayout, { .v = &layouts[2] } }), //monocle
     &((Keychord){2, {{MODKEY,XK_w}, {0,XK_0}}, setlayout, { .v = &layouts[4] } }), //desk
     //===================================================================================//
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_Tab}}, toggleAttachBelow, { 0 } }), //toggleAttachBelow
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_w}}, togglefloating, { 0 } }), //toggle floating
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}}, setlayout, { 0 } }),// setlayout
     //===================================================================================//
@@ -290,3 +293,9 @@ static const Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
+//=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+//bar paddings
+static const int vertpad             = 13;      // vertical padding of bar 
+static const int sidepad             = 7;       // horizontal padding of bar 
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+
