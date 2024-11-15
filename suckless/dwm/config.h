@@ -33,7 +33,7 @@ static const unsigned int single_gappoh = 70; // Горизонтальный в
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
 // font
-static const char *fonts[]           = { "FiraCode Nerd Font:size=15" };
+static const char *fonts[]           = { "FiraCode Nerd Font:size=16" };
 // color
 static const char col_gray1[]        = "#222222";
 static const char col_gray2[]        = "#444444";

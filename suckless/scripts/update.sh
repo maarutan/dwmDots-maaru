@@ -13,19 +13,19 @@ required_apps=(neofetch figlet notify-send)
 missing_apps=()
 
 for app in "${required_apps[@]}"; do
-    if ! command -v $app &> /dev/null; then
-        missing_apps+=($app)
-    fi
+  if ! command -v $app &>/dev/null; then
+    missing_apps+=($app)
+  fi
 done
 
 if [ ${#missing_apps[@]} -ne 0 ]; then
-    echo -e "${COLOR_RED}Ошибка: Для корректной работы скрипта необходимо установить следующие приложения: ${missing_apps[*]}${COLOR_RESET}"
-    exit 1
+  echo -e "${COLOR_RED}Ошибка: Для корректной работы скрипта необходимо установить следующие приложения: ${missing_apps[*]}${COLOR_RESET}"
+  exit 1
 fi
 
 # Файл для текущего значения обновлений pacman
 current_file=~/suckless/scripts/dwmbScripts/.currentInfoUpDate
-mkdir -p "$(dirname "$current_file")"  # Создаем директорию, если она не существует
+mkdir -p "$(dirname "$current_file")" # Создаем директорию, если она не существует
 
 # Функция для подсчета обновлений с обработкой ошибок
 count_updates() {
@@ -58,7 +58,7 @@ check_updates() {
     else
       # Сохраняем текущее значение и обновляем файл
       formatted_pacman_updates=$(printf "%2s" "$pacman_updates")
-      echo "$formatted_pacman_updates" > "$current_file"
+      echo "$formatted_pacman_updates" >"$current_file"
     fi
     echo -e "${COLOR_YELLOW}===> pacman     󰮯   ~~> : $formatted_pacman_updates${COLOR_RESET}"
 
@@ -85,60 +85,54 @@ check_updates() {
 
 # Функция обновления системы
 update_system() {
-  # Обновление pacman
-  if [ "$pacman_updates" -gt 0 ]; then
-    notify_password
-    echo -e "${COLOR_YELLOW}\n=== Обновление pacman ===${COLOR_RESET}"
-    if ! sudo pacman -Syu --noconfirm; then
-      echo -e "${COLOR_RED}Ошибка обновления через pacman!${COLOR_RESET}"
-      notify-send "Ошибка обновления" "Pacman не смог обновиться"
-    fi
+  # Обновление pacman (всегда)
+  notify_password
+  echo -e "${COLOR_YELLOW}\n=== Обновление pacman ===${COLOR_RESET}"
+  if ! sudo pacman -Syu --noconfirm; then
+    echo -e "${COLOR_RED}Ошибка обновления через pacman!${COLOR_RESET}"
+    notify-send "Ошибка обновления" "Pacman не смог обновиться"
   fi
 
-  # Обновление yay
-  if [ "$yay_updates" -gt 0 ]; then
-    notify_password
-    echo -e "${COLOR_GREEN}\n=== Обновление yay ===${COLOR_RESET}"
-    if ! yay -Syu --noconfirm; then
-      echo -e "${COLOR_RED}Ошибка обновления через yay!${COLOR_RESET}"
-      notify-send "Ошибка обновления" "Yay не смог обновиться"
-    fi
+  # Обновление yay (всегда)
+  notify_password
+  echo -e "${COLOR_GREEN}\n=== Обновление yay ===${COLOR_RESET}"
+  if ! yay -Syu --noconfirm; then
+    echo -e "${COLOR_RED}Ошибка обновления через yay!${COLOR_RESET}"
+    notify-send "Ошибка обновления" "Yay не смог обновиться"
   fi
 
-  # Обновление flatpak
-  if [ "$flatpak_updates" -gt 0 ]; then
-    notify_password
-    echo -e "${COLOR_CYAN}\n=== Обновление flatpak ===${COLOR_RESET}"
-    if ! flatpak update -y; then
-      echo -e "${COLOR_RED}Ошибка обновления через flatpak!${COLOR_RESET}"
-      notify-send "Ошибка обновления" "Flatpak не смог обновиться"
-    fi
+  # Обновление flatpak (всегда)
+  notify_password
+  echo -e "${COLOR_CYAN}\n=== Обновление flatpak ===${COLOR_RESET}"
+  if ! flatpak update -y; then
+    echo -e "${COLOR_RED}Ошибка обновления через flatpak!${COLOR_RESET}"
+    notify-send "Ошибка обновления" "Flatpak не смог обновиться"
   fi
 }
 
 # Функция для вызова neofetch или альтернативных fetch
 fetch_alternative() {
   if [ -f "$HOME/.config/neofetch/startFetch.py" ]; then
-    python $HOME/.config/neofetch/startFetch.py &>/dev/null &  # Фоновый запуск startFetch.py
-    wait $!  # Ожидание завершения фонового процесса
-    if command -v neofetch &> /dev/null; then
+    python $HOME/.config/neofetch/startFetch.py &>/dev/null & # Фоновый запуск startFetch.py
+    wait $!                                                   # Ожидание завершения фонового процесса
+    if command -v neofetch &>/dev/null; then
       neofetch
-    elif command -v fetch &> /dev/null; then
+    elif command -v fetch &>/dev/null; then
       fetch
     elif [ -f "/home/maaru/suckless/scripts/fetch.sh" ]; then
       /home/maaru/suckless/scripts/fetch.sh
-    elif command -v fastfetch &> /dev/null; then
+    elif command -v fastfetch &>/dev/null; then
       fastfetch
     else
       echo -e "${COLOR_RED}Ошибка: Не удалось найти ни одну из программ для вывода системной информации.${COLOR_RESET}"
     fi
-  elif command -v neofetch &> /dev/null; then
+  elif command -v neofetch &>/dev/null; then
     neofetch
-  elif command -v fetch &> /dev/null; then
+  elif command -v fetch &>/dev/null; then
     fetch
   elif [ -f "/home/maaru/suckless/scripts/fetch.sh" ]; then
     /home/maaru/suckless/scripts/fetch.sh
-  elif command -v fastfetch &> /dev/null; then
+  elif command -v fastfetch &>/dev/null; then
     fastfetch
   else
     echo -e "${COLOR_RED}Ошибка: Не удалось найти ни одну из программ для вывода системной информации.${COLOR_RESET}"
@@ -151,7 +145,7 @@ fetch_alternative
 # Проверка обновлений
 check_updates
 
-# Обновление системы
+# Обновление системы (независимо от наличия обновлений)
 update_system
 
 # Очистка терминала и вызов neofetch после обновления
@@ -168,4 +162,3 @@ echo "$bye_user_message"
 
 # Ожидание перед завершением
 sleep 5
-
