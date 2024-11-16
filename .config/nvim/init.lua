@@ -14,8 +14,6 @@ if not pcall(require, "lazy") then
   vim.fn.getchar()
   vim.cmd.quit()
 end
-
-vim.o.laststatus = 0 
-require "lazy_setup"
 require "polish"
-
+require "lazy_setup"
+vim.o.laststatus = 0

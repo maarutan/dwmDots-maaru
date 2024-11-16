@@ -14,7 +14,12 @@ return {
       "css",
       "javascript",
       "typescript",
-      "rust"
+      "rust",
+      "json",
+      "yaml",
+      "toml",
+      "bash",
+      "c",
       -- add more arguments for adding more treesitter parsers
     },
   },

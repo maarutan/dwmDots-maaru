@@ -4,7 +4,7 @@ return {
     lazy = false, -- Загружать сразу
     dependencies = { "nvim-tree/nvim-web-devicons" }, -- Иконки (опционально)
     config = function()
-      require("lualine").setup({
+      require("lualine").setup {
         options = {
           theme = "catppuccin", -- Замени на свою тему
           component_separators = { left = "", right = "" },
@@ -23,12 +23,11 @@ return {
           lualine_a = {},
           lualine_b = {},
           lualine_c = { "filename" },
-          lualine_x = { "location" },
+          lualine_x = {},
           lualine_y = {},
           lualine_z = {},
         },
-      })
+      }
     end,
   },
 }
-
