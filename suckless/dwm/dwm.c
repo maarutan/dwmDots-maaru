@@ -54,8 +54,6 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
-#define STATE_FILE_PATH "/tmp/.smartgaps_state.txt"
-#define SHOW_TAG_BOXES_FILE "/tmp/.dwm_show_tag_boxes_state.txt"  // Путь к файлу для хранения состояния
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 /* XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY      0
@@ -68,6 +66,11 @@
 #define VERSION_MAJOR               0
 #define VERSION_MINOR               0
 #define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
+
+#define STATE_FILE_PATH ".cache/dwm/.smartgaps_state"
+#define SHOW_TAG_BOXES_FILE ".cache/dwm/.show_tag_boxes_state"  
+#define STATE_FILE_PATH_SYSTRAY ".cache/dwm/.systray_state" 
+
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { SchemeNorm, SchemeSel }; /* color schemes */
@@ -350,7 +353,7 @@ int loadSmartgapsState() {
 
 void toggleSystray(const Arg *arg) {
     showsystray = !showsystray;
-    FILE *file = fopen("/tmp/.systray_state.txt", "w");
+    FILE *file = fopen(STATE_FILE_PATH_SYSTRAY, "w");
     if (file) {
         fprintf(file, "%d", showsystray);
         fclose(file);
@@ -367,7 +370,7 @@ void toggleSystray(const Arg *arg) {
 }
 
 void loadSystrayState() {
-    FILE *file = fopen("/tmp/.systray_state.txt", "r");
+    FILE *file = fopen(STATE_FILE_PATH_SYSTRAY, "r");
     if (file) {
         int state;
         if (fscanf(file, "%d", &state) == 1) {
