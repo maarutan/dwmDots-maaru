@@ -11,27 +11,30 @@
 */
 // See LICENSE file for copyright and license details. 
 // appearance 
-static const unsigned int borderpx   = 4;       // border pixel of windows 
+static const unsigned int borderpx   = 6;       // border pixel of windows 
 static const unsigned int snap       = 0;       // snap pixel 
 //systray
 static const unsigned int systraypinning = 1;    // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
 static const unsigned int systrayonleft = 1;     // 0: systray in the right corner, >0: systray on left of status text 
 static const unsigned int systrayspacing = 12;   // systray spacing 
 static const int systraypinningfailfirst = 1;    // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
-static const int showsystray        = 0;         // 0 means no systray 
+static const int showsystray        =      0;         // 0 means no systray 
 //show boxes
 static int show_tag_boxes = 1;  // 1 — показывать квадратики, 0 — не показывать
 //gap
 static const unsigned int gappiv     = 20;       // vert inner gap between windows 
 static const unsigned int gappih     = 20;       // horiz inner gap between windows 
-static const unsigned int gappoh     = 20;       // horiz outer gap between windows and screen edge 
+static const unsigned int gappoh     = 35;       // horiz outer gap between windows and screen edge 
 static const unsigned int gappov     = 20;       // vert outer gap between windows and screen edge 
 static       int smartgaps           = 1;        // 1 means no outer gap when there is only one window 
-static const unsigned int single_gappov = 90; // Вертикальный внешний отступ при одном окне
-static const unsigned int single_gappoh = 70; // Горизонтальный внешний отступ при одном окне
+static const unsigned int single_gappov = 120; // Вертикальный внешний отступ при одном окне
+static const unsigned int single_gappoh = 60; // Горизонтальный внешний отступ при одном окне
 //bar
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
+// padding bar 
+static const int vertpad             = 20;      // vertical padding of bar 
+static const int sidepad             = 35;       // horizontal padding of bar 
 // font
 static const char *fonts[]           = { "FiraCode Nerd Font:size=16" };
 // color
@@ -303,7 +306,5 @@ static const Button buttons[] = {
 };
 //=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 //bar paddings
-static const int vertpad             = 20;      // vertical padding of bar 
-static const int sidepad             = 40;       // horizontal padding of bar 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 

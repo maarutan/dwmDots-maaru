@@ -3024,4 +3024,3 @@ void togglesmartgaps(const Arg *arg) {
     saveSmartgapsState(smartgaps); // Сохранение текущего состояния
     arrange(NULL);               // Обновление расположения окон
 }
-
