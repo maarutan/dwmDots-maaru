@@ -14,11 +14,11 @@
 static const unsigned int borderpx   = 6;       // border pixel of windows 
 static const unsigned int snap       = 0;       // snap pixel 
 //systray
-static const unsigned int systraypinning = 1;    // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
-static const unsigned int systrayonleft = 1;     // 0: systray in the right corner, >0: systray on left of status text 
+static const unsigned int systraypinning = 0;    // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
+static const unsigned int systrayonleft =  0;     // 0: systray in the right corner, >0: systray on left of status text 
 static const unsigned int systrayspacing = 12;   // systray spacing 
 static const int systraypinningfailfirst = 1;    // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
-static const int showsystray        =      0;         // 0 means no systray 
+static int showsystray = 1;
 //show boxes
 static int show_tag_boxes = 1;  // 1 — показывать квадратики, 0 — не показывать
 //gap
@@ -32,7 +32,7 @@ static const unsigned int single_gappoh = 60; // Горизонтальный в
 //bar
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
-// padding bar 
+//bar paddings
 static const int vertpad             = 20;      // vertical padding of bar 
 static const int sidepad             = 20;       // horizontal padding of bar 
 // font
@@ -45,8 +45,7 @@ static const char col_gray4[]        = "#eeeeee";
 static const char background[]       = "#1e1e2e";
 static const char col_borderActive[] = "#8aadf4";
 static const char col_noActive[]     = "#868eba";
-static const char background2[]      = "#2f2f49";
-static const char *colors[][3]       = {
+static const char background2[]      = "#2f2f49"; static const char *colors[][3]       = {
 	//               fg         bg         border   
 	[SchemeNorm] = { col_gray3, background, col_noActive, },
 	[SchemeSel]  = { col_gray4, background2 , col_borderActive },
@@ -129,6 +128,7 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_s},{0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/suckless/scripts/pushDots.sh")  }), //pushDots
     &((Keychord){2, {{MODKEY, XK_s},{0,XK_r}}, spawn,  SHCMD("$HOME/suckless/scripts/recompileDwm.sh")  }), //recompile dwm
     &((Keychord){2, {{MODKEY, XK_s},{0, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }), // powermenu
+    &((Keychord){3, {{MODKEY, XK_s},{0, XK_s}, {0, XK_t}}, toggleSystray,  { 0 }  }), // toggle systray
     // aplication [ super + a ] 
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_f}}, spawn,  {.v = browser } }),   //firefox
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_d}}, spawn,  SHCMD("vesktop")  }), //vesktop
@@ -304,7 +304,5 @@ static const Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-//=-=-=-=-=-=-=-=-=-=-=-not=-Working=-=-=-=-=-=-=-=-=-=-=-=-=-=//
-//bar paddings
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 

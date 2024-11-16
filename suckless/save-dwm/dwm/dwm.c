@@ -55,7 +55,7 @@
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 #define STATE_FILE_PATH "/tmp/.smartgaps_state.txt"
-#define SHOW_TAG_BOXES_FILE "/tmp/dwm_show_tag_boxes_state.txt"  // Путь к файлу для хранения состояния
+#define SHOW_TAG_BOXES_FILE "/tmp/.dwm_show_tag_boxes_state.txt"  // Путь к файлу для хранения состояния
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 /* XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY      0
@@ -68,7 +68,6 @@
 #define VERSION_MAJOR               0
 #define VERSION_MINOR               0
 #define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
-
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { SchemeNorm, SchemeSel }; /* color schemes */
@@ -215,6 +214,7 @@ static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
 void toggle_tag_boxes(const Arg *arg);
+void toggleSystray(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
@@ -347,6 +347,36 @@ int loadSmartgapsState() {
     }
     return state;
 }
+
+void toggleSystray(const Arg *arg) {
+    showsystray = !showsystray;
+    FILE *file = fopen("/tmp/.systray_state.txt", "w");
+    if (file) {
+        fprintf(file, "%d", showsystray);
+        fclose(file);
+    }
+
+    if (!showsystray) {
+        XUnmapWindow(dpy, systray->win);
+    } else {
+        XMapWindow(dpy, systray->win);
+    }
+    updatebarpos(selmon);
+    arrange(selmon);
+    drawbar(selmon);
+}
+
+void loadSystrayState() {
+    FILE *file = fopen("/tmp/.systray_state.txt", "r");
+    if (file) {
+        int state;
+        if (fscanf(file, "%d", &state) == 1) {
+            showsystray = state; // Восстановить состояние
+        }
+        fclose(file);
+    }
+}
+
 
 
 struct Pertag {
@@ -2140,11 +2170,11 @@ void load_show_tag_boxes_state(void) {
     }
 }
 
-
 void
 setup(void)
 {
   load_show_tag_boxes_state(); 
+  loadSystrayState();
 	int i;
 	XSetWindowAttributes wa;
 	Atom utf8string;
@@ -3024,4 +3054,3 @@ void togglesmartgaps(const Arg *arg) {
     saveSmartgapsState(smartgaps); // Сохранение текущего состояния
     arrange(NULL);               // Обновление расположения окон
 }
-
