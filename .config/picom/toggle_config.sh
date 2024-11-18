@@ -7,8 +7,12 @@ if [[ "$1" == "default" ]]; then
 elif [[ "$1" == "glass" ]]; then
     CONFIG1="$HOME/.config/picom/glass/picom_no_anims_glass.conf"
     CONFIG2="$HOME/.config/picom/glass/picom_simple_anims_glass.conf"
+elif [[ "$1" == "nOpacity" ]]; then
+    CONFIG1="$HOME/.config/picom/no_opcity/picom_no_anims.conf"
+    CONFIG2="$HOME/.config/picom/no_opcity/picom_simple_anims.conf"
+
 else
-    echo "Укажите режим: 'default' или 'glass'"
+    echo "Укажите режим: 'default' или 'glass' или 'nOpacity'"
     exit 1
 fi
 
@@ -37,3 +41,4 @@ echo "$NEW_CONFIG" > "$LAST_CONFIG_FILE"
 pkill picom
 sleep 0.5
 picom --config "$NEW_CONFIG" &
+$HOME/.config/kitty/toggle_config.sh nOpacity

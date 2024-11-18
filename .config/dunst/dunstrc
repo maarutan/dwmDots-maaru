@@ -4,7 +4,7 @@
 	#background = "#1e1e1e44"
     foreground  = "#C1CDE6"
     frame_color = "#809ee0"
-    origin      =  top-right
+    origin      =  bottom-right
 	width = 480
     timeout = 2
 	padding = 15

@@ -53,9 +53,9 @@ mainbox {
     enabled:                     true;
     spacing:                     0px;
     margin:                      0px;
-    padding:                     0px;
-    border:                      0px solid;
-    border-radius:               0px 0px 0px 0px;
+    padding:                     20px ;
+    border:                      4px solid;
+    border-radius:               5px;
     border-color:                @selected;
     background-color:            transparent;
     children:                    [ "inputbar", "listview" ];
@@ -63,10 +63,10 @@ mainbox {
 
 /*****----- Inputbar -----*****/
 inputbar {
-    enabled:                     true;
+    enabled:                     false;
     spacing:                     10px;
     margin:                      0px;
-    padding:                     5px;
+    padding:                     0px;
     border:                      0px solid;
     border-radius:               0px;
     border-color:                @selected;

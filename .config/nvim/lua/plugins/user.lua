@@ -72,7 +72,6 @@ return {
       )
     end,
   },
-  "github/copilot.vim",
   event = "InsertEnter", -- Загружать плагин только при входе в режим вставки
   -- Удаление nvim-cmp и связанных плагинов
   ["hrsh7th/nvim-cmp"] = false,
@@ -81,4 +80,5 @@ return {
   ["hrsh7th/cmp-path"] = false,
   ["saadparwaiz1/cmp_luasnip"] = false,
   ["L3MON4D3/LuaSnip"] = false,
+  "nvim-lualine/lualine.nvim",
 }

@@ -138,9 +138,10 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("$HOME/suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
     &((Keychord){2, {{MODKEY, XK_p}, {0, XK_s}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
     &((Keychord){2, {{MODKEY, XK_p},{0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }), //clock
-    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default") }), // picom blur
-    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_g},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh glass") }), // picom glass
-    &((Keychord){3, {{MODKEY, XK_p},{0, XK_p},{0, XK_c}}, spawn, SHCMD("kitty -e $HOME/.config/picom/") }), // picom glass
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default; $HOME/.config/kitty/.other/toggle_config.sh default") }), // picom blur
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_g},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh glass; $HOME/.config/kitty/.other/toggle_config.sh default") }), // picom glass
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_o},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh nOpacity; $HOME/.config/kitty/.other/toggle_config.sh nOpacity") }), // picom no opacity
+    &((Keychord){3, {{MODKEY, XK_p},{0, XK_p},{0, XK_c}}, spawn, SHCMD("kitty -e $HOME/.config/picom/") }), // picom 
     //filemanager [super + e ]
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_y}}, spawn,  SHCMD("kitty --hold sh -c 'yazi'")  }), // yazi
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_n}}, spawn,  SHCMD("nemo")  }), // nemo
@@ -152,7 +153,8 @@ static Keychord *keychords[] = {
     //killActive 
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
     //changeKeyboard
-    &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks && $HOME/suckless/scripts/changeKeyboard.sh setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
+    &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
+    &((Keychord){1, {{MODKEY,XK_space }}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
 	//rofi
     &((Keychord){1, {{MODKEY, XK_r}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),
     &((Keychord){1, {{MODKEY|ShiftMask, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),

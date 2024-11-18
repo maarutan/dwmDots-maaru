@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Интервал обновления в секундах
-INTERVAL=10
+INTERVAL=1
 
 # Файл для хранения последнего уровня заряда и состояния
 STATUS_FILE="/tmp/battery_status.txt"
@@ -68,7 +68,7 @@ get_battery_status() {
   last_status=$(cat "$STATUS_FILE")
 
   # Уведомление при заряде 90% (во время зарядки)
-  if [ "$status" = "Charging" ] && [ "$capacity" -ge 90 ] && [[ "$last_status" != "Charging_90" ]]; then
+  if [ "$status" = "Charging" ] && [ "$capacity" -ge 80 ] && [[ "$last_status" != "Charging_90" ]]; then
     notify-send "Батарея" "Батарея заряжена до 90%. Пора снять зарядку." -u normal
     echo "Charging_90" >"$STATUS_FILE"
 
@@ -78,7 +78,7 @@ get_battery_status() {
     echo "Discharging_50" >"$STATUS_FILE"
 
   # Уведомление при критическом уровне заряда 15%
-  elif [ "$status" = "Discharging" ] && [ "$capacity" -le 15 ] && [[ "$last_status" != "Discharging_15" ]]; then
+  elif [ "$status" = "Discharging" ] && [ "$capacity" -le 20 ] && [[ "$last_status" != "Discharging_15" ]]; then
     notify-send "Батарея" "Критический уровень заряда: $capacity%. Пора подключить зарядку." -u critical
     echo "Discharging_15" >"$STATUS_FILE"
   fi

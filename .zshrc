@@ -63,7 +63,6 @@ bindkey -v
  alias yaa="yay"
  alias yayy="yay"
  alias yyay="yay"
- alias ya="yay"
  alias ay="yay"
 
  # new order

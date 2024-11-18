@@ -245,6 +245,18 @@ function Yatline.string.get:hovered_mime()
 	end
 end
 
+--- Gets the hovered file's user and group ownership of the current active tab.
+--- @return string ownership active tab's hovered file's path.
+function Yatline.string.get:hovered_ownership()
+	local hovered = cx.active.current.hovered
+
+	if hovered then
+		return ya.user_name(hovered.cha.uid) .. ":" .. ya.group_name(hovered.cha.gid)
+	else
+		return ""
+	end
+end
+
 --- Gets the hovered file's extension of the current active tab.
 --- @param show_icon boolean Whether or not an icon will be shown.
 --- @return string file_extension Current active tab's hovered file's extension.
@@ -512,29 +524,33 @@ function Yatline.coloreds.get:permissions()
 	if hovered then
 		local perm = hovered.cha:permissions()
 
-		local coloreds = {}
-		coloreds[1] = { " ", "black" }
+		if perm then
+			local coloreds = {}
+			coloreds[1] = { " ", "black" }
 
-		for i = 1, #perm do
-			local c = perm:sub(i, i)
+			for i = 1, #perm do
+				local c = perm:sub(i, i)
 
-			local fg = permissions_t_fg
-			if c == "-" then
-				fg = permissions_s_fg
-			elseif c == "r" then
-				fg = permissions_r_fg
-			elseif c == "w" then
-				fg = permissions_w_fg
-			elseif c == "x" or c == "s" or c == "S" or c == "t" or c == "T" then
-				fg = permissions_x_fg
+				local fg = permissions_t_fg
+				if c == "-" then
+					fg = permissions_s_fg
+				elseif c == "r" then
+					fg = permissions_r_fg
+				elseif c == "w" then
+					fg = permissions_w_fg
+				elseif c == "x" or c == "s" or c == "S" or c == "t" or c == "T" then
+					fg = permissions_x_fg
+				end
+
+				coloreds[i + 1] = { c, fg }
 			end
 
-			coloreds[i + 1] = { c, fg }
+			coloreds[#perm + 2] = { " ", "black" }
+
+			return coloreds
+		else
+			return ""
 		end
-
-		coloreds[#perm + 2] = { " ", "black" }
-
-		return coloreds
 	else
 		return ""
 	end
@@ -822,6 +838,8 @@ return {
 
 		tab_width = config.tab_width or 20
 
+		local component_positions = config.component_positions or { "header", "tab", "status" }
+
 		show_background = config.show_background or false
 
 		local display_header_line = config.display_header_line
@@ -1019,35 +1037,32 @@ return {
 
 		Root.layout = function(self)
 			local constraints = {}
-			if display_header_line then
-				table.insert(constraints, ui.Constraint.Length(1))
+			for _, component in ipairs(component_positions) do
+				if (component == "header" and display_header_line) or (component == "status" and display_status_line) then
+					table.insert(constraints, ui.Constraint.Length(1))
+				elseif component == "tab" then
+					table.insert(constraints, ui.Constraint.Fill(1))
+				end
 			end
 
-			table.insert(constraints, ui.Constraint.Fill(1))
-
-			if display_status_line then
-				table.insert(constraints, ui.Constraint.Length(1))
-			end
-
-			self._chunks = ui.Layout()
-			:direction(ui.Layout.VERTICAL)
-			:constraints(constraints)
-			:split(self._area)
+			self._chunks = ui.Layout():direction(ui.Layout.VERTICAL):constraints(constraints):split(self._area)
 		end
 
 		Root.build = function(self)
 			local childrens = {}
+
 			local i = 1
-			if display_header_line then
-				table.insert(childrens, Header:new(self._chunks[i], cx.active))
-				i = i + 1
-			end
-
-			table.insert(childrens, Tab:new(self._chunks[i], cx.active))
-			i = i + 1
-
-			if display_status_line then
-				table.insert(childrens, Status:new(self._chunks[i], cx.active))
+			for _, component in ipairs(component_positions) do
+				if component == "header" and display_header_line then
+					table.insert(childrens, Header:new(self._chunks[i], cx.active))
+					i = i + 1
+				elseif component == "tab" then
+					table.insert(childrens, Tab:new(self._chunks[i], cx.active))
+					i = i + 1
+				elseif component == "status" and display_status_line then
+					table.insert(childrens, Status:new(self._chunks[i], cx.active))
+					i = i + 1
+				end
 			end
 
 			self._children = childrens
