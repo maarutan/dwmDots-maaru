@@ -67,9 +67,9 @@
 #define VERSION_MINOR               0
 #define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
 
-#define STATE_FILE_PATH ".cache/dwm/.smartgaps_state"
-#define SHOW_TAG_BOXES_FILE ".cache/dwm/.show_tag_boxes_state"  
-#define STATE_FILE_PATH_SYSTRAY ".cache/dwm/.systray_state" 
+#define STATE_FILE_PATH ".cache/dwm/smartgaps_state"
+#define SHOW_TAG_BOXES_FILE ".cache/dwm/dwmshowtagboxes_state"  
+#define STATE_FILE_PATH_SYSTRAY ".cache/dwm/dwmsystray_state" 
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
@@ -216,12 +216,9 @@ static void grabkeys(void);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
-void toggle_tag_boxes(const Arg *arg);
-void toggleSystray(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
-static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void moveresize(const Arg *arg);
 static void moveresizeedge(const Arg *arg);
@@ -285,6 +282,9 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
+
+void toggle_tag_boxes(const Arg *arg);
+void toggleSystray(const Arg *arg);
 
 /* variables */
 static Systray *systray = NULL;
@@ -353,20 +353,24 @@ int loadSmartgapsState() {
 
 void toggleSystray(const Arg *arg) {
     showsystray = !showsystray;
+
+    // Сохраняем текущее состояние в файл
     FILE *file = fopen(STATE_FILE_PATH_SYSTRAY, "w");
     if (file) {
         fprintf(file, "%d", showsystray);
         fclose(file);
     }
 
+    // Управление видимостью трея
     if (!showsystray) {
-        XUnmapWindow(dpy, systray->win);
+        XUnmapWindow(dpy, systray->win); // Скрыть трей
     } else {
-        XMapWindow(dpy, systray->win);
+        XMapWindow(dpy, systray->win);   // Показать трей
     }
-    updatebarpos(selmon);
-    arrange(selmon);
-    drawbar(selmon);
+
+    updatebarpos(selmon); // Обновляем позиции панели
+    arrange(selmon);      // Переразметка окон
+    drawbar(selmon);      // Перерисовка панели
 }
 
 void loadSystrayState() {
@@ -374,12 +378,20 @@ void loadSystrayState() {
     if (file) {
         int state;
         if (fscanf(file, "%d", &state) == 1) {
-            showsystray = state; // Восстановить состояние
+            showsystray = state; // Восстанавливаем сохранённое состояние
         }
         fclose(file);
+    } else {
+        showsystray = 1; // Если файл не найден, показываем трей по умолчанию
+    }
+
+    // Управляем видимостью трея на основе состояния
+    if (!showsystray) {
+        XUnmapWindow(dpy, systray->win); // Скрываем трей, если нужно
+    } else {
+        XMapWindow(dpy, systray->win);   // Показываем трей, если нужно
     }
 }
-
 
 
 struct Pertag {
@@ -1455,21 +1467,6 @@ maprequest(XEvent *e)
 }
 
 void
-monocle(Monitor *m)
-{
-	unsigned int n = 0;
-	Client *c;
-
-	for (c = m->clients; c; c = c->next)
-		if (ISVISIBLE(c))
-			n++;
-	if (n > 0) /* override layout symbol */
-		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
-	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
-		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
-}
-
-void
 motionnotify(XEvent *e)
 {
 	static Monitor *mon = NULL;
@@ -2177,7 +2174,6 @@ void
 setup(void)
 {
   load_show_tag_boxes_state(); 
-  loadSystrayState();
 	int i;
 	XSetWindowAttributes wa;
 	Atom utf8string;
@@ -2266,6 +2262,8 @@ setup(void)
 	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
 	focus(NULL);
+	loadSystrayState();
+
 }
 
 

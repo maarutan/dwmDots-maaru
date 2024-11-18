@@ -20,6 +20,8 @@ static void grid(Monitor *m);
 static void nrowgrid(Monitor *m);
 static void spiral(Monitor *m);
 static void tile(Monitor *m);
+static void monocle(Monitor *m);
+
 /* Internals */
 static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc);
 static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
@@ -826,3 +828,28 @@ tile(Monitor *m)
 			sy += HEIGHT(c) + ih;
 		}
 }
+
+void
+monocle(Monitor *m)
+{
+    unsigned int n;
+    int oh, ov, ih, iv; // Внешние и внутренние отступы
+
+    // Получаем значения отступов и количество окон
+    getgaps(m, &oh, &ov, &ih, &iv, &n);
+
+    Client *c;
+
+    if (n > 0) /* override layout symbol */
+        snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
+
+    for (c = nexttiled(m->clients); c; c = nexttiled(c->next)) {
+        resize(c,
+            m->wx + ov,                              // x-координата с учетом вертикального внешнего отступа
+            m->wy + oh,                              // y-координата с учетом горизонтального внешнего отступа
+            m->ww - 2 * ov - 2 * c->bw,             // ширина с учетом вертикальных отступов
+            m->wh - 2 * oh - 2 * c->bw,             // высота с учетом горизонтальных отступов
+            0);
+    }
+}
+
