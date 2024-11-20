@@ -11,7 +11,7 @@
 */
 // See LICENSE file for copyright and license details. 
 // appearance 
-static const unsigned int borderpx   = 6;       // border pixel of windows 
+static const unsigned int borderpx   = 7;       // border pixel of windows 
 static const unsigned int snap       = 0;       // snap pixel 
 //systray
 static const unsigned int systraypinning = 0;    // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
@@ -44,7 +44,7 @@ static const char col_gray3[]        = "#bbbbbb";
 static const char col_gray4[]        = "#eeeeee";
 static const char background[]       = "#1e1e2e";
 static const char col_borderActive[] = "#8aadf4";
-static const char col_noActive[]     = "#868eba";
+static const char col_noActive[]     = "#45475a";
 static const char background2[]      = "#2f2f49"; static const char *colors[][3]       = {
 	//               fg         bg         border   
 	[SchemeNorm] = { col_gray3, background, col_noActive, },
@@ -57,6 +57,11 @@ static const char *tags[] = {   " 󱍢 ", "  ", " 󰈹 ", "  ", " 󰣇 ", 
 //static const char *tags[] = { "󱍢", "", "󰈹", "", "󰣇", "", "", "", "" };
 //static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
+// Сохраняем состояние перед переходом в тег 0
+static unsigned int prevtags = 0; // Хранение предыдущего тега
+static Client *prevclient = NULL;  // Хранение предыдущего окна
+static const Layout *prevlayout = NULL;  // Переменная для хранения предыдущего layout
+
 static const Rule rules[] = {
 	// xprop(1):
 	//	WM_CLASS(STRING) = instance, class
@@ -67,6 +72,7 @@ static const Rule rules[] = {
     { "TelegramDesktop",  NULL, NULL, 1 << 3, 0, -1 },
     { "kitty", NULL, "neofetch_terminal", 1 << 0, 0, -1 },
 };
+//============================================//
 /* layout(s) */
 static const float mfact     = 0.55; // factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    // number of clients in master area 
@@ -92,6 +98,9 @@ static const Layout layouts[] = {
 	{ "><>",      NULL },    // no layout function means floating behavior 
 	{ NULL,       NULL },
 };
+// Layout для тега 0 (все теги активны)
+#define TAG0_LAYOUT &layouts[7] // "HHH" (grid)
+//============================================//
 // key definitions
 #define MODKEY Mod4Mask
 #define ALTKEY Mod1Mask
@@ -198,8 +207,8 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY|ShiftMask, XK_h}}, focusstack, { .i = -0.05 } }),
     &((Keychord){1, {{MODKEY|ShiftMask, XK_l}}, focusstack, { .i = +0.05 } }),
     //resizeStack
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_l}}, setmfact, { .f = +0.05 } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_h}}, setmfact, { .f = -0.05 } }),
+    &((Keychord){1, {{MODKEY|ControlMask, XK_l}}, setmfact, { .f = +0.05 } }),
+    &((Keychord){1, {{MODKEY|ControlMask, XK_h}}, setmfact, { .f = -0.05 } }),
 	// tileStack modes I, D 
     &((Keychord){1, {{MODKEY, XK_u}}, incnmaster, { .i = +1 } }),
     &((Keychord){1, {{MODKEY, XK_d}}, incnmaster, { .i = -1 } }),
@@ -207,6 +216,9 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY|ControlMask, XK_j}}, movestack, { .i = +1 } }),
     &((Keychord){1, {{MODKEY|ControlMask, XK_k}}, movestack, { .i = -1 } }),
     &((Keychord){1, {{MODKEY|ControlMask, XK_Return}}, zoom, { 0 } }),
+	//MoveWorkSpace
+    &((Keychord){1, {{MODKEY|ShiftMask, XK_h}}, viewprev,  { 0 } }),
+    &((Keychord){1, {{MODKEY|ShiftMask, XK_l}}, viewnext, { 0 } }),
 	//fullscreen
     &((Keychord){1, {{MODKEY, XK_f}}, togglefullscr, { 0 } }),
 	//Gaps resize 
@@ -217,6 +229,7 @@ static Keychord *keychords[] = {
     &((Keychord){1, {{MODKEY, XK_Tab}}, view, { 0 } }),
     // view all window
     &((Keychord){1, {{MODKEY, XK_0}}, view, { .ui = ~0 } }),
+    &((Keychord){1, {{MODKEY, XK_o}}, winview, { 0 } }),
     // pin window
     &((Keychord){1, {{MODKEY|ShiftMask, XK_0}}, tag, { .ui = ~0 } }),
     &((Keychord){1, {{MODKEY, XK_comma}}, focusmon, { .i = -1 } }),
@@ -255,10 +268,15 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_Tab}}, toggleAttachBelow, { 0 } }), //toggleAttachBelow
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_w}}, togglefloating, { 0 } }), //toggle floating
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}}, setlayout, { 0 } }),// setlayout
-    &((Keychord){2, {{MODKEY, XK_w},{0,XK_g}}, togglesmartgaps, { 0 } }),// togglesmartgaps
+    &((Keychord){2, {{MODKEY, XK_w},{0|ShiftMask,XK_g}}, togglesmartgaps, { 0 } }),// togglesmartgaps
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_t}}, toggle_tag_boxes, { 0 } }),// toggle_tag_boxes
-
-
+                                                                          
+    //===================================================================================//
+    // click mouse
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_f}}, spawn,  SHCMD("warpd --hint --click 1")  }),
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}}, spawn,  SHCMD("warpd --hint --click 3")  }),
+    // click mouse
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_g}}, spawn,  SHCMD("warpd --grid")  }),
     //===================================================================================//
 	// tags 
 	TAGKEYS(            XK_1,                      0)

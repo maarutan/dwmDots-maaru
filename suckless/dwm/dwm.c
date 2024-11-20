@@ -282,9 +282,11 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
-
+static void winview(const Arg* arg);
 void toggle_tag_boxes(const Arg *arg);
 void toggleSystray(const Arg *arg);
+void viewnext(const Arg *arg);
+void viewprev(const Arg *arg);
 
 /* variables */
 static Systray *systray = NULL;
@@ -2880,43 +2882,89 @@ updatewmhints(Client *c)
 	}
 }
 
+
+void
+viewnext(const Arg *arg) {
+    unsigned int i;
+    for (i = 0; i < LENGTH(tags); i++) {
+        if (selmon->tagset[selmon->seltags] & (1 << i)) {
+            view(&(Arg) { .ui = 1 << ((i + 1) % LENGTH(tags)) });
+            return;
+        }
+    }
+}
+
+void
+viewprev(const Arg *arg) {
+    unsigned int i;
+    for (i = 0; i < LENGTH(tags); i++) {
+        if (selmon->tagset[selmon->seltags] & (1 << i)) {
+            view(&(Arg) { .ui = 1 << ((i + LENGTH(tags) - 1) % LENGTH(tags)) });
+            return;
+        }
+    }
+}
+
+
 void
 view(const Arg *arg)
 {
-	int i;
-	unsigned int tmptag;
+    int i;
+    unsigned int tmptag;
 
-	if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
-		return;
-	selmon->seltags ^= 1; /* toggle sel tagset */
-	if (arg->ui & TAGMASK) {
-		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
+    // Если мы переключаемся на тег 0
+    if (arg->ui == ~0) {
+        if (selmon->pertag->curtag == 0) {
+            // Если мы уже находимся на теге 0, восстанавливаем прежнее состояние
+            if (prevtags != 0) {  // Проверяем, что состояние было сохранено
+                selmon->tagset[selmon->seltags] = prevtags;  // Восстанавливаем предыдущий тег
+                setlayout(&((Arg) { .v = prevlayout }));     // Восстанавливаем layout
+                focus(prevclient);  // Восстанавливаем фокус на предыдущем окне
+                arrange(selmon);
+            }
+            return; // Прерываем выполнение, не переключаемся
+        } else {
+            // Сохраняем текущее состояние перед переходом на тег 0
+            prevtags = selmon->tagset[selmon->seltags];   // Сохраняем предыдущий тег
+            prevclient = selmon->sel;                      // Сохраняем текущее окно
+            prevlayout = selmon->lt[selmon->sellt];        // Сохраняем текущий layout
+            selmon->pertag->curtag = 0; // Переключаем на тег 0
+            setlayout(&((Arg) { .v = TAG0_LAYOUT }));      // Устанавливаем layout для тега 0
+        }
+    }
 
-		if (arg->ui == ~0)
-			selmon->pertag->curtag = 0;
-		else {
-			for (i = 0; !(arg->ui & 1 << i); i++) ;
-			selmon->pertag->curtag = i + 1;
-		}
-	} else {
-		tmptag = selmon->pertag->prevtag;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
-		selmon->pertag->curtag = tmptag;
-	}
+    // Если тег уже активен, не делаем ничего
+    if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
+        return;
 
-	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+    selmon->seltags ^= 1; /* toggle sel tagset */
+    if (arg->ui & TAGMASK) {
+        selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+        selmon->pertag->prevtag = selmon->pertag->curtag;
 
-	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-		togglebar(NULL);
+        if (arg->ui != ~0) {
+            for (i = 0; !(arg->ui & 1 << i); i++) ;
+            selmon->pertag->curtag = i + 1;
+        }
+    } else {
+        tmptag = selmon->pertag->prevtag;
+        selmon->pertag->prevtag = selmon->pertag->curtag;
+        selmon->pertag->curtag = tmptag;
+    }
 
-	focus(selmon->pertag->sel[selmon->pertag->curtag]);
-	arrange(selmon);
+    selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+    selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+    selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+    selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+    selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+    if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
+        togglebar(NULL);
+
+    focus(selmon->pertag->sel[selmon->pertag->curtag]);
+    arrange(selmon);
 }
+
 
 Client *
 wintoclient(Window w)
@@ -2956,6 +3004,26 @@ wintomon(Window w)
 	if ((c = wintoclient(w)))
 		return c->mon;
 	return selmon;
+}
+
+/* Selects for the view of the focused window. The list of tags */
+/* to be displayed is matched to the focused window tag list. */
+void
+winview(const Arg* arg){
+	Window win, win_r, win_p, *win_c;
+	unsigned nc;
+	int unused;
+	Client* c;
+	Arg a;
+
+	if (!XGetInputFocus(dpy, &win, &unused)) return;
+	while(XQueryTree(dpy, win, &win_r, &win_p, &win_c, &nc)
+	      && win_p != win_r) win = win_p;
+
+	if (!(c = wintoclient(win))) return;
+
+	a.ui = c->tags;
+	view(&a);
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are

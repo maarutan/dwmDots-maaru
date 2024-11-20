@@ -37,12 +37,6 @@ count_updates() {
   echo ${updates:-}
 }
 
-# Функция уведомления о необходимости ввода пароля
-notify_password() {
-  echo -e "${COLOR_BLUE}Требуется ввести пароль для продолжения выполнения команд с правами суперпользователя.${COLOR_RESET}"
-  notify-send "Требуется пароль" "Введите пароль для продолжения работы"
-}
-
 # Функция для проверки обновлений
 check_updates() {
   while true; do
@@ -86,7 +80,8 @@ check_updates() {
 # Функция обновления системы
 update_system() {
   # Обновление pacman (всегда)
-  notify_password
+  echo -e "${COLOR_BLUE}Требуется ввести пароль для продолжения выполнения команд с правами суперпользователя.${COLOR_RESET}"
+  notify-send "Требуется пароль" "Введите пароль для продолжения работы"
   echo -e "${COLOR_YELLOW}\n=== Обновление pacman ===${COLOR_RESET}"
   if ! sudo pacman -Syu --noconfirm; then
     echo -e "${COLOR_RED}Ошибка обновления через pacman!${COLOR_RESET}"
@@ -94,7 +89,6 @@ update_system() {
   fi
 
   # Обновление yay (всегда)
-  notify_password
   echo -e "${COLOR_GREEN}\n=== Обновление yay ===${COLOR_RESET}"
   if ! yay -Syu --noconfirm; then
     echo -e "${COLOR_RED}Ошибка обновления через yay!${COLOR_RESET}"
@@ -102,7 +96,6 @@ update_system() {
   fi
 
   # Обновление flatpak (всегда)
-  notify_password
   echo -e "${COLOR_CYAN}\n=== Обновление flatpak ===${COLOR_RESET}"
   if ! flatpak update -y; then
     echo -e "${COLOR_RED}Ошибка обновления через flatpak!${COLOR_RESET}"

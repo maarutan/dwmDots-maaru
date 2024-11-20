@@ -7,20 +7,35 @@
  * Rofi Version: 1.7.3
  **/
 
+/*****----- Configuration -----*****/
+configuration {
+	modi:                       "window";
+    show-icons:                 true;
+    display-drun:               "~~> ";
+	drun-display-format:        "{name}";
+
+    kb-row-up: "Up,Control+k,Shift+Tab,Shift+ISO_Left_Tab";
+kb-row-down: "Down,Control+j";
+kb-accept-entry: "Control+m,Return,KP_Enter";
+terminal: "mate-terminal";
+kb-remove-to-eol: "Control+Shift+e";
+/*kb-mode-next: "Shift+Right,Control+Tab,Control+l";*/
+kb-mode-previous: "Shift+Left,Control+Shift+Tab,Control+h";
+kb-remove-char-back: "BackSpace";
+}
+
 /*****----- Global Properties -----*****/
+@import                          "shared/colors.rasi"
+
 * {
     font: "Fira Code 15";
 }
-@import "~/.config/rofi/colors/catppuccin.rasi"
 
-
-
-/*****----- Configuration -----*****/
-configuration {
-    modi: "window";
-    show-icons: true;
-    display-drun: "";
-    drun-display-format: "{name}";
+prompt {
+    enabled: false;
+}
+textbox-prompt-colon {
+    str: "";
 }
 
 
@@ -30,7 +45,7 @@ window {
     location:                    center;
     anchor:                      center;
     fullscreen:                  false;
-    width:                       50%;
+    width:                       800px;
     x-offset:                    0px;
     y-offset:                    0px;
 
@@ -47,11 +62,11 @@ window {
 /*****----- Main Box -----*****/
 mainbox {
     enabled:                     true;
-    spacing:                     20px;
+    spacing:                     0px;
     margin:                      0px;
-    padding:                     20px;
-    border:                      0px solid;
-    border-radius:               0px 0px 0px 0px;
+    padding:                     10px ;
+    border:                      4px solid;
+    border-radius:               15px;
     border-color:                @selected;
     background-color:            transparent;
     children:                    [ "inputbar", "listview" ];
@@ -59,16 +74,16 @@ mainbox {
 
 /*****----- Inputbar -----*****/
 inputbar {
-    enabled:                     true;
+    enabled:                     false;
     spacing:                     10px;
     margin:                      0px;
     padding:                     0px;
     border:                      0px solid;
     border-radius:               0px;
     border-color:                @selected;
-    background-color:            @background;
-    text-color:                  @foreground;
-    children:                    [ "entry" ];
+    background-color:            @selected;
+    text-color:                  @background;
+    children:                    [ "prompt", "entry" ];
 }
 
 prompt {
@@ -79,26 +94,24 @@ prompt {
 textbox-prompt-colon {
     enabled:                     true;
     expand:                      false;
-    str:                         "::";
+    str:                         "==>";
     background-color:            inherit;
     text-color:                  inherit;
 }
 entry {
-    enabled:                     false;
+    enabled:                     true;
     background-color:            inherit;
     text-color:                  inherit;
     cursor:                      text;
-    placeholder:                 "Search...";
+    placeholder:                 "...";
     placeholder-color:           inherit;
-    vertical-align:              0.5;
-    horizontal-align:            0.5;
 }
 
 /*****----- Listview -----*****/
 listview {
     enabled:                     true;
-    columns:                     100%;
-    lines:                       1;
+    columns:                     1;
+    lines:                       6;
     cycle:                       true;
     dynamic:                     true;
     scrollbar:                   false;
@@ -107,7 +120,7 @@ listview {
     fixed-height:                true;
     fixed-columns:               true;
     
-    spacing:                     10px;
+    spacing:                     5px;
     margin:                      0px;
     padding:                     0px;
     border:                      0px solid;
@@ -127,19 +140,18 @@ scrollbar {
 /*****----- Elements -----*****/
 element {
     enabled:                     true;
-    spacing:                     15px;
+    spacing:                     10px;
     margin:                      0px;
-    padding:                     20px 10px;
+    padding:                     2px;
     border:                      0px solid;
-    border-radius:               20px;
+    border-radius:               5px;
     border-color:                @selected;
     background-color:            transparent;
     text-color:                  @foreground;
-    orientation:                 vertical;
     cursor:                      pointer;
 }
 element normal.normal {
-    background-color:            transparent;
+    background-color:            @background;
     text-color:                  @foreground;
 }
 element selected.normal {
@@ -149,7 +161,7 @@ element selected.normal {
 element-icon {
     background-color:            transparent;
     text-color:                  inherit;
-    size:                        128px;
+    size:                        50px;
     cursor:                      inherit;
 }
 element-text {
@@ -158,20 +170,20 @@ element-text {
     highlight:                   inherit;
     cursor:                      inherit;
     vertical-align:              0.5;
-    horizontal-align:            0.5;
+    horizontal-align:            0.0;
 }
 
 /*****----- Message -----*****/
 error-message {
-    padding:                     20px;
-    border:                      0px solid;
+    padding:                     15px;
+    border:                      2px solid;
     border-radius:               0px;
     border-color:                @selected;
-    background-color:            black / 10%;
+    background-color:            @background;
     text-color:                  @foreground;
 }
 textbox {
-    background-color:            transparent;
+    background-color:            @background;
     text-color:                  @foreground;
     vertical-align:              0.5;
     horizontal-align:            0.0;

@@ -11,7 +11,7 @@
 */
 // See LICENSE file for copyright and license details. 
 // appearance 
-static const unsigned int borderpx   = 6;       // border pixel of windows 
+static const unsigned int borderpx   = 7;       // border pixel of windows 
 static const unsigned int snap       = 0;       // snap pixel 
 //systray
 static const unsigned int systraypinning = 0;    // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
@@ -44,7 +44,7 @@ static const char col_gray3[]        = "#bbbbbb";
 static const char col_gray4[]        = "#eeeeee";
 static const char background[]       = "#1e1e2e";
 static const char col_borderActive[] = "#8aadf4";
-static const char col_noActive[]     = "#868eba";
+static const char col_noActive[]     = "#45475a";
 static const char background2[]      = "#2f2f49"; static const char *colors[][3]       = {
 	//               fg         bg         border   
 	[SchemeNorm] = { col_gray3, background, col_noActive, },
@@ -67,6 +67,7 @@ static const Rule rules[] = {
     { "TelegramDesktop",  NULL, NULL, 1 << 3, 0, -1 },
     { "kitty", NULL, "neofetch_terminal", 1 << 0, 0, -1 },
 };
+//============================================//
 /* layout(s) */
 static const float mfact     = 0.55; // factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    // number of clients in master area 
@@ -92,6 +93,9 @@ static const Layout layouts[] = {
 	{ "><>",      NULL },    // no layout function means floating behavior 
 	{ NULL,       NULL },
 };
+// Layout для тега 0 (все теги активны)
+#define TAG0_LAYOUT &layouts[7] // "HHH" (grid)
+//============================================//
 // key definitions
 #define MODKEY Mod4Mask
 #define ALTKEY Mod1Mask

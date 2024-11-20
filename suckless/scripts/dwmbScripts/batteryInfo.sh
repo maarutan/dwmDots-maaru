@@ -63,25 +63,8 @@ get_battery_status() {
 
   # Записываем уровень заряда с иконкой в файл
   echo "$icon $capacity%" >$HOME/suckless/scripts/dwmbScripts/.carrentsBattery
-
   # Чтение последнего статуса и отправка уведомлений при изменении
   last_status=$(cat "$STATUS_FILE")
-
-  # Уведомление при заряде 90% (во время зарядки)
-  if [ "$status" = "Charging" ] && [ "$capacity" -ge 80 ] && [[ "$last_status" != "Charging_90" ]]; then
-    notify-send "Батарея" "Батарея заряжена до 90%. Пора снять зарядку." -u normal
-    echo "Charging_90" >"$STATUS_FILE"
-
-  # Уведомление при заряде 50% (во время разрядки)
-  elif [ "$status" = "Discharging" ] && [ "$capacity" -le 50 ] && [ "$capacity" -gt 15 ] && [[ "$last_status" != "Discharging_50" ]]; then
-    notify-send "Батарея" "Средний уровень заряда: $capacity%. Обратите внимание, зарядка наполовину." -u normal
-    echo "Discharging_50" >"$STATUS_FILE"
-
-  # Уведомление при критическом уровне заряда 15%
-  elif [ "$status" = "Discharging" ] && [ "$capacity" -le 20 ] && [[ "$last_status" != "Discharging_15" ]]; then
-    notify-send "Батарея" "Критический уровень заряда: $capacity%. Пора подключить зарядку." -u critical
-    echo "Discharging_15" >"$STATUS_FILE"
-  fi
 }
 
 # Основной цикл для обновления информации каждые $INTERVAL секунд
