@@ -231,3 +231,4 @@ fi
 
 display_ascii_art "${ascii_arts[4]}"
 sleep 2
+add_more_push()
