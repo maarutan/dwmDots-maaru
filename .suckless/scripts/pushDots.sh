@@ -10,7 +10,7 @@ TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
 YOURTERM=${YOURTERM:-"kitty -e"}
 add_more_push()
 {
-    $HOME/.suckless/scripts/pushVSconfig.sh &
+    $HOME/.suckless/scripts/pushVSconfig.sh 
 }
 # //==============доп вызовы==============//
 
