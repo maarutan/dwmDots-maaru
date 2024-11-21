@@ -2,6 +2,7 @@
 	// main editor  settings
 	"editor.suggestSelection": "first",
 	"editor.detectIndentation": true,
+	"terminal.integrated.showExitAlert": false,
 	"editor.minimap.enabled": false,
 	"editor.smoothScrolling": true,
 	"editor.folding": true,
@@ -33,7 +34,7 @@
 	//font
 	"editor.fontLigatures": true,
 	"editor.inlayHints.fontFamily": "JetBrains mono",
-	"editor.fontFamily": "JetBrains mono",
+	"editor.fontFamily": "\"JetBrainsMono Nerd Font\", Consolas, \"Courier New\", monospacej",
 	"editor.letterSpacing": 0.7,
 	"editor.tokenColorCustomizations": {
 		"textMateRules": [
@@ -175,6 +176,7 @@
 	"[python]": {
 		"editor.defaultFormatter": "ms-python.black-formatter"
 	},
+	"python.analysis.autoImportCompletions": false,
 	"security.workspace.trust.untrustedFiles": "open",
 	"glassit.alpha": 220,
 	"warmUp.changeTypingMode": "code snippets",
@@ -272,13 +274,14 @@
 		},
 		// переход по вкладкам
 		{
-			"before": ["<S-j>"],
+			"before": ["<S-k>"],
 			"commands": ["workbench.action.nextEditor"]
 		},
 		{
-			"before": ["<S-k>"],
+			"before": ["<S-j>"],
 			"commands": ["workbench.action.previousEditor"]
 		},
+
 		// фокус по окнам
 		{
 			"before": ["<C-l>"],
@@ -324,7 +327,8 @@
 			"commands": ["lineBreakInsert"],
 			"silent": true
 		}
-	], //leader key
+	],
+	//leader key
 	"vim.leader": "<space>",
 	"vim.handleKeys": {
 		"<C-a>": false,
@@ -355,5 +359,6 @@
 		"*.copilotmd": "vscode.markdown.preview.editor",
 		"{git,gitlens}:/**/*.{md,csv,svg}": "default"
 	},
-	"liveServer.settings.donotVerifyTags": true
+	"liveServer.settings.donotVerifyTags": true,
+	"chat.editing.alwaysSaveWithGeneratedChanges": true
 }

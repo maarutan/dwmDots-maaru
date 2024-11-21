@@ -333,10 +333,6 @@
 		"when": "codeium.chatPanelView.defaultViewLocation"
 	},
 	{
-		"key": "shift+alt+a",
-		"command": "workbench.panel.chat.view.copilot.focus"
-	},
-	{
 		"key": "shift+alt+p",
 		"command": "petsView.focus"
 	},
@@ -458,7 +454,7 @@
 	},
 	// multi cursor for select
 	{
-		"key": "ctrl+d",
+		"key": "alt+d",
 		"command": "editor.action.addSelectionToNextFindMatch",
 		"when": "editorFocus"
 	},
@@ -516,5 +512,55 @@
 		"key": "shift+alt+z",
 		"command": "workbench.view.extension.liveshare",
 		"when": "viewContainer.workbench.view.extension.liveshare.enabled"
+	},
+	{
+		"key": "ctrl+i",
+		"command": "-markdown.extension.editing.toggleItalic",
+		"when": "editorTextFocus && !editorReadonly && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
+	},
+	{
+		"key": "ctrl+i",
+		"command": "-workbench.action.chat.stopListeningAndSubmit",
+		"when": "inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'view' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'view'"
+	},
+	{
+		"key": "ctrl+i",
+		"command": "-workbench.action.chat.startVoiceChat",
+		"when": "chatIsEnabled && hasSpeechProvider && inChatInput && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest || chatIsEnabled && hasSpeechProvider && inlineChatFocused && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest"
+	},
+	{
+		"key": "ctrl+i",
+		"command": "codeium.openCodeiumCommand",
+		"when": "codeium.commandEnabled && editorTextFocus && !inlineSuggestionsVisible"
+	},
+	{
+		"key": "ctrl+i",
+		"command": "-codeium.openCodeiumCommand",
+		"when": "codeium.commandEnabled && editorTextFocus && !inlineSuggestionsVisible"
+	},
+	{
+		"key": "ctrl+'",
+		"command": "editor.action.quickFix",
+		"when": "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
+	},
+	{
+		"key": "k",
+		"command": "list.focusUp",
+		"when": "editorTextFocus && quickFixWidgetVisible"
+	},
+	{
+		"key": "j",
+		"command": "list.focusDown",
+		"when": "editorTextFocus && quickFixWidgetVisible"
+	},
+	{
+		"key": "ctrl+/",
+		"command": "-notebook.commentSelectedCells",
+		"when": "notebookEditable && notebookEditorFocused && !inputFocus"
+	},
+	{
+		"key": "alt+o",
+		"command": "editor.action.commentLine",
+		"when": "editorTextFocus && !editorReadonly"
 	}
 ]

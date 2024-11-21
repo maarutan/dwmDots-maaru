@@ -44,7 +44,7 @@ bindkey -v
 #----- alias -----
 
 
- alias gay="$HOME/suckless/scripts/gay.sh"
+ alias gay="$HOME/.suckless/scripts/gay.sh"
  alias ls='exa --icons --color'
  alias la='exa -a --icons --color'
  alias df="duf"
@@ -74,7 +74,7 @@ bindkey -v
  alias vim="nvim"
  alias nzsh="nvim ~/.zshrc"
  alias neo="$HOME/.config/neofetch/startFetch.sh"
- alias fetch="$HOME/suckless/scripts/fetch.sh"
+ alias fetch="$HOME/.suckless/scripts/fetch.sh"
  alias cls="clear"
  alias ex="exit"
  alias нфяш="yazi"
