@@ -7,10 +7,10 @@ SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwmSync-maaru"}
 TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
 
 # //==============доп вызовы==============//
+YOURTERM=${YOURTERM:-"kitty -e"}
 add_more_push()
 {
-    $HOME/.suckless/scripts/pushVSconfig.sh 
-# ...
+    $HOME/.suckless/scripts/pushVSconfig.sh &
 }
 # //==============доп вызовы==============//
 
@@ -112,10 +112,10 @@ EOF
 EOF
 )"
 "$(cat << 'EOF'
-                                 _    _             
- _ __   ___  _ _  ___    __ _ __| |__| |            
-| '  \ / _ \  '_ / -_)  / _` / _` / _` |  _   _   _ 
-|_|_|_ \___/ _|  \___|  \__,_\__,_\__,_| (_) (_) (_)        
+                             _    _             
+ _ __  ___ _ _ ___   __ _ __| |__| |            
+| '  \/ _ \ '_/ -_) / _` / _` / _` |  _   _   _ 
+|_|_|_\___/_| \___| \__,_\__,_\__,_| (_) (_) (_)        
 EOF
 )"
 
@@ -214,7 +214,7 @@ if [ $? -ne 0 ]; then
     if [[ "$RETRY" == "y" ]]; then
         "$0"  # Повторный запуск текущего скрипта
     else
-        echo "Звершино"
+        exit 1
     fi
 fi
 
@@ -229,6 +229,5 @@ else
     echo "Временная директория сохранена."
 fi
 
-display_ascii_art "${ascii_arts[4]}"
-sleep 2
-add_more_push()
+display_ascii_art "${ascii_arts[5]}"
+YOURTERM add_more_push()
