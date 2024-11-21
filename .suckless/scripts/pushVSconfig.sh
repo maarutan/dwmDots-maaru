@@ -4,7 +4,7 @@
 REPO_SSH=${REPO_SSH:-"git@github.com:maarutan/vscode-config.git"}
 BRANCH=${BRANCH:-"main"}
 SOURCE_DIR=${SOURCE_DIR:-"$HOME/.vscode-sync-config"}
-TARGET_DIR=${TARGET_DIR:-"$HOME/.vscode-config/"}
+TARGET_DIR=${TARGET_DIR:-"$HOME/.vscode-config"}
 
 # Проверка наличия необходимых приложений
 required_apps=(git rsync neofetch bc figlet sl)

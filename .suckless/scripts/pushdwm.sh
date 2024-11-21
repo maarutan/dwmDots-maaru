@@ -1,20 +1,10 @@
 #!/bin/bash
 
 # Объявление переменных
-REPO_SSH=${REPO_SSH:-"git@github.com:maarutan/dwmDots-maaru.git"}
+REPO_SSH=${REPO_SSH:-"git@github.com:maarutan/dwm-maaru.git"}
 BRANCH=${BRANCH:-"main"}
-SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwmSync-maaru"}
-TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
-
-# //==============доп вызовы==============//
-YOURTERM=${YOURTERM:-"kitty -e"}
-add_more_push()
-{
-    $HOME/.suckless/scripts/pushVSconfig.sh 
-    $HOME/.suckless/scripts/pushdwm.sh 
-
-}
-# //==============доп вызовы==============//
+SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwm-maaru-sync"}
+TARGET_DIR=${TARGET_DIR:-"$HOME/.dwm-maaru"}
 
 # Проверка наличия необходимых приложений
 required_apps=(git rsync neofetch bc figlet sl)
@@ -25,6 +15,7 @@ for app in "${required_apps[@]}"; do
         missing_apps+=($app)
     fi
 done
+
 if [ ${#missing_apps[@]} -ne 0 ]; then
     echo "Ошибка: Для корректной работы скрипта необходимо установить следующие приложения: ${missing_apps[*]}"
     exit 1
@@ -78,16 +69,8 @@ trap_exit() {
     exit 0
 }
 
-plusing(){
-    display_ascii_art "${ascii_arts[5]}"
-    sleep 1
-
-}
-
 # Установка обработчика прерывания
 trap trap_exit SIGINT
-trap 'plusing; add_more_push; trap_exit' EXIT
-
 
 # Определение ASCII-арта
 ascii_arts=(
@@ -121,21 +104,13 @@ EOF
 |_|           
 EOF
 )"
-"$(cat << 'EOF'
-                             _    _             
- _ __  ___ _ _ ___   __ _ __| |__| |            
-| '  \/ _ \ '_/ -_) / _` / _` / _` |  _   _   _ 
-|_|_|_\___/_| \___| \__,_\__,_\__,_| (_) (_) (_)        
-EOF
-)"
-
 )
 
 # Шаг 1: Очистка экрана, запуск neofetch, вывод ASCII-арта и проверка наличия репозитория
 clear
 if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
     $HOME/.config/neofetch/startFetch.sh
-else 
+else
     neofetch
 fi
 display_ascii_art "${ascii_arts[0]}"
@@ -224,7 +199,7 @@ if [ $? -ne 0 ]; then
     if [[ "$RETRY" == "y" ]]; then
         "$0"  # Повторный запуск текущего скрипта
     else
-        echo "завершено"
+        exit 1
     fi
 fi
 
@@ -238,4 +213,3 @@ if [[ "$DELETE_TEMP" == "y" ]]; then
 else
     echo "Временная директория сохранена."
 fi
-
