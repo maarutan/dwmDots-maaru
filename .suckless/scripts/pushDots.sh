@@ -214,7 +214,7 @@ if [ $? -ne 0 ]; then
     if [[ "$RETRY" == "y" ]]; then
         "$0"  # Повторный запуск текущего скрипта
     else
-        exit 1
+        echo "завершено"
     fi
 fi
 
@@ -231,3 +231,4 @@ fi
 
 display_ascii_art "${ascii_arts[5]}"
 YOURTERM add_more_push()
+trap_exit()
