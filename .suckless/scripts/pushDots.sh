@@ -9,7 +9,7 @@ TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
 # //==============доп вызовы==============//
 add_more_push()
 {
-    $HOME/.suckless/scripts/pushVSconfig.sh &
+    $HOME/.suckless/scripts/pushVSconfig.sh 
 # ...
 }
 # //==============доп вызовы==============//
@@ -112,10 +112,10 @@ EOF
 EOF
 )"
 "$(cat << 'EOF'
-                             _    _             
- _ __  ___ _ _ ___   __ _ __| |__| |            
-| '  \/ _ \ '_/ -_) / _` / _` / _` |  _   _   _ 
-|_|_|_\___/_| \___| \__,_\__,_\__,_| (_) (_) (_)        
+                                 _    _             
+ _ __   ___  _ _  ___    __ _ __| |__| |            
+| '  \ / _ \  '_ / -_)  / _` / _` / _` |  _   _   _ 
+|_|_|_ \___/ _|  \___|  \__,_\__,_\__,_| (_) (_) (_)        
 EOF
 )"
 
@@ -231,4 +231,3 @@ fi
 
 display_ascii_art "${ascii_arts[4]}"
 sleep 2
-add_more_push()
