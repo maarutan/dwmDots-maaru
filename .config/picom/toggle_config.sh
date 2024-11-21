@@ -17,7 +17,7 @@ else
 fi
 
 # Файл для хранения последнего использованного конфига (один для всех режимов)
-LAST_CONFIG_FILE="$HOME/.config/picom/last_config.txt"
+LAST_CONFIG_FILE="$HOME/.config/picom/.last_config.txt"
 
 # Проверка существования файла последней конфигурации
 if [ ! -f "$LAST_CONFIG_FILE" ]; then
@@ -41,4 +41,3 @@ echo "$NEW_CONFIG" > "$LAST_CONFIG_FILE"
 pkill picom
 sleep 0.5
 picom --config "$NEW_CONFIG" &
-$HOME/.config/kitty/toggle_config.sh nOpacity

@@ -68,12 +68,12 @@
 #define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
 
 #define STATE_FILE_PATH ".cache/dwm/smartgaps_state"
-#define SHOW_TAG_BOXES_FILE ".cache/dwm/dwmshowtagboxes_state"  
 #define STATE_FILE_PATH_SYSTRAY ".cache/dwm/dwmsystray_state" 
-
+#define STATE_FILE_PATH_TITLE ".cache/dwm/dwmtitle_state"
+#define STATE_FILE_TOGGLEGAPS ".cache/dwm/togglebottgaps"
+#define CURRENTS_MINIBOX ".cache/dwm/dwmshowtagboxes_state"
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
@@ -83,6 +83,7 @@ enum { Manager, Xembed, XembedInfo, XLast }; /* Xembed atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkClientWin,
        ClkRootWin, ClkLast }; /* clicks */
+enum { SchemeNorm, SchemeSel, SchemeTitle, SchemeTitleSel, SchemeLine }; /* color schemes */
 
 typedef union {
 	int i;
@@ -135,30 +136,32 @@ typedef struct {
 } Layout;
 
 typedef struct Pertag Pertag;
+
 struct Monitor {
-	char ltsymbol[16];
-	float mfact;
-	int nmaster;
-	int num;
-	int by;               /* bar geometry */
-	int mx, my, mw, mh;   /* screen size */
-	int wx, wy, ww, wh;   /* window area  */
-	int gappih;           /* horizontal gap between windows */
-	int gappiv;           /* vertical gap between windows */
-	int gappoh;           /* horizontal outer gaps */
-	int gappov;           /* vertical outer gaps */
-	unsigned int seltags;
-	unsigned int sellt;
-	unsigned int tagset[2];
-	int showbar;
-	int topbar;
-	Client *clients;
-	Client *sel;
-	Client *stack;
-	Monitor *next;
-	Window barwin;
-	const Layout *lt[2];
-	Pertag *pertag;
+    char ltsymbol[16];
+    float mfact;
+    int nmaster;
+    int num;
+    int by;               /* bar geometry */
+    int mx, my, mw, mh;   /* screen size */
+    int wx, wy, ww, wh;   /* window area  */
+    int gappih;           /* horizontal gap between windows */
+    int gappiv;           /* vertical gap between windows */
+    int gappoh;           /* horizontal outer gaps */
+    int gappov;           /* vertical outer gaps */
+    unsigned int seltags;
+    unsigned int sellt;
+    unsigned int tagset[2];
+    int showbar;
+    int showtitle;        /* управление отображением заголовков */
+    int topbar;
+    Client *clients;
+    Client *sel;
+    Client *stack;
+    Monitor *next;
+    Window barwin;
+    const Layout *lt[2];
+    Pertag *pertag;
 };
 
 typedef struct {
@@ -282,9 +285,19 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
-
-void toggle_tag_boxes(const Arg *arg);
+static void winview(const Arg* arg);
 void toggleSystray(const Arg *arg);
+void viewnext(const Arg *arg);
+void viewprev(const Arg *arg);
+int is_noborder_app(const char *class);
+int is_alltags_app(const char *class);
+void toggleshowtitle(const Arg *arg);
+void save_showtitle_state(void);
+void load_showtitle_state(void);
+void saveSmartgapsState(int state);
+int isWindowIgnored(Client *c);  // Объявление функции
+void toggle_bottGaps(const Arg *arg);  // Прототип функции
+void toggleTagBoxes(const Arg *arg);
 
 /* variables */
 static Systray *systray = NULL;
@@ -328,13 +341,92 @@ unsigned int currentkey = 0;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-void saveSmartgapsState(int state) {
-    FILE *file = fopen(STATE_FILE_PATH, "w");
+void save_bottGaps_state() {
+    FILE *file = fopen(STATE_FILE_TOGGLEGAPS, "w");
+    if (file) {
+        fprintf(file, "%d", bottGaps);  // Сохраняем текущее значение в файл
+        fclose(file);
+    }
+}
+
+// Функция для чтения состояния из файла
+void load_bottGaps_state() {
+    FILE *file = fopen(STATE_FILE_TOGGLEGAPS, "r");
+    if (file) {
+        fscanf(file, "%d", &bottGaps);  // Читаем значение из файла
+        fclose(file);
+    }
+}
+
+void toggle_bottGaps(const Arg *arg) {
+    // Загружаем состояние из файла, если оно есть
+    load_bottGaps_state();
+
+    // Формируем команду для запуска и остановки dock
+    char command[256];
+
+    if (bottGaps == 0) {
+        // Если отступы 0, восстанавливаем сохранённое значение (например, 160 или то, что было сохранено)
+        bottGaps = default_bottGaps;
+
+        // Формируем команду для запуска dock
+        snprintf(command, sizeof(command), "%s &", DOCK_NAME);
+
+        // Запускаем dock
+        system(command);
+    } else {
+        // Если отступы больше 0, сбрасываем их в 0
+        bottGaps = 0;
+
+        // Формируем команду для остановки dock
+        snprintf(command, sizeof(command), "pkill %s", DOCK_NAME);
+
+        // Останавливаем dock
+        system(command);
+    }
+
+    // Сохраняем новое состояние в файл
+    save_bottGaps_state();
+
+    // Перерисовываем окна с новыми отступами
+    arrange(NULL);
+}
+void save_showtitle_state(void)
+{
+    FILE *file = fopen(STATE_FILE_PATH_TITLE, "w");
     if (file != NULL) {
-        fprintf(file, "%d\n", state);
+        fprintf(file, "%d\n", showtitle);
         fclose(file);
     } else {
-        fprintf(stderr, "Ошибка: не удалось открыть файл для записи состояния.\n");
+        fprintf(stderr, "Ошибка: не удалось открыть файл для записи состояния showtitle.\n");
+    }
+}
+
+
+
+
+
+void load_showtitle_state(void)
+{
+    FILE *file = fopen(STATE_FILE_PATH_TITLE, "r");
+    if (file != NULL) {
+        if (fscanf(file, "%d", &showtitle) != 1) {
+            fprintf(stderr, "Ошибка: не удалось считать состояние showtitle из файла.\n");
+        }
+        fclose(file);
+    } else {
+        fprintf(stderr, "Ошибка: не удалось открыть файл для чтения состояния showtitle.\n");
+    }
+}
+
+
+void saveSmartgapsState(int state) {
+    FILE *file = fopen(STATE_FILE_PATH, "w");
+    if (file) {
+        fprintf(file, "%d\n", state); // Сохраняем состояние smartgaps
+        fclose(file);
+    } else {
+        fprintf(stderr, "Ошибка: не удалось открыть файл для записи состояния smartgaps.\n");
     }
 }
 
@@ -981,30 +1073,61 @@ expose(XEvent *e)
 	}
 }
 
+
+int isWindowIgnored(Client *c) {
+    const char **ignore = focusIgnore;  // Указатель на массив с именами окон
+    XClassHint class_hint;  // Структура для хранения информации о классе окна
+
+    // Получаем информацию о классе окна
+    if (XGetClassHint(dpy, c->win, &class_hint)) {  // Передаем указатель на class_hint
+        while (*ignore) {
+            if (strstr(class_hint.res_class, *ignore)) {  // Проверяем, есть ли совпадение
+                return 1;  // Окно игнорируется, возвращаем 1
+            }
+            ignore++;
+        }
+    }
+
+    return 0;  // Фокус можно установить для этого окна
+}
+
+
+
 void
 focus(Client *c)
 {
-	if (!c || !ISVISIBLE(c))
-		for (c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
-	if (selmon->sel && selmon->sel != c)
-		unfocus(selmon->sel, 0);
-	if (c) {
-		if (c->mon != selmon)
-			selmon = c->mon;
-		if (c->isurgent)
-			seturgent(c, 0);
-		detachstack(c);
-		attachstack(c);
-		grabbuttons(c, 1);
-		XSetWindowBorder(dpy, c->win, scheme[SchemeSel][ColBorder].pixel);
-		setfocus(c);
-	} else {
-		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-		XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
-	}
-	selmon->sel = c;
-	selmon->pertag->sel[selmon->pertag->curtag] = c;
-	drawbars();
+    // Проверка, если окно игнорируется или не видно, переходим к следующему в стеке
+    if (!c || !ISVISIBLE(c) || isWindowIgnored(c)) // Проверяем видимость и игнорирование
+        for (c = selmon->stack; c && (!ISVISIBLE(c) || isWindowIgnored(c)); c = c->snext);
+
+    // Если окно, на котором был фокус, не является текущим, снимаем фокус с него
+    if (selmon->sel && selmon->sel != c)
+        unfocus(selmon->sel, 0);
+
+    // Если окно существует и не должно быть проигнорировано
+    if (c) {
+        if (c->mon != selmon)
+            selmon = c->mon;  // Переключаем монитор, если нужно
+
+        if (c->isurgent)
+            seturgent(c, 0);  // Снимаем статус "тревожного" окна
+
+        detachstack(c);  // Убираем окно из стека
+        attachstack(c);  // Добавляем окно в стек
+
+        grabbuttons(c, 1);  // Захватываем кнопки для окна
+        XSetWindowBorder(dpy, c->win, scheme[SchemeSel][ColBorder].pixel);  // Изменяем границу окна
+        setfocus(c);  // Устанавливаем фокус на окно
+    } else {
+        // Если окно не найдено, устанавливаем фокус на корень
+        XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+        XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
+    }
+
+    // Обновляем информацию о текущем выбранном окне
+    selmon->sel = c;
+    selmon->pertag->sel[selmon->pertag->curtag] = c;
+    drawbars();  // Перерисовываем панели
 }
 
 
@@ -1168,13 +1291,10 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size)
 
 
 
-
 void
 drawbar(Monitor *m)
 {
     int x, w, tw = 0, stw = 0;
-    int boxs = drw->fonts->h / 9;
-    int boxw = drw->fonts->h / 6 + 2;
     unsigned int i, occ = 0, urg = 0;
     Client *c;
 
@@ -1183,9 +1303,9 @@ drawbar(Monitor *m)
 
     /* Убираем padding для системного трея */
     if (showsystray && m == systraytomon(m) && !systrayonleft)
-        stw = getsystraywidth();  /* не добавляем дополнительный отступ */
+        stw = getsystraywidth();
 
-    x = 0;  /* Начинаем с левого края экрана */
+    x = 0;
 
     /* Отрисовка статуса (только для выбранного монитора) */
     if (m == selmon) {
@@ -1196,24 +1316,69 @@ drawbar(Monitor *m)
 
     resizebarwin(m);
 
+    /* Собираем информацию о тегах */
     for (c = m->clients; c; c = c->next) {
-        occ |= c->tags;
+        /* Игнорируем окна, прикрепленные ко всем тегам */
+        if (c->tags != ~0)
+            occ |= c->tags;
+
         if (c->isurgent)
             urg |= c->tags;
     }
 
-    /* Отрисовка тегов с квадратиками */
+    /* Отрисовка тегов с линиями */
     for (i = 0; i < LENGTH(tags); i++) {
         w = TEXTW(tags[i]);
+
+        /* Выбор цвета для текущего тега */
         drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+
+        /* Отрисовка названия тега */
         drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
-        
-        /* Рисуем квадратики только если show_tag_boxes = 1 */
-        if (show_tag_boxes && (occ & 1 << i)) {
-            drw_rect(drw, x + boxs, boxs, boxw, boxw,
-                m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-                urg & 1 << i);  /* Рисуем квадратик для активных тегов */
+
+
+
+if (occ & 1 << i) {
+    // Рассчитываем отступ, чтобы линия была по центру
+    int line_width = w - 8;  // Ширина линии (уменьшаем на 8 пикселей)
+    
+    // Переключение между тремя режимами
+    if (show_tag_boxes == 1) {
+        // Режим 1: Увеличиваем ширину и высоту, сдвиг вверх на 23 пикселя
+        int line_height = 1;  // Базовая высота линии
+        if (m->tagset[m->seltags] & 1 << i) {
+            line_width += 4;  // Увеличиваем ширину линии для активного тега
+            line_height += 1; // Увеличиваем высоту линии для активного тега
         }
+
+        // Сдвигаем линию по центру
+        int line_offset = (w - line_width) / 2;  // Сдвиг для центрирования линии
+
+        // Перемещаем линию вверх
+        int line_y_position = bh - line_height - 25;  // Сдвигаем линию вверх на 23 пикселя
+
+        // Рисуем линию по центру с измененной высотой и новым вертикальным смещением
+        drw_rect(drw, x + line_offset, line_y_position, line_width, line_height, 1, 0);  // Линия по центру
+    }
+    else if (show_tag_boxes == 2) {
+        // Режим 2: Увеличиваем ширину и высоту, но без сдвига
+        int line_height = 1;  // Базовая высота линии
+        if (m->tagset[m->seltags] & 1 << i) {
+            line_width += 2;  // Увеличиваем ширину линии для активного тега
+            line_height += 1; // Увеличиваем высоту линии для активного тега
+        }
+
+        // Сдвигаем линию по центру
+        int line_offset = (w - line_width) / 2;  // Сдвиг для центрирования линии
+
+        // Рисуем линию по центру с измененной высотой
+        drw_rect(drw, x + line_offset, bh - line_height, line_width, line_height, 1, 0);  // Линия по центру
+    }
+    else if (show_tag_boxes == 3) {
+        // Режим 3: Отображение стандартных квадратиков
+        drw_rect(drw, x + 6, bh - 20, 5, 5, 1, 0);  // Стандартные квадратики
+    }
+}
         x += w;
     }
 
@@ -1222,16 +1387,83 @@ drawbar(Monitor *m)
     drw_setscheme(drw, scheme[SchemeNorm]);
     x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
+    /* Отрисовка заголовков окон (awesomebar) */
     if ((w = m->ww - tw - stw - x) > bh) {
-        drw_setscheme(drw, scheme[SchemeNorm]);
-        drw_rect(drw, x, 0, w, bh, 1, 1);
+        if (showtitle) {
+            int n = 0;
+            for (c = m->clients; c; c = c->next)
+                if (ISVISIBLE(c))
+                    n++;
+            if (n > 0) {
+                int tabw = (w - 2 * lrpad) / n;
+                if (tabw < 50) tabw = 50;
+                for (c = m->clients; c; c = c->next) {
+                    if (!ISVISIBLE(c))
+                        continue;
+
+                    if (c == m->sel) {
+                        drw_setscheme(drw, scheme[SchemeLine]);
+                        drw_rect(drw, x, 0, tabw, 4, 1, 0);
+                    } else {
+                        drw_setscheme(drw, scheme[SchemeNorm]);
+                        drw_rect(drw, x, 0, tabw, 4, 1, 1);
+                    }
+
+                    drw_setscheme(drw, scheme[m->sel == c ? SchemeTitleSel : SchemeTitle]);
+                    drw_text(drw, x, 6, tabw, bh - 6, lrpad / 2, c->name, 0);
+                    x += tabw;
+                }
+            } else {
+                drw_setscheme(drw, scheme[SchemeNorm]);
+                drw_rect(drw, x, 0, w, bh, 1, 1);
+            }
+        } else {
+            drw_setscheme(drw, scheme[SchemeNorm]);
+            drw_rect(drw, x, 0, w, bh, 1, 1);
+        }
     }
 
     /* Обновление панели без padding для системного трея */
-    drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);  /* Просто отрисовываем панель */
+    drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
 }
 
 
+void MINIBOXloadState() {
+    FILE *inputFile = fopen(CURRENTS_MINIBOX, "r");
+    if (inputFile != NULL) {
+        fscanf(inputFile, "%d", &show_tag_boxes); // Считываем значение из файла
+        fclose(inputFile);
+    }
+}
+
+void MINIBOXsaveState() {
+    FILE *outputFile = fopen(CURRENTS_MINIBOX, "w");
+    if (outputFile != NULL) {
+        fprintf(outputFile, "%d", show_tag_boxes); // Записываем значение в файл
+        fclose(outputFile);
+    }
+}
+// Изменение функции toggleTagBoxes
+void toggleTagBoxes(const Arg *arg) {
+    if (show_tag_boxes == 1) {
+        show_tag_boxes = 2;
+    } else if (show_tag_boxes == 2) {
+        show_tag_boxes = 3;
+    } else if (show_tag_boxes == 3) {
+        show_tag_boxes = 1;
+    }
+
+    // Сохраняем новое состояние
+    MINIBOXsaveState(); // Функция сохранения
+}
+
+
+void toggleshowtitle(const Arg *arg)
+{
+    showtitle = !showtitle; // Переключаем состояние
+    save_showtitle_state(); // Убедитесь, что эта функция существует и сохраняет состояние
+    drawbars();             // Обновляем панель
+}
 void
 grabkeys(void)
 {
@@ -1350,92 +1582,132 @@ killclient(const Arg *arg)
 	}
 }
 
+
 void
 manage(Window w, XWindowAttributes *wa)
 {
-	Client *c, *t = NULL;
-	Window trans = None;
-	XWindowChanges wc;
+    Client *c, *t = NULL;
+    Window trans = None;
+    XWindowChanges wc;
 
-	c = ecalloc(1, sizeof(Client));
-	c->win = w;
-	/* geometry */
-	c->x = c->oldx = wa->x;
-	c->y = c->oldy = wa->y;
-	c->w = c->oldw = wa->width;
-	c->h = c->oldh = wa->height;
-	c->oldbw = wa->border_width;
-	c->cfact = 1.0;
+    c = ecalloc(1, sizeof(Client));
+    c->win = w;
+    /* geometry */
+    c->x = c->oldx = wa->x;
+    c->y = c->oldy = wa->y;
+    c->w = c->oldw = wa->width;
+    c->h = c->oldh = wa->height;
+    c->oldbw = wa->border_width;
+    c->cfact = 1.0;
 
-	updatetitle(c);
-	if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
-		c->mon = t->mon;
-		c->tags = t->tags;
-	} else {
-		c->mon = selmon;
-		applyrules(c);
-	}
+    updatetitle(c);
+    if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
+        c->mon = t->mon;
+        c->tags = t->tags;
+    } else {
+        c->mon = selmon;
+        applyrules(c);
+    }
 
-	if (c->x + WIDTH(c) > c->mon->wx + c->mon->ww)
-		c->x = c->mon->wx + c->mon->ww - WIDTH(c);
-	if (c->y + HEIGHT(c) > c->mon->wy + c->mon->wh)
-		c->y = c->mon->wy + c->mon->wh - HEIGHT(c);
-	c->x = MAX(c->x, c->mon->wx);
-	c->y = MAX(c->y, c->mon->wy);
-	c->bw = borderpx;
+    /* Восстановление логики сохранения тегов */
+    {
+        int format;
+        unsigned long *data, n, extra;
+        Monitor *m;
+        Atom atom;
 
-	wc.border_width = c->bw;
-	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
-	configure(c); /* propagates border_width, if size doesn't change */
-	updatewindowtype(c);
-	updatesizehints(c);
-	updatewmhints(c);
-	{
-		int format;
-		unsigned long *data, n, extra;
-		Monitor *m;
-		Atom atom;
-		if (XGetWindowProperty(dpy, c->win, netatom[NetClientInfo], 0L, 2L, False, XA_CARDINAL,
-				&atom, &format, &n, &extra, (unsigned char **)&data) == Success && n == 2) {
-			c->tags = *data;
-			for (m = mons; m; m = m->next) {
-				if (m->num == *(data+1)) {
-					c->mon = m;
-					break;
-				}
-			}
-		}
-		if (n > 0)
-			XFree(data);
-	}
-	setclienttagprop(c);
+        if (XGetWindowProperty(dpy, c->win, netatom[NetClientInfo], 0L, 2L, False, XA_CARDINAL,
+                               &atom, &format, &n, &extra, (unsigned char **)&data) == Success && n == 2) {
+            c->tags = *data;
+            for (m = mons; m; m = m->next) {
+                if (m->num == *(data + 1)) {
+                    c->mon = m;
+                    break;
+                }
+            }
+        }
+        if (n > 0)
+            XFree(data);
+    }
 
+    setclienttagprop(c); /* Устанавливаем сохранённые теги */
 
+    /* Логика для обработки класса окна */
+    char class[256] = "";
+    XClassHint ch = { NULL, NULL };
+
+    if (XGetClassHint(dpy, c->win, &ch)) {
+        if (ch.res_class)
+            strncpy(class, ch.res_class, sizeof(class) - 1);
+
+        /* Проверка на принадлежность к alltags_apps */
+        if (is_alltags_app(class)) {
+            c->tags = ~0; // Устанавливаем окно на все теги
+        }
+
+        /* Устанавливаем бордеры */
+        if (is_noborder_app(class)) {
+            c->bw = 0; // Убираем границы
+        } else {
+            c->bw = borderpx; // Устанавливаем стандартные границы
+        }
+
+        if (ch.res_class)
+            XFree(ch.res_class);
+        if (ch.res_name)
+            XFree(ch.res_name);
+    } else {
+        c->bw = borderpx; // Если класс не удалось определить, применяем стандартные границы
+    }
+
+    wc.border_width = c->bw;
+    XConfigureWindow(dpy, w, CWBorderWidth, &wc);
+    XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
+    configure(c); /* propagates border_width, if size doesn't change */
+    updatewindowtype(c);
+    updatesizehints(c);
+    updatewmhints(c);
 	c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
 	c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
-	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
-	grabbuttons(c, 0);
-	if (!c->isfloating)
-		c->isfloating = c->oldstate = trans != None || c->isfixed;
-	if (c->isfloating)
-		XRaiseWindow(dpy, c->win);
-	if( attachbelow )
-		attachBelow(c);
-	else
-		attach(c);
-	attachstack(c);
-	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
-		(unsigned char *) &(c->win), 1);
-	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
-	setclientstate(c, NormalState);
-	if (c->mon == selmon)
-		unfocus(selmon->sel, 0);
-	c->mon->sel = c;
-	arrange(c->mon);
-	XMapWindow(dpy, c->win);
-	focus(NULL);
+    if (c->isfloating)
+        XRaiseWindow(dpy, c->win);
+
+    if (attachbelow)
+        attachBelow(c);
+    else
+        attach(c);
+
+    attachstack(c);
+    XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
+                    (unsigned char *)&(c->win), 1);
+    XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
+    setclientstate(c, NormalState);
+    if (c->mon == selmon)
+        unfocus(selmon->sel, 0);
+    c->mon->sel = c;
+    arrange(c->mon);
+    XMapWindow(dpy, c->win);
+    focus(NULL);
 }
+
+
+int is_noborder_app(const char *class) {
+    for (int i = 0; noborder_apps[i]; i++) {
+        if (strstr(class, noborder_apps[i]))
+            return 1;
+    }
+    return 0;
+}
+
+int is_alltags_app(const char *class) {
+    for (int i = 0; alltags_apps[i]; i++) {
+        if (strstr(class, alltags_apps[i]))
+            return 1; 
+    }
+    return 0; 
+}
+
+
 
 void
 mappingnotify(XEvent *e)
@@ -2153,27 +2425,10 @@ setmfact(const Arg *arg)
 	arrange(selmon);
 }
 
-
-void save_show_tag_boxes_state(void) {
-    FILE *file = fopen(SHOW_TAG_BOXES_FILE, "w");
-    if (file) {
-        fprintf(file, "%d\n", show_tag_boxes);  // Сохраняем состояние
-        fclose(file);
-    }
-}
-
-void load_show_tag_boxes_state(void) {
-    FILE *file = fopen(SHOW_TAG_BOXES_FILE, "r");
-    if (file) {
-        fscanf(file, "%d", &show_tag_boxes);  // Загружаем состояние
-        fclose(file);
-    }
-}
-
 void
 setup(void)
 {
-  load_show_tag_boxes_state(); 
+  load_showtitle_state();
 	int i;
 	XSetWindowAttributes wa;
 	Atom utf8string;
@@ -2267,12 +2522,6 @@ setup(void)
 }
 
 
-
-void toggle_tag_boxes(const Arg *arg) {
-    show_tag_boxes = !show_tag_boxes;  // Переключаем отображение квадратиков
-    save_show_tag_boxes_state();  // Сохраняем состояние
-    drawbar(selmon);  // Перерисовываем панель
-}
 
 
 void
@@ -2840,13 +3089,13 @@ updatesystray(void)
 	XSync(dpy, False);
 }
 
+
 void
-updatetitle(Client *c)
-{
-	if (!gettextprop(c->win, netatom[NetWMName], c->name, sizeof c->name))
-		gettextprop(c->win, XA_WM_NAME, c->name, sizeof c->name);
-	if (c->name[0] == '\0') /* hack to mark broken clients */
-		strcpy(c->name, broken);
+updatetitle(Client *c) {
+    if (!gettextprop(c->win, netatom[NetWMName], c->name, sizeof c->name))
+        gettextprop(c->win, XA_WM_NAME, c->name, sizeof c->name);
+    if (c->name[0] == '\0') /* no name */
+        strcpy(c->name, broken);
 }
 
 void
@@ -2880,45 +3129,89 @@ updatewmhints(Client *c)
 	}
 }
 
+
+void
+viewnext(const Arg *arg) {
+    unsigned int i;
+    for (i = 0; i < LENGTH(tags); i++) {
+        if (selmon->tagset[selmon->seltags] & (1 << i)) {
+            view(&(Arg) { .ui = 1 << ((i + 1) % LENGTH(tags)) });
+            return;
+        }
+    }
+}
+
+void
+viewprev(const Arg *arg) {
+    unsigned int i;
+    for (i = 0; i < LENGTH(tags); i++) {
+        if (selmon->tagset[selmon->seltags] & (1 << i)) {
+            view(&(Arg) { .ui = 1 << ((i + LENGTH(tags) - 1) % LENGTH(tags)) });
+            return;
+        }
+    }
+}
+
+
 void
 view(const Arg *arg)
 {
-	int i;
-	unsigned int tmptag;
+    int i;
+    unsigned int tmptag;
 
-	if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
-		return;
-	selmon->seltags ^= 1; /* toggle sel tagset */
-	if (arg->ui & TAGMASK) {
-		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
+    // Если мы переключаемся на тег 0
+    if (arg->ui == ~0) {
+        if (selmon->pertag->curtag == 0) {
+            // Если мы уже находимся на теге 0, восстанавливаем прежнее состояние
+            if (prevtags != 0) {  // Проверяем, что состояние было сохранено
+                selmon->tagset[selmon->seltags] = prevtags;  // Восстанавливаем предыдущий тег
+                setlayout(&((Arg) { .v = prevlayout }));     // Восстанавливаем layout
+                focus(prevclient);  // Восстанавливаем фокус на предыдущем окне
+                arrange(selmon);
+            }
+            return; // Прерываем выполнение, не переключаемся
+        } else {
+            // Сохраняем текущее состояние перед переходом на тег 0
+            prevtags = selmon->tagset[selmon->seltags];   // Сохраняем предыдущий тег
+            prevclient = selmon->sel;                      // Сохраняем текущее окно
+            prevlayout = selmon->lt[selmon->sellt];        // Сохраняем текущий layout
+            selmon->pertag->curtag = 0; // Переключаем на тег 0
+            setlayout(&((Arg) { .v = TAG0_LAYOUT }));      // Устанавливаем layout для тега 0
+        }
+    }
 
-		if (arg->ui == ~0) {
-			selmon->pertag->curtag = 0;
-			// Установить layout для тега 0
-			setlayout(&((Arg) { .v = TAG0_LAYOUT }));
-		} else {
-			for (i = 0; !(arg->ui & 1 << i); i++) ;
-			selmon->pertag->curtag = i + 1;
-		}
-	} else {
-		tmptag = selmon->pertag->prevtag;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
-		selmon->pertag->curtag = tmptag;
-	}
+    // Если тег уже активен, не делаем ничего
+    if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
+        return;
 
-	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+    selmon->seltags ^= 1; /* toggle sel tagset */
+    if (arg->ui & TAGMASK) {
+        selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+        selmon->pertag->prevtag = selmon->pertag->curtag;
 
-	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-		togglebar(NULL);
+        if (arg->ui != ~0) {
+            for (i = 0; !(arg->ui & 1 << i); i++) ;
+            selmon->pertag->curtag = i + 1;
+        }
+    } else {
+        tmptag = selmon->pertag->prevtag;
+        selmon->pertag->prevtag = selmon->pertag->curtag;
+        selmon->pertag->curtag = tmptag;
+    }
 
-	focus(selmon->pertag->sel[selmon->pertag->curtag]);
-	arrange(selmon);
+    selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+    selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+    selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+    selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+    selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+    if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
+        togglebar(NULL);
+
+    focus(selmon->pertag->sel[selmon->pertag->curtag]);
+    arrange(selmon);
 }
+
 
 Client *
 wintoclient(Window w)
@@ -2958,6 +3251,26 @@ wintomon(Window w)
 	if ((c = wintoclient(w)))
 		return c->mon;
 	return selmon;
+}
+
+/* Selects for the view of the focused window. The list of tags */
+/* to be displayed is matched to the focused window tag list. */
+void
+winview(const Arg* arg){
+	Window win, win_r, win_p, *win_c;
+	unsigned nc;
+	int unused;
+	Client* c;
+	Arg a;
+
+	if (!XGetInputFocus(dpy, &win, &unused)) return;
+	while(XQueryTree(dpy, win, &win_r, &win_p, &win_c, &nc)
+	      && win_p != win_r) win = win_p;
+
+	if (!(c = wintoclient(win))) return;
+
+	a.ui = c->tags;
+	view(&a);
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are
@@ -3030,6 +3343,8 @@ int
 main(int argc, char *argv[])
 {
     loadAttachBelow();   
+    load_bottGaps_state();  
+		MINIBOXloadState();
     smartgaps = loadSmartgapsState();
 	if (argc == 2 && !strcmp("-v", argv[1]))
 		die("dwm-"VERSION);
@@ -3051,7 +3366,6 @@ main(int argc, char *argv[])
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
 }
-
 void togglesmartgaps(const Arg *arg) {
     smartgaps = !smartgaps;      // Переключение значения smartgaps
     saveSmartgapsState(smartgaps); // Сохранение текущего состояния

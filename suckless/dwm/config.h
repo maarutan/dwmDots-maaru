@@ -20,15 +20,25 @@ static const unsigned int systrayspacing = 12;   // systray spacing
 static const int systraypinningfailfirst = 1;    // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
 static int showsystray = 1;
 //show boxes
-static int show_tag_boxes = 1;  // 1 — показывать квадратики, 0 — не показывать
+int show_tag_boxes = 2; // Установите значение для переключателя: 1, 2, или 3
+//toggle_smartgaps_monocle
+int always_smartgaps_monocle = 1; // 0 - стандартная логика, 1 - всегда включены smartgaps
 //gap
 static const unsigned int gappiv     = 20;       // vert inner gap between windows 
 static const unsigned int gappih     = 20;       // horiz inner gap between windows 
 static const unsigned int gappoh     = 20;       // horiz outer gap between windows and screen edge 
 static const unsigned int gappov     = 20;       // vert outer gap between windows and screen edge 
 static       int smartgaps           = 1;        // 1 means no outer gap when there is only one window 
-static const unsigned int single_gappov = 120; // Вертикальный внешний отступ при одном окне
-static const unsigned int single_gappoh = 60; // Горизонтальный внешний отступ при одном окне
+static const unsigned int single_gappov = 150; // Вертикальный внешний отступ при одном окне
+static const unsigned int single_gappoh = 40; // Горизонтальный внешний отступ при одном окне
+//=======================================//
+static int bottGaps = 0;  // иницилицация переменных
+static int default_bottGaps = 60;  // нижние отступы для dock 
+#define DOCK_NAME "plank" // class твоего дока
+//========================================//
+
+//awesome title
+static int showtitle = 0; // 1 — показывать заголовки, 0 — скрывать
 //bar
 static const int showbar             = 1;        // 0 means no bar 
 static const int topbar              = 1;        // 0 means bottom bar 
@@ -36,19 +46,22 @@ static const int topbar              = 1;        // 0 means bottom bar
 static const int vertpad             = 20;      // vertical padding of bar 
 static const int sidepad             = 20;       // horizontal padding of bar 
 // font
-static const char *fonts[]           = { "FiraCode Nerd Font:size=16" };
+static const char *fonts[]           = { "FiraCode Nerd Font:size=15" };
 // color
-static const char col_gray1[]        = "#222222";
-static const char col_gray2[]        = "#444444";
-static const char col_gray3[]        = "#bbbbbb";
-static const char col_gray4[]        = "#eeeeee";
+static const char col_noActiveFG[]   = "#bbbbbb";
+static const char col_activeFG[]     = "#cdd6f4";
 static const char background[]       = "#1e1e2e";
 static const char col_borderActive[] = "#8aadf4";
 static const char col_noActive[]     = "#45475a";
-static const char background2[]      = "#2f2f49"; static const char *colors[][3]       = {
-	//               fg         bg         border   
-	[SchemeNorm] = { col_gray3, background, col_noActive, },
-	[SchemeSel]  = { col_gray4, background2 , col_borderActive },
+static const char background2[]      = "#2f2f49";
+static const char *colors[][3]       = {
+//                   fg              bg          border   
+	[SchemeNorm] = { col_noActiveFG, background, col_noActive, },
+	[SchemeSel]  = { col_activeFG, background2 , col_borderActive },
+	[SchemeTitle]   = { col_noActiveFG, background, col_noActive }, // Цвет заголовков окон
+    [SchemeTitleSel] = { col_activeFG, background2, col_borderActive }, // Цвет активного окна
+    [SchemeLine]  = { col_borderActive, background2 , col_borderActive },
+
 };
 // tagging 
 static const char *tags[] = {   " 󱍢 ", "  ", " 󰈹 ", "  ", " 󰣇 ", "  ", "  ", "  ", "  " };
@@ -67,12 +80,39 @@ static const Rule rules[] = {
 	//	WM_CLASS(STRING) = instance, class
 	//	WM_NAME(STRING) = title
 	// class      instance    title       tags mask     isfloating   monitor 
-	  { "firefox",          NULL, NULL, 1 << 2, 0, -1 },
+	{ "firefox",          NULL, NULL, 1 << 2, 0, -1 },
     { "telegram-desktop", NULL, NULL, 1 << 3, 0, -1 },
     { "TelegramDesktop",  NULL, NULL, 1 << 3, 0, -1 },
     { "kitty", NULL, "neofetch_terminal", 1 << 0, 0, -1 },
+    { "Plank", NULL, NULL, 0, True, -1 },
+
+
 };
+
+
 //============================================//
+// убрать обводку 
+static const char *noborder_apps[] = {
+    "Plank",       // Пример приложения
+     NULL // Завершающий NULL для указания конца массива
+};
+
+//============================================//
+// прикрепить ко всем тегам 
+static const char *alltags_apps[] = {
+    "Plank",       // Пример: Plank
+     NULL // Завершающий NULL
+};
+
+//============================================//
+//  Игнорировать определенное окно
+static const char *focusIgnore[] = {
+    "Plank",       // Пример: Plank
+     NULL // Завершающий NULL
+};
+
+//============================================//
+
 /* layout(s) */
 static const float mfact     = 0.55; // factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    // number of clients in master area 
@@ -138,6 +178,8 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_s},{0,XK_r}}, spawn,  SHCMD("$HOME/suckless/scripts/recompileDwm.sh")  }), //recompile dwm
     &((Keychord){2, {{MODKEY, XK_s},{0, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }), // powermenu
     &((Keychord){3, {{MODKEY, XK_s},{0, XK_s}, {0, XK_t}}, toggleSystray,  { 0 }  }), // toggle systray
+    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_t}}, spawn,  SHCMD("$HOME/suckless/scripts/toggle_touchpad.sh")  }), // toggle systray
+    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_d}}, toggle_bottGaps,  {0}  }), // toggle bottGaps
     // aplication [ super + a ] 
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_f}}, spawn,  {.v = browser } }),   //firefox
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_d}}, spawn,  SHCMD("vesktop")  }), //vesktop
@@ -147,9 +189,9 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("$HOME/suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
     &((Keychord){2, {{MODKEY, XK_p}, {0, XK_s}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
     &((Keychord){2, {{MODKEY, XK_p},{0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/suckless/scripts/clock.sh") }), //clock
-    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default; $HOME/.config/kitty/.other/toggle_config.sh default") }), // picom blur
-    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_g},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh glass; $HOME/.config/kitty/.other/toggle_config.sh default") }), // picom glass
-    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_o},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh nOpacity; $HOME/.config/kitty/.other/toggle_config.sh nOpacity") }), // picom no opacity
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default; $HOME/.config/kitty/.other/toggle_config.sh default && $HOME/.config/dunst/.other/toggle_config.sh default") }), // picom blur
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_g},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh glass; $HOME/.config/kitty/.other/toggle_config.sh default && $HOME/.config/dunst/.other/toggle_config.sh default") }), // picom glass
+    &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_o},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh nOpacity; $HOME/.config/kitty/.other/toggle_config.sh nOpacity && $HOME/.config/dunst/.other/toggle_config.sh nOpacity") }), // picom no opacity
     &((Keychord){3, {{MODKEY, XK_p},{0, XK_p},{0, XK_c}}, spawn, SHCMD("kitty -e $HOME/.config/picom/") }), // picom 
     //filemanager [super + e ]
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_y}}, spawn,  SHCMD("kitty --hold sh -c 'yazi'")  }), // yazi
@@ -268,9 +310,12 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_Tab}}, toggleAttachBelow, { 0 } }), //toggleAttachBelow
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_w}}, togglefloating, { 0 } }), //toggle floating
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}}, setlayout, { 0 } }),// setlayout
-    &((Keychord){2, {{MODKEY, XK_w},{0|ShiftMask,XK_g}}, togglesmartgaps, { 0 } }),// togglesmartgaps
-    &((Keychord){2, {{MODKEY, XK_w},{0,XK_t}}, toggle_tag_boxes, { 0 } }),// toggle_tag_boxes
-                                                                          
+    &((Keychord){2, {{MODKEY, XK_w},{0|ShiftMask, XK_g}}, togglesmartgaps, { 0 } }),// togglesmartgaps
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_t}}, toggleTagBoxes, { 0 } }),// toggle_tag_boxes
+    &((Keychord){3, {{MODKEY, XK_w},{0,XK_m},{0|ShiftMask, XK_g}}, toggle_always_smartgaps_monocle, { 0 } }),// toggle_smartgaps_monocle
+    //awesome bar
+    &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_t}}, toggleshowtitle, { 0 } }),// toggleshowtitle 
+
     //===================================================================================//
     // click mouse
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_f}}, spawn,  SHCMD("warpd --hint --click 1")  }),

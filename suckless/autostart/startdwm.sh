@@ -7,7 +7,7 @@ export QT_QPA_PLATFORMTHEME=qt5ct
 xsettingsd &
 
 # Запуск композитора для управления окнами
-picom --config $(cat /home/maaru/.config/picom/last_config.txt) &
+picom --config $(cat $HOME/.config/picom/.last_config.txt) &
 
 # Остановка предыдущих процессов libinput-gestures и их перезапуск
 pkill -f libinput-gestures
@@ -43,6 +43,8 @@ blueman-applet &
 # Запуск Telegram
 telegram-desktop &
 
+#запуск dock
+plank &
 
 # Автоматический запуск neofetch в новом терминале через 3 секунды
 (

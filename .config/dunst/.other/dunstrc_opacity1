@@ -19,6 +19,7 @@
 	line_height = 10
 	browser = /usr/bin/xdg-open
 	frame_width = 3
+	transparency = 20
 
     progress_bar_height = 25
     progress_bar_min_width = 150

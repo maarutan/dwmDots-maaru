@@ -7,16 +7,15 @@ get_wifi_icon() {
   if [ "$signal_strength" -ge 65 ]; then
     echo "▁▃▅▇"  # Иконка для сильного сигнала
   elif [ "$signal_strength" -ge 55 ]; then
-    echo "▁▃▅_"  # Иконка для среднего сигнала
+    echo "▁▃▅⎽"  # Иконка для среднего сигнала
   elif [ "$signal_strength" -ge 40 ]; then
-    echo "▁▃__"  # Иконка для слабого сигнала
+    echo "▁▃⎽⎽"  # Иконка для слабого сигнала
   elif [ "$signal_strength" -ge 20 ]; then
-    echo "▁___"  # Иконка для очень слабого сигнала
+    echo "▁⎽⎽⎽"  # Иконка для очень слабого сигнала
   else
-    echo "____"  # Иконка для отсутствующего сигнала
+    echo "⎽⎽⎽⎽"  # Иконка для отсутствующего сигнала
   fi
 }
-
 # Проверка на наличие nmcli
 if ! command -v nmcli &> /dev/null; then
   echo "nmcli не найдено. Установите NetworkManager." > $HOME/suckless/scripts/dwmbScripts/.currentShowInternet
