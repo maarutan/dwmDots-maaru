@@ -10,8 +10,11 @@ TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
 YOURTERM=${YOURTERM:-"kitty -e"}
 add_more_push()
 {
+    display_ascii_art "${ascii_arts[5]}"
+    sleep 1
     $HOME/.suckless/scripts/pushVSconfig.sh &
 }
+trap add_more_push EXIT
 # //==============доп вызовы==============//
 
 # Проверка наличия необходимых приложений
@@ -229,5 +232,3 @@ else
     echo "Временная директория сохранена."
 fi
 
-display_ascii_art "${ascii_arts[5]}"
-trap YOURTERM add_more_push()
