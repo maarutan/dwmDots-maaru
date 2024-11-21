@@ -230,5 +230,4 @@ else
 fi
 
 display_ascii_art "${ascii_arts[5]}"
-YOURTERM add_more_push()
-trap_exit()
+trap YOURTERM add_more_push()
