@@ -35,7 +35,7 @@ fi
 
 # Запуск строки состояния dwmblocks и пользовательских скриптов
 dwmblocks &
-$HOME/.suckless/scripts/dwmbScripts/blocks.sh &
+$HOME/.suckless/dwmblocks/dwmbScripts/blocks.sh &
 
 # Запуск Bluetooth-апплета
 blueman-applet &

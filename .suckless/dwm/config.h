@@ -166,18 +166,18 @@ static Keychord *keychords[] = {
     //settings [ super + i ] 
     &((Keychord){2, {{MODKEY, XK_i}, {0, XK_d}}, spawn,  SHCMD("kitty -e $HOME/.suckless/dwm")  }),
     &((Keychord){2, {{MODKEY, XK_i}, {0, XK_a}}, spawn,  SHCMD("kitty -e $HOME/.suckless/autostart")  }),
-    &((Keychord){2, {{MODKEY, XK_i}, {0, XK_s}}, spawn,  SHCMD("kitty -e $HOME/.suckless/scripts")  }),
+    &((Keychord){2, {{MODKEY, XK_i}, {0, XK_s}}, spawn,  SHCMD("kitty -e $HOME/.local/bin/")  }),
     &((Keychord){3, {{MODKEY, XK_i}, {0, XK_i},{0,XK_c}}, spawn,  SHCMD("kitty --hold sh -c 'cd $HOME/.suckless/dwm; nvim config.h; exec $SHELL'")  }),
     &((Keychord){3, {{MODKEY, XK_i}, {0, XK_i},{0,XK_d}}, spawn,  SHCMD("kitty --hold sh -c 'cd $HOME/.suckless/dwm; nvim dwm.c; exec $SHELL'")  }),
     &((Keychord){4, {{MODKEY, XK_i}, {0, XK_i},{0,XK_r},{0,XK_c}}, spawn,  SHCMD("kitty --hold sh -c 'cd $HOME/.suckless/dwm; nvim config.def.h.rej; exec $SHELL'")  }),
     &((Keychord){4, {{MODKEY, XK_i}, {0, XK_i},{0,XK_r},{0,XK_d}}, spawn,  SHCMD("kitty --hold sh -c 'cd $HOME/.suckless/dwm; nvim dwm.c.rej; exec $SHELL'")  }),
     // system [ super + s ]
-    &((Keychord){2, {{MODKEY, XK_s},{0,XK_u}}, spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/update.sh")  }), //update system
-    &((Keychord){2, {{MODKEY, XK_s},{0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/pushDots.sh")  }), //pushDots
-    &((Keychord){2, {{MODKEY, XK_s},{0,XK_r}}, spawn,  SHCMD("$HOME/.suckless/scripts/recompileDwm.sh")  }), //recompile dwm
+    &((Keychord){2, {{MODKEY, XK_s},{0,XK_u}}, spawn,  SHCMD("kitty -e  $HOME/.local/bin/update")  }), //update system
+    &((Keychord){2, {{MODKEY, XK_s},{0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/.local/bin/pushDots")  }), //pushDots
+    &((Keychord){2, {{MODKEY, XK_s},{0,XK_r}}, spawn,  SHCMD("$HOME/.local/bin/recompileDwm")  }), //recompile dwm
     &((Keychord){2, {{MODKEY, XK_s},{0, XK_p}}, spawn,  SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }), // powermenu
     &((Keychord){3, {{MODKEY, XK_s},{0, XK_s}, {0, XK_t}}, toggleSystray,  { 0 }  }), // toggle systray
-    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_t}}, spawn,  SHCMD("$HOME/.suckless/scripts/toggle_touchpad.sh")  }), // toggle systray
+    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_t}}, spawn,  SHCMD("$HOME/.local/bin/toggle_touchpad")  }), // toggle systray
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_d}}, toggle_bottGaps,  {0}  }), // toggle bottGaps
     // aplication [ super + a ] 
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_f}}, spawn,  {.v = browser } }),   //firefox
@@ -185,9 +185,9 @@ static Keychord *keychords[] = {
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_c}}, spawn,  {.v = codeEditor } }),//vscode
     &((Keychord){2, {{MODKEY, XK_a},{0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
     //screen [super + p ]
-    &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("$HOME/.suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
+    &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}}, spawn,  SHCMD("$HOME/.local/bin/xcolor-picker")  }),//	colorpicer
     &((Keychord){2, {{MODKEY, XK_p}, {0, XK_s}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
-    &((Keychord){2, {{MODKEY, XK_p},{0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/.suckless/scripts/clock.sh") }), //clock
+    &((Keychord){2, {{MODKEY, XK_p},{0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/.local/bin/clock") }), //clock
     &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default; $HOME/.config/kitty/.other/toggle_config.sh default && $HOME/.config/dunst/.other/toggle_config.sh default") }), // picom blur
     &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_g},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh glass; $HOME/.config/kitty/.other/toggle_config.sh default && $HOME/.config/dunst/.other/toggle_config.sh default") }), // picom glass
     &((Keychord){4, {{MODKEY, XK_p},{0, XK_p},{0, XK_o},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh nOpacity; $HOME/.config/kitty/.other/toggle_config.sh nOpacity && $HOME/.config/dunst/.other/toggle_config.sh nOpacity") }), // picom no opacity
@@ -203,23 +203,23 @@ static Keychord *keychords[] = {
     //killActive 
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
     //changeKeyboard
-    &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
-    &((Keychord){1, {{MODKEY,XK_space }}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
+    &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.local/bin/changeKeyboard; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
+    &((Keychord){1, {{MODKEY,XK_space }}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.local/bin/changeKeyboard; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
 	//rofi
     &((Keychord){1, {{MODKEY, XK_r}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),
     &((Keychord){1, {{MODKEY|ShiftMask, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),
     &((Keychord){1, {{MODKEY, XK_v}}, spawn, SHCMD("$HOME/.config/rofi/launchers/type-2/bufer.sh") }),
     &((Keychord){1, {{MODKEY|ALTKEY, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/emoji.sh")  }),
     //wallpapers control
-    &((Keychord){1, {{MODKEY|ControlMask, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/change_wallpaper.sh left" ) }),
-    &((Keychord){1, {{MODKEY|ControlMask, 0x5d}}, spawn, SHCMD("$HOME/.suckless/scripts/change_wallpaper.sh right") }),
+    &((Keychord){1, {{MODKEY|ControlMask, 0x5b}}, spawn, SHCMD("$HOME/.local/bin/change_wallpaper left ") }),
+    &((Keychord){1, {{MODKEY|ControlMask, 0x5d}}, spawn, SHCMD("$HOME/.local/bin/change_wallpaper right") }),
 	// Управление Ярсотью 
-    &((Keychord){1, {{MODKEY|ShiftMask, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/brightnessControl.sh up") }),
-    &((Keychord){1, {{MODKEY|ShiftMask, 0x5d}}, spawn, SHCMD("$HOME/.suckless/scripts/brightnessControl.sh down") }),
-    // Управление Громкостью 
-    &((Keychord){1, {{MODKEY, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/volume.sh up"  ) }),
-    &((Keychord){1, {{MODKEY, 0x5d}}, spawn, SHCMD("$HOME/.suckless/scripts/volume.sh down") }),
-    &((Keychord){1, {{MODKEY, 0x5c}}, spawn, SHCMD("$HOME/.suckless/scripts/volume.sh mute") }),
+    &((Keychord){1, {{MODKEY|ShiftMask, 0x5b}}, spawn, SHCMD("$HOME/.local/bin/brightnessControl up  ") }),
+    &((Keychord){1, {{MODKEY|ShiftMask, 0x5d}}, spawn, SHCMD("$HOME/.local/bin/brightnesscontrol down") }),
+    // управление громкостью 
+    &((Keychord){1, {{MODKEY, 0x5b}}, spawn, SHCMD("$HOME/.local/bin/volume up  ") }),
+    &((Keychord){1, {{MODKEY, 0x5d}}, spawn, SHCMD("$HOME/.local/bin/volume down") }),
+    &((Keychord){1, {{MODKEY, 0x5c}}, spawn, SHCMD("$HOME/.local/bin/volume mute") }),
     // move flouting window
 	&((Keychord){1, {{MODKEY, XK_j}}, moveresize, { .v = "0x 45y 0w 0h"  } }),
     &((Keychord){1, {{MODKEY, XK_k}}, moveresize, { .v = "0x -45y 0w 0h" } }),
