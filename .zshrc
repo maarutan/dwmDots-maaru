@@ -44,7 +44,7 @@ bindkey -v
 #----- alias -----
 
 
- alias gay="$HOME/.suckless/scripts/gay.sh"
+ alias gay="$HOME/suckless/scripts/gay.sh"
  alias ls='exa --icons --color'
  alias la='exa -a --icons --color'
  alias df="duf"
@@ -73,12 +73,16 @@ bindkey -v
  alias teri="yetris"
  alias vim="nvim"
  alias nzsh="nvim ~/.zshrc"
+ alias neo="$HOME/.config/neofetch/startFetch.sh"
+ alias fetch="$HOME/.suckless/scripts/fetch.sh"
  alias cls="clear"
  alias ex="exit"
  alias нфяш="yazi"
  alias clock="peaclock"
  alias pingG="ping google.com"
+ alias pushDots=" $HOME/.dwmSync-maaru/pushDots.sh"
  alias n="python"
+ alias maaruKey="screenkey --bg-color "#1e1e2e" --font-color "#7da5e4" -f "Sans 15" --position fixed --geometry 800x80-80-20"
 
 
 #----- function -----

@@ -3,8 +3,8 @@
 # Директория с обоями
 WALLPAPER_DIR="$HOME/wallpapers"
 
-# Файл для хранения пути к текущим обоям
-CURRENT_WALLPAPER_FILE="$HOME/.current_wallpaper"
+# Файл для хранения пути к текущим обоям (уникальный для каждого пользователя)
+CURRENT_WALLPAPER_FILE="$HOME/.current_wallpaper_$(id -u)"
 
 # Проверяем, что директория с обоями не пуста
 if [ ! "$(find "$WALLPAPER_DIR" -maxdepth 1 -type f)" ]; then
@@ -13,18 +13,19 @@ if [ ! "$(find "$WALLPAPER_DIR" -maxdepth 1 -type f)" ]; then
 fi
 
 # Получаем текущее изображение
-if [ -f "$CURRENT_WALLPAPER_FILE" ]; then
+if [ -f "$CURRENT_WALLPAPER_FILE" ] && [ -s "$CURRENT_WALLPAPER_FILE" ]; then
     CURRENT_WALLPAPER=$(< "$CURRENT_WALLPAPER_FILE")
 else
-    # Если файл не существует, берем первое изображение из директории
+    # Если файл не существует или пуст, берем первое изображение
     CURRENT_WALLPAPER=$(find "$WALLPAPER_DIR" -maxdepth 1 -type f | head -n 1)
     echo "$CURRENT_WALLPAPER" > "$CURRENT_WALLPAPER_FILE"
 fi
 
 # Проверяем, что текущее изображение существует
 if [ ! -f "$CURRENT_WALLPAPER" ]; then
-    echo "Текущее изображение не найдено!"
-    exit 1
+    echo "Текущее изображение недоступно. Используем первое изображение."
+    CURRENT_WALLPAPER=$(find "$WALLPAPER_DIR" -maxdepth 1 -type f | head -n 1)
+    echo "$CURRENT_WALLPAPER" > "$CURRENT_WALLPAPER_FILE"
 fi
 
 # Получаем список всех обоев
@@ -69,7 +70,10 @@ if [ ! -f "$NEW_WALLPAPER" ]; then
 fi
 
 # Применяем обои с помощью feh
-feh --bg-scale "$NEW_WALLPAPER"
+if ! feh --bg-scale "$NEW_WALLPAPER"; then
+    echo "Ошибка применения обоев!"
+    exit 1
+fi
 
 # Сохраняем новое изображение
 echo "$NEW_WALLPAPER" > "$CURRENT_WALLPAPER_FILE"
