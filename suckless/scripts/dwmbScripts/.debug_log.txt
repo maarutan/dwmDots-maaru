@@ -1,4 +1,0 @@
-Пт 08 ноя 2024 23:46:00 +06: pacman_updates_raw=11, formatted=  11
-Пт 08 ноя 2024 23:46:02 +06: pacman_updates_raw=11, formatted=  11
-Пт 08 ноя 2024 23:46:05 +06: pacman_updates_raw=11, formatted=  11
-Пт 08 ноя 2024 23:46:06 +06: pacman_updates_raw=0, formatted=   0
