@@ -189,7 +189,7 @@ else
 fi
 
 $HOME/.suckless/.builder/.etc/grub.sh
-
+$HOME/.suckless/.builder/.systemctl/sddm.sh
 
 sleep 7 
 sudo reboot

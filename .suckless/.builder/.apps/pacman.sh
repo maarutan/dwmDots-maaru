@@ -22,6 +22,7 @@ filerepo=("flatpak")
 machinelanguage=("python" "python-pip" "nodejs" "npm")
 shell=("zsh")
 git=("git" "lazygit" "github-cli")
+starter=("sddm")
 
 # Полный набор пакетов (all)
 all=(
@@ -32,6 +33,7 @@ all=(
     "${browsers[@]}" "${terminalUtils[@]}" "${screenloader[@]}"
     "${clipboard[@]}" "${colorPicker[@]}" "${filerepo[@]}"
     "${machinelanguage[@]}" "${shell[@]}" "${git[@]}"
+    "${starter[@]}"
 )
 
 # Минимальный набор пакетов (quickstart)
@@ -40,7 +42,8 @@ quickstart=(
     "${fonts[@]}" "${image[@]}" "${clipboard[@]}" "${xorg[@]}"
     "${filemanager[@]}" "${editor[@]}" "${terminal[@]}" "${browsers[@]}"
     "${terminalUtils[@]}" "${colorPicker[@]}" "${filerepo[@]}"
-    "${shell[@]}" "${git[@]}"
+    "${shell[@]}" "${git[@]}" "${starter[@]}"
+
 )
 
 # Проверяем наличие аргумента
