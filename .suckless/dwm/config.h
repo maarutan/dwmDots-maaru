@@ -32,8 +32,7 @@ static       int smartgaps           = 1;        // 1 means no outer gap when th
 static const unsigned int single_gappov = 150; // Вертикальный внешний отступ при одном окне
 static const unsigned int single_gappoh = 40; // Горизонтальный внешний отступ при одном окне
 //=======================================//
-static int bottGaps = 0;  // иницилицация переменных
-static int default_bottGaps = 60;  // нижние отступы для dock 
+static int default_bottGaps = 30;  // нижние отступы для dock 
 #define DOCK_NAME "plank" // class твоего дока
 //========================================//
 

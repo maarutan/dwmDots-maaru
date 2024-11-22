@@ -38,6 +38,7 @@ static void setgaps(int oh, int ov, int ih, int iv);
 /* Settings */
 #if !PERTAG_PATCH
 static int enablegaps = 1;
+static int bottGaps;  // иницилицация переменных
 #endif // PERTAG_PATCH
 
 void
