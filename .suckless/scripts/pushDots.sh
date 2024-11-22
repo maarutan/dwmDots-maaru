@@ -3,8 +3,8 @@
 # Объявление переменных
 REPO_SSH=${REPO_SSH:-"git@github.com:maarutan/dwmDots-maaru.git"}
 BRANCH=${BRANCH:-"main"}
-SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwmSync-maaru"}
-TARGET_DIR=${TARGET_DIR:-"$HOME/.dwmDots-$(echo $USER)"}
+SOURCE_DIR=${SOURCE_DIR:-"$HOME/.dwm_sync-maaru"}
+TARGET_DIR=${TARGET_DIR:-"$HOME/.dwm_dots-maaru"}
 
 # //==============доп вызовы==============//
 YOURTERM=${YOURTERM:-"kitty -e"}

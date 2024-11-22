@@ -1,0 +1,1 @@
+/home/maaru/.config/picom/picom_simple_anims_glass.conf
