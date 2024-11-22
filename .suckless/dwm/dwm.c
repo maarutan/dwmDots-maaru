@@ -55,11 +55,11 @@
 #define VERSION_MINOR               0
 #define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
 
-#define STATE_FILE_PATH ".cache/dwm/smartgaps_state"
-#define STATE_FILE_PATH_SYSTRAY ".cache/dwm/dwmsystray_state" 
-#define STATE_FILE_PATH_TITLE ".cache/dwm/dwmtitle_state"
-#define STATE_FILE_TOGGLEGAPS ".cache/dwm/togglebottgaps"
-#define CURRENTS_MINIBOX ".cache/dwm/dwmshowtagboxes_state"
+#define STATE_FILE_PATH ".cache/smartgaps_state"
+#define STATE_FILE_PATH_SYSTRAY ".cache/dwmsystray_state" 
+#define STATE_FILE_PATH_TITLE ".cache/dwmtitle_state"
+#define STATE_FILE_TOGGLEGAPS ".cache/togglebottgaps"
+#define CURRENTS_MINIBOX ".cache/dwmshowtagboxes_state"
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,

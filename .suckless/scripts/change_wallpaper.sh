@@ -3,8 +3,8 @@
 # Директория с обоями
 WALLPAPER_DIR="$HOME/wallpapers"
 
-# Файл для хранения пути к текущим обоям (уникальный для каждого пользователя)
-CURRENT_WALLPAPER_FILE="$HOME/.current_wallpaper_$(id -u)"
+# Файл для хранения пути к текущим обоям
+CURRENT_WALLPAPER_FILE="$HOME/.current_wallpaper"
 
 # Проверяем, что директория с обоями не пуста
 if [ ! "$(find "$WALLPAPER_DIR" -maxdepth 1 -type f)" ]; then

@@ -1,1 +1,1 @@
-/home/maaru/.config/picom/no_opcity/picom_no_anims.conf
+/home/maaru/.config/picom/no_opcity/picom_simple_anims.conf
