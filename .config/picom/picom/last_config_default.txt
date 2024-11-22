@@ -1,1 +1,0 @@
-/home/maaru/.config/picom/picom_simple_anims.conf
