@@ -203,7 +203,8 @@ fi
 # Шаг 3: Копирование символьных ссылок и файлов
 clear
 sl
-rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors >/dev/null 2>&1
+# Копирование файлов и проверка дубликатов
+rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/"
 remove_duplicates "$TARGET_DIR"
 
 # Шаг 4: Добавление файлов в Git
