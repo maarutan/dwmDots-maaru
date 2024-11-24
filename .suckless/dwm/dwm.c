@@ -355,7 +355,7 @@ void toggle_bottGaps(const Arg *arg) {
 
     if (bottGaps == 0) {
         // Если отступы 0, восстанавливаем сохранённое значение (например, 160 или то, что было сохранено)
-        bottGaps = default_bottGaps;
+        bottGaps = bottgaps;
 
         // Формируем команду для запуска dock
         snprintf(command, sizeof(command), "%s &", DOCK_NAME);

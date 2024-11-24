@@ -1,75 +1,46 @@
 #!/bin/sh
 
+# Функция для получения иконки в зависимости от погодного кода
 get_icon() {
     case $1 in
-        # Icons for weather-icons
-        01d) icon="";;
-        01n) icon="";;
-        02d) icon="";;
-        02n) icon="";;
-        03*) icon="";;
-        04*) icon="";;
-        09d) icon="";;
-        09n) icon="";;
-        10d) icon="";;
-        10n) icon="";;
-        11d) icon="";;
-        11n) icon="";;
-        13d) icon="";;
-        13n) icon="";;
-        50d) icon="";;
-        50n) icon="";;
-        *) icon="";
-
-        # Icons for Font Awesome 5 Pro
-        #01d) icon="";;
-        #01n) icon="";;
-        #02d) icon="";;
-        #02n) icon="";;
-        #03d) icon="";;
-        #03n) icon="";;
-        #04*) icon="";;
-        #09*) icon="";;
-        #10d) icon="";;
-        #10n) icon="";;
-        #11*) icon="";;
-        #13*) icon="";;
-        #50*) icon="";;
-        #*) icon="";
+        # Icons for weather-icons (все иконки будут одинаковыми)
+        01d|01n|02d|02n|03*|04*|09d|09n|10d|10n|11d|11n|13d|13n|50d|50n) icon="";;
+        *) icon="  ";;
     esac
-
     echo $icon
 }
 
-KEY="e434b5435a979de6e155570590bee89b"
-CITY="Bishkek"
-UNITS="metric"
-SYMBOL="°"
+# Параметры
+KEY="95eceb682535840197b4bbca6483b862"  # Ваш API ключ
+CITY="Bishkek,kg"  # Город и страна (Bishkek, Кыргызстан)
+UNITS="metric"  # Единицы измерения температуры (метрическая система)
+SYMBOL="°"  # Символ для температуры (градусы)
 
-API="https://api.openweathermap.org/data/2.5"
+API="https://api.openweathermap.org/data/2.5"  # Базовый URL API OpenWeatherMap
 
-if [ -n "$CITY" ]; then
-    if [ "$CITY" -eq "$CITY" ] 2>/dev/null; then
-        CITY_PARAM="id=$CITY"
+# Цикл для выполнения 900 раз в день (каждую минуту)
+for i in {1..900}; do
+    # Получаем данные о погоде
+    weather=$(curl -sf "$API/weather?q=$CITY&appid=$KEY&units=$UNITS")
+
+    # Проверяем, если данные были получены
+    if [ -n "$weather" ]; then
+        # Извлекаем температуру и не округляем ее
+        weather_temp=$(echo "$weather" | jq ".main.temp")  # Берем температуру с десятичными знаками
+        weather_icon=$(echo "$weather" | jq -r ".weather[0].icon")  # Извлекаем иконку погоды
+
+        # Если температура равна -0, заменяем на 0
+        if [ "$weather_temp" = "-0" ]; then
+            weather_temp="0"
+        fi
+
+        # Выводим иконку и температуру с десятичными знаками
+        echo "$(get_icon "$weather_icon")  $weather_temp$SYMBOL" > "$HOME/.suckless/scripts/dwmbScripts/.currentsWather"
     else
-        CITY_PARAM="q=$CITY"
+        echo "Не удалось получить данные о погоде."
     fi
 
-    weather=$(curl -sf "$API/weather?appid=$KEY&$CITY_PARAM&units=$UNITS")
-else
-    location=$(curl -sf https://location.services.mozilla.com/v1/geolocate?key=geoclue)
+    # Пауза 1 минута (60 секунд)
+    sleep 60
+done
 
-    if [ -n "$location" ]; then
-        location_lat="$(echo "$location" | jq '.location.lat')"
-        location_lon="$(echo "$location" | jq '.location.lng')"
-
-        weather=$(curl -sf "$API/weather?appid=$KEY&lat=$location_lat&lon=$location_lon&units=$UNITS")
-    fi
-fi
-
-if [ -n "$weather" ]; then
-    weather_temp=$(echo "$weather" | jq ".main.temp" | cut -d "." -f 1)
-    weather_icon=$(echo "$weather" | jq -r ".weather[0].icon")
-
-    echo "$(get_icon "$weather_icon")" " $weather_temp$SYMBOL" > $HOME/.suckless/scripts/dwmbScripts/.currentsWather
-fi
