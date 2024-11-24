@@ -174,7 +174,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     // system [ super + s ]
     &((Keychord){2, {{MODKEY, XK_s}, {0,XK_u}} ,          spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/update.sh")  }), //update system
-    &((Keychord){2, {{MODKEY, XK_s}, {0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/pushDots.sh")  }), //pushDots
+    &((Keychord){2, {{MODKEY, XK_s}, {0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/pushdots.sh")  }), //pushDots
     &((Keychord){2, {{MODKEY, XK_s}, {0,XK_r}} ,  spawn,          SHCMD("$HOME/.suckless/scripts/recompiledwm.sh")  }), //recompile dwm
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_p}}, spawn,           SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }), // powermenu
     &((Keychord){3, {{MODKEY, XK_s}, {0, XK_s} ,  {0, XK_t}},     toggleSystray,  { 0 }  }), // toggle systray
