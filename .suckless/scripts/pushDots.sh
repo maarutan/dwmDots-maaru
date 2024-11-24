@@ -89,10 +89,10 @@ plusing(){
 delete_duplicate_dirs() {
     echo "Проверка на дубликаты в $TARGET_DIR..."
     find "$TARGET_DIR" -type d | while read -r dir; do
-        basename=$(basename "$dir")
-        duplicates=$(find "$TARGET_DIR" -type d -name "$basename" | wc -l)
+        dir_name=$(basename "$dir")  # Замените basename на dir_name
+        duplicates=$(find "$TARGET_DIR" -type d -name "$dir_name" | wc -l)
         if [ "$duplicates" -gt 1 ]; then
-            echo "Найден дубликат: $basename"
+            echo "Найден дубликат: $dir_name"
             echo "Удаляем $dir"
             rm -rf "$dir"
         fi
