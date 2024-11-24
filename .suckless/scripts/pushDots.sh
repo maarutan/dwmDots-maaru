@@ -62,19 +62,34 @@ plusing(){
 
 }
 # //==============новый функционал==============//
-delete_duplicate_dirs() {
-    echo "Проверка на дубликаты в $TARGET_DIR..."
-    find "$TARGET_DIR" -type d | while read -r dir; do
-        basename=$(basename "$dir")
-        duplicates=$(find "$TARGET_DIR" -type d -name "$basename" | wc -l)
-        if [ "$duplicates" -gt 1 ]; then
-            echo "Найден дубликат: $basename"
-            echo "Удаляем $dir"
-            rm -rf "$dir"
+# Проверка и удаление дубликатов
+remove_duplicates() {
+    local dir="$1"
+    local duplicates_found=false
+
+    # Проходим по всем поддиректориям
+    find "$dir" -type d | while read -r subdir; do
+        parent_dir=$(dirname "$subdir")
+        duplicate_dir="$parent_dir/$(basename "$subdir")"
+
+        # Если родительская папка содержит папку с таким же именем
+        if [ "$subdir" != "$duplicate_dir" ] && [ -d "$duplicate_dir" ]; then
+            # Проверяем, является ли содержимое папок идентичным
+            if diff -rq "$subdir" "$duplicate_dir" >/dev/null 2>&1; then
+                echo "Найдена копия: $duplicate_dir, удаляем..."
+                rm -rf "$duplicate_dir"
+                duplicates_found=true
+            fi
         fi
     done
-    echo "Удаление дубликатов завершено."
+
+    if [ "$duplicates_found" = true ]; then
+        echo "Дубликаты успешно удалены."
+    else
+        echo "Дубликатов не обнаружено."
+    fi
 }
+
 # //==============новый функционал==============//
 
 
@@ -189,6 +204,7 @@ fi
 clear
 sl
 rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors >/dev/null 2>&1
+remove_duplicates "$TARGET_DIR"
 
 # Шаг 4: Добавление файлов в Git
 cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
