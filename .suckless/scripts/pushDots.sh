@@ -36,28 +36,6 @@ color() {
 }
 
 # Функция для создания радужного текста
-rainbow_text() {
-    local text="$1"
-    local colors=(31 32 33 34 35 36)  # Красный, зелёный, жёлтый, синий, фиолетовый, голубой
-    local colored_text=""
-
-    # Итерация по каждой букве текста
-    for ((i=0; i<${#text}; i++)); do
-        char="${text:$i:1}"
-        color_index=$((i % ${#colors[@]}))  # Определяем цвет по индексу
-        colored_text+=$(color "${colors[$color_index]}" "$char")
-    done
-
-    echo -e "$colored_text"
-}
-
-# Функция для вывода ASCII-арта с радужным текстом
-display_ascii_art() {
-    local ascii_art="$1"
-    while IFS= read -r line; do
-        rainbow_text "$line"
-    done <<< "$ascii_art"
-}
 
 # Функция для анимации загрузки с индикатором прогресса
 loading_animation() {
@@ -73,26 +51,24 @@ loading_animation() {
 trap_exit() {
     clear
     ascii_art_exit=$(figlet -f small "bye bye $USER ^^")
-    display_ascii_art "$ascii_art_exit"
+    echo "$ascii_art_exit"
     sleep 1.3
     exit 0
 }
 
 plusing(){
-    display_ascii_art "${ascii_arts[5]}"
+    echo "${ascii_arts[5]}"
     sleep 1
 
 }
-
-
 # //==============новый функционал==============//
 delete_duplicate_dirs() {
     echo "Проверка на дубликаты в $TARGET_DIR..."
     find "$TARGET_DIR" -type d | while read -r dir; do
-        dir_name=$(basename "$dir")  # Замените basename на dir_name
-        duplicates=$(find "$TARGET_DIR" -type d -name "$dir_name" | wc -l)
+        basename=$(basename "$dir")
+        duplicates=$(find "$TARGET_DIR" -type d -name "$basename" | wc -l)
         if [ "$duplicates" -gt 1 ]; then
-            echo "Найден дубликат: $dir_name"
+            echo "Найден дубликат: $basename"
             echo "Удаляем $dir"
             rm -rf "$dir"
         fi
@@ -167,7 +143,7 @@ if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
 else 
     neofetch
 fi
-display_ascii_art "${ascii_arts[0]}"
+echo "${ascii_arts[0]}"
 sleep 1.3
 
 # Проверка наличия .git в целевой директории
@@ -178,7 +154,7 @@ if [ -d "$TARGET_DIR/.git" ]; then
     else
         neofetch
     fi
-    display_ascii_art "${ascii_arts[1]}"
+    echo "${ascii_arts[1]}"
     echo "Репозиторий уже клонирован. Обновляем его..."
     cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
     git pull origin "$BRANCH"
@@ -190,7 +166,7 @@ if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
 else
     neofetch
 fi
-display_ascii_art "$(cat << 'EOF'
+echo "$(cat << 'EOF'
  ██████╗ ██╗████████╗ ██████╗██╗      ██████╗ ███╗   ██╗███████╗
 ██╔════╝ ██║╚══██╔══╝██╔════╝██║     ██╔═══██╗████╗  ██║██╔════╝
 ██║  ███╗██║   ██║   ██║     ██║     ██║   ██║██╔██╗ ██║█████╗  
@@ -229,7 +205,7 @@ if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
 else
     neofetch
 fi
-display_ascii_art "${ascii_arts[2]}"
+echo "${ascii_arts[2]}"
 echo "Введите сообщение для коммита (по умолчанию: 'add'):"
 read -t 10 COMMIT_MSG
 COMMIT_MSG=${COMMIT_MSG:-add}
@@ -246,7 +222,7 @@ if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
 else
     neofetch
 fi
-display_ascii_art "${ascii_arts[3]}"
+echo "${ascii_arts[3]}"
 git push origin "$BRANCH"
 if [ $? -ne 0 ]; then
     echo "Ошибка при пуше. Попробовать снова? (y/n)"
