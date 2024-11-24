@@ -12,6 +12,7 @@ add_more_push()
 {
     $HOME/.suckless/scripts/pushVSconfig.sh 
     $HOME/.suckless/scripts/pushdwm.sh 
+
 }
 # //==============доп вызовы==============//
 
@@ -40,9 +41,10 @@ rainbow_text() {
     local colors=(31 32 33 34 35 36)  # Красный, зелёный, жёлтый, синий, фиолетовый, голубой
     local colored_text=""
 
+    # Итерация по каждой букве текста
     for ((i=0; i<${#text}; i++)); do
         char="${text:$i:1}"
-        color_index=$((i % ${#colors[@]}))
+        color_index=$((i % ${#colors[@]}))  # Определяем цвет по индексу
         colored_text+=$(color "${colors[$color_index]}" "$char")
     done
 
@@ -57,32 +59,14 @@ display_ascii_art() {
     done <<< "$ascii_art"
 }
 
-# Функция для удаления дубликатов
-remove_duplicates() {
-    local dir="$1"
-    local duplicates_found=false
-
-    # Проходим по всем поддиректориям
-    find "$dir" -type d | while read -r subdir; do
-        parent_dir=$(dirname "$subdir")
-        duplicate_dir="$parent_dir/$(basename "$subdir")"
-
-        # Если родительская папка содержит папку с таким же именем
-        if [ "$subdir" != "$duplicate_dir" ] && [ -d "$duplicate_dir" ]; then
-            # Проверяем, является ли содержимое папок идентичным
-            if diff -rq "$subdir" "$duplicate_dir" >/dev/null 2>&1; then
-                echo "Найдена копия: $duplicate_dir, удаляем..."
-                rm -rf "$duplicate_dir"
-                duplicates_found=true
-            fi
-        fi
+# Функция для анимации загрузки с индикатором прогресса
+loading_animation() {
+    echo -n "["
+    for i in {1..10}; do
+        echo -n "="
+        sleep 0.2
     done
-
-    if [ "$duplicates_found" = true ]; then
-        echo "Дубликаты успешно удалены."
-    else
-        echo "Дубликатов не обнаружено."
-    fi
+    echo "]"
 }
 
 # Функция для обработки выхода из скрипта
@@ -94,37 +78,129 @@ trap_exit() {
     exit 0
 }
 
+plusing(){
+    display_ascii_art "${ascii_arts[5]}"
+    sleep 1
+
+}
+
+
+# //==============новый функционал==============//
+delete_duplicate_dirs() {
+    echo "Проверка на дубликаты в $TARGET_DIR..."
+    find "$TARGET_DIR" -type d | while read -r dir; do
+        basename=$(basename "$dir")
+        duplicates=$(find "$TARGET_DIR" -type d -name "$basename" | wc -l)
+        if [ "$duplicates" -gt 1 ]; then
+            echo "Найден дубликат: $basename"
+            echo "Удаляем $dir"
+            rm -rf "$dir"
+        fi
+    done
+    echo "Удаление дубликатов завершено."
+}
+# //==============новый функционал==============//
+
+
+
 # Установка обработчика прерывания
 trap trap_exit SIGINT
+trap 'plusing; add_more_push; trap_exit' EXIT
 
-# ASCII-арт
+
+
+
+# Определение ASCII-арта
 ascii_arts=(
-    "$(cat << 'EOF'
-  _          _   _     _          _
- (_)  _ _   (_) | |_  (_)  __ _  | |
- | | | ' \  | | |  _| | | / _` | | |
- |_| |_||_| |_|  \__| |_| \__,_| |_|
+"$(cat << 'EOF'
+██╗███╗   ██╗██╗████████╗██╗ █████╗ ██╗     
+██║████╗  ██║██║╚══██╔══╝██║██╔══██╗██║     
+██║██╔██╗ ██║██║   ██║   ██║███████║██║     
+██║██║╚██╗██║██║   ██║   ██║██╔══██║██║     
+██║██║ ╚████║██║   ██║   ██║██║  ██║███████╗
+╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝   ╚═╝╚═╝  ╚═╝╚══════╝
 EOF
 )"
+"$(cat << 'EOF'
+    ██████╗ ██╗████████╗
+   ██╔════╝ ██║╚══██╔══╝
+   ██║  ███╗██║   ██║   
+   ██║   ██║██║   ██║   
+██╗╚██████╔╝██║   ██║   
+╚═╝ ╚═════╝ ╚═╝   ╚═╝
+EOF
+)"
+"$(cat << 'EOF'
+ ██████╗ ██████╗ ███╗   ███╗███╗   ███╗██╗████████╗
+██╔════╝██╔═══██╗████╗ ████║████╗ ████║██║╚══██╔══╝
+██║     ██║   ██║██╔████╔██║██╔████╔██║██║   ██║   
+██║     ██║   ██║██║╚██╔╝██║██║╚██╔╝██║██║   ██║   
+╚██████╗╚██████╔╝██║ ╚═╝ ██║██║ ╚═╝ ██║██║   ██║   
+ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚═╝   ╚═╝   
+EOF
+)"
+"$(cat << 'EOF'
+██████╗ ██╗   ██╗███████╗██╗  ██╗
+██╔══██╗██║   ██║██╔════╝██║  ██║
+██████╔╝██║   ██║███████╗███████║
+██╔═══╝ ██║   ██║╚════██║██╔══██║
+██║     ╚██████╔╝███████║██║  ██║
+╚═╝      ╚═════╝ ╚══════╝╚═╝  ╚═╝           
+EOF
+)"
+"$(cat << 'EOF'
+███╗   ███╗ ██████╗ ██████╗ ███████╗     █████╗ ██████╗ ██████╗              
+████╗ ████║██╔═══██╗██╔══██╗██╔════╝    ██╔══██╗██╔══██╗██╔══██╗             
+██╔████╔██║██║   ██║██████╔╝█████╗      ███████║██║  ██║██║  ██║             
+██║╚██╔╝██║██║   ██║██╔══██╗██╔══╝      ██╔══██║██║  ██║██║  ██║             
+██║ ╚═╝ ██║╚██████╔╝██║  ██║███████╗    ██║  ██║██████╔╝██████╔╝██╗██╗██╗
+╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═╝╚═════╝ ╚═════╝ ╚═╝╚═╝╚═╝      
+EOF
+)"
+
 )
 
-# Очистка экрана, запуск neofetch и вывод ASCII-арта
+# Шаг 1: Очистка экрана, запуск neofetch, вывод ASCII-арта и проверка наличия репозитория
 clear
 if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
     $HOME/.config/neofetch/startFetch.sh
-else
+else 
     neofetch
 fi
 display_ascii_art "${ascii_arts[0]}"
 sleep 1.3
 
-# Проверка наличия репозитория
+# Проверка наличия .git в целевой директории
 if [ -d "$TARGET_DIR/.git" ]; then
+    clear
+    if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+        $HOME/.config/neofetch/startFetch.sh
+    else
+        neofetch
+    fi
+    display_ascii_art "${ascii_arts[1]}"
     echo "Репозиторий уже клонирован. Обновляем его..."
     cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
     git pull origin "$BRANCH"
     git checkout HEAD .
 else
+    clear
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
+display_ascii_art "$(cat << 'EOF'
+ ██████╗ ██╗████████╗ ██████╗██╗      ██████╗ ███╗   ██╗███████╗
+██╔════╝ ██║╚══██╔══╝██╔════╝██║     ██╔═══██╗████╗  ██║██╔════╝
+██║  ███╗██║   ██║   ██║     ██║     ██║   ██║██╔██╗ ██║█████╗  
+██║   ██║██║   ██║   ██║     ██║     ██║   ██║██║╚██╗██║██╔══╝  
+╚██████╔╝██║   ██║   ╚██████╗███████╗╚██████╔╝██║ ╚████║███████╗
+ ╚═════╝ ╚═╝   ╚═╝    ╚═════╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+EOF
+)"
+sleep 1.3
+sleep 1.3
     echo "Репозиторий не найден. Клонируем его..."
     git clone --branch "$BRANCH" "$REPO_SSH" "$TARGET_DIR"
     if [ $? -ne 0 ]; then
@@ -133,18 +209,63 @@ else
     fi
 fi
 
-# Копирование файлов и проверка дубликатов
-rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors
-remove_duplicates "$TARGET_DIR"
+# Шаг 3: Копирование символьных ссылок и файлов
+clear
+sl
+rsync -a --copy-links --exclude='.git' "$SOURCE_DIR/" "$TARGET_DIR/" --ignore-errors >/dev/null 2>&1
 
-# Добавление файлов в Git
+# Шаг 4: Добавление файлов в Git
 cd "$TARGET_DIR" || { echo "Не удалось перейти в директорию $TARGET_DIR"; exit 1; }
 git add .
+if [ $? -ne 0 ]; then
+    echo "Ошибка при добавлении файлов в Git"
+    exit 1
+fi
+
+# Очистка экрана, запуск neofetch, вывод ASCII-арта перед коммитом
+clear
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
+display_ascii_art "${ascii_arts[2]}"
 echo "Введите сообщение для коммита (по умолчанию: 'add'):"
 read -t 10 COMMIT_MSG
 COMMIT_MSG=${COMMIT_MSG:-add}
 git commit -m "$COMMIT_MSG"
+if [ $? -ne 0 ]; then
+    echo "Ошибка при создании коммита"
+    exit 1
+fi
 
-# Пуш в репозиторий
+# Очистка экрана, запуск neofetch и вывод ASCII-арта перед пушем
+clear
+if [ -f "$HOME/.config/neofetch/startFetch.sh" ]; then
+    $HOME/.config/neofetch/startFetch.sh
+else
+    neofetch
+fi
+display_ascii_art "${ascii_arts[3]}"
 git push origin "$BRANCH"
+if [ $? -ne 0 ]; then
+    echo "Ошибка при пуше. Попробовать снова? (y/n)"
+    read -r RETRY
+    if [[ "$RETRY" == "y" ]]; then
+        "$0"  # Повторный запуск текущего скрипта
+    else
+        echo "завершено"
+    fi
+fi
+
+# Шаг 6: Удаление временной директории
+echo "Удалить временную директорию? (y/n) (по умолчанию: 'n')"
+read -t 5 -r DELETE_TEMP
+DELETE_TEMP=${DELETE_TEMP:-n}
+if [[ "$DELETE_TEMP" == "y" ]]; then
+    rm -rf "$TARGET_DIR"
+    echo "Временная директория удалена."
+else
+    echo "Временная директория сохранена."
+fi
 
