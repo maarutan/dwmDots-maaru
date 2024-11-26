@@ -3,7 +3,7 @@
 # Путь к исходному файлу dwm.desktop
 dwm_desktop_src="$HOME/dwm_dots-maaru/.suckless/dwm.desktop"
 
-# Путь к системной директории xsession
+# Путь к системной директории xsessions
 dwm_desktop_dst_system="/usr/share/xsessions/dwm.desktop"
 
 # Путь к пользовательской директории .xsessions
@@ -18,8 +18,11 @@ fi
 
 # Проверяем наличие системной директории /usr/share/xsessions
 if [ ! -d "/usr/share/xsessions" ]; then
-    echo "Ошибка: Директория /usr/share/xsessions не существует!"
-    exit 1
+    echo "Директория /usr/share/xsessions не существует. Создаю..."
+    sudo mkdir -p "/usr/share/xsessions"
+    echo "Директория /usr/share/xsessions создана."
+else
+    echo "Директория /usr/share/xsessions уже существует."
 fi
 
 # Проверяем наличие пользовательской директории ~/.xsessions
