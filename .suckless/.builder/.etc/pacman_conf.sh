@@ -2,46 +2,34 @@
 
 pacman_conf="/etc/pacman.conf"
 
-# Проверяем права суперпользователя
-if [[ $EUID -ne 0 ]]; then
-    echo "Ошибка: Этот скрипт должен быть запущен с правами суперпользователя." >&2
-    exit 1
-fi
-
 # Проверка существования файла конфигурации
 if [ ! -f "$pacman_conf" ]; then
-    echo "Ошибка: Файл $pacman_conf не найден!"
+    echo -e "Ошибка: Файл $pacman_conf не найден!\n"
     exit 1
 fi
 
-# Создание резервной копии файла
-backup_file="${pacman_conf}.bak.$(date +%Y%m%d%H%M%S)"
-cp "$pacman_conf" "$backup_file"
-echo "Создана резервная копия файла: $backup_file"
-
-# Включение цветной поддержки и добавление ILoveCandy
+# Проверка и изменение #Color на Color, добавление ILoveCandy
 if grep -q "#Color" "$pacman_conf"; then
     sudo sed -i 's/#Color/Color/' "$pacman_conf"
-    echo "Включена поддержка цвета для pacman."
-fi
-
-if ! grep -q "ILoveCandy" "$pacman_conf"; then
     sudo sed -i '/Color/a ILoveCandy' "$pacman_conf"
-    echo "Добавлен ILoveCandy для красивой анимации загрузки."
-fi
-
-# Установка ParallelDownloads = 15
-if grep -q "^#ParallelDownloads" "$pacman_conf"; then
-    sudo sed -i 's/^#ParallelDownloads.*/ParallelDownloads = 15/' "$pacman_conf"
-    echo "Включено ParallelDownloads с параметром 15."
-elif grep -q "^ParallelDownloads" "$pacman_conf"; then
-    sudo sed -i 's/^ParallelDownloads.*/ParallelDownloads = 15/' "$pacman_conf"
-    echo "Обновлено значение ParallelDownloads до 15."
+    echo -e "Теперь у pacman есть поддержка цветов.\nДобавлена красивая загрузка ILoveCandy.\n"
 else
-    echo "ParallelDownloads не найден. Добавляем новую строку..."
-    echo "ParallelDownloads = 15" | sudo tee -a "$pacman_conf" > /dev/null
-    echo "Добавлена строка ParallelDownloads = 15."
+    # Если строка Color уже существует, добавляем ILoveCandy, если его нет
+    if grep -q "Color" "$pacman_conf" && ! grep -q "ILoveCandy" "$pacman_conf"; then
+        sudo sed -i '/Color/a ILoveCandy' "$pacman_conf"
+        echo -e "ILoveCandy добавлен после Color.\n"
+    else
+        echo -e "Изменения по Color и ILoveCandy не требуются.\n"
+    fi
 fi
 
-# Завершающее сообщение
-echo -e "\nПроверка и обновление pacman.conf завершены!"
+# Проверка и изменение #ParallelDownloads = 5 на ParallelDownloads = 15
+if grep -q "#ParallelDownloads = 5" "$pacman_conf"; then
+    sudo sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 15/' "$pacman_conf"
+    echo -e "Добавлена строка ParallelDownloads = 15.\n"
+else
+    echo -e "Строка #ParallelDownloads не найдена. Изменение не требуется.\n"
+fi
+
+echo -e "Проверка и обновление завершены!\n"
+
