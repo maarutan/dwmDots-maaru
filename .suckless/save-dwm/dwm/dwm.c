@@ -1,25 +1,13 @@
-/* See LICENSE file for copyright and license details.
-
- * dynamic window manager is designed like any other X client as well. It is
- * driven through handling X events. In contrast to other X clients, a window
- * manager selects for SubstructureRedirectMask on the root window, to receive
- * events about window (dis-)appearance. Only one X connection at a time is
- * allowed to select for this event mask.
- *
- * The event handlers of dwm are organized in an array which is accessed
- * whenever a new event has been fetched. This allows event dispatching
- * in O(1) time.
- *
- * Each child of the root window is called a client, except windows which have
- * set the override_redirect flag. Clients are organized in a linked client
- * list on each monitor, the focus history is remembered through a stack list
- * on each monitor. Each client contains a bit array to indicate the tags of a
- * client.
- *
- * Keys and tagging rules are organized as arrays and defined in config.h.
- *
- * To understand everything else, start reading main().
- */
+/*
+* /==========================================//
+* / ██████╗ ██╗    ██╗███╗   ███╗     ██████╗
+* / ██╔══██╗██║    ██║████╗ ████║    ██╔════╝
+* / ██║  ██║██║ █╗ ██║██╔████╔██║    ██║     
+* / ██║  ██║██║███╗██║██║╚██╔╝██║    ██║     
+* / ██████╔╝╚███╔███╔╝██║ ╚═╝ ██║ ██╗╚ ██████╗
+* / ╚═════╝  ╚══╝╚══╝ ╚═╝     ╚═╝ ╚═╝  ╚═════╝
+* /==========================================//
+*/
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
@@ -53,6 +41,7 @@
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
+#define TAGSLENGTH              (LENGTH(tags))
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 /* XEMBED messages */
@@ -67,18 +56,18 @@
 #define VERSION_MINOR               0
 #define XEMBED_EMBEDDED_VERSION (VERSION_MAJOR << 16) | VERSION_MINOR
 
-#define STATE_FILE_PATH ".cache/dwm/smartgaps_state"
-#define STATE_FILE_PATH_SYSTRAY ".cache/dwm/dwmsystray_state" 
-#define STATE_FILE_PATH_TITLE ".cache/dwm/dwmtitle_state"
-#define STATE_FILE_TOGGLEGAPS ".cache/dwm/togglebottgaps"
-#define CURRENTS_MINIBOX ".cache/dwm/dwmshowtagboxes_state"
+#define STATE_FILE_PATH ".cache/smartgaps_state"
+#define STATE_FILE_PATH_SYSTRAY ".cache/dwmsystray_state" 
+#define STATE_FILE_PATH_TITLE ".cache/dwmtitle_state"
+#define STATE_FILE_TOGGLEGAPS ".cache/togglebottgaps"
+#define CURRENTS_MINIBOX ".cache/dwmshowtagboxes_state"
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetClientList, NetClientInfo, NetLast }; /* EWMH atoms */
-
+       NetWMWindowTypeDialog, NetClientList, NetDesktopNames, NetDesktopViewport,
+       NetNumberOfDesktops, NetCurrentDesktop, NetClientInfo, NetLast }; /* EWMH atoms */
 enum { Manager, Xembed, XembedInfo, XLast }; /* Xembed atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkClientWin,
@@ -243,6 +232,10 @@ static void scan(void);
 static int sendevent(Window w, Atom proto, int m, long d0, long d1, long d2, long d3, long d4);
 static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
+static void setcurrentdesktop(void);
+static void setdesktopnames(void);
+static void setnumdesktops(void);
+static void setviewport(void);
 static void setclienttagprop(Client *c);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
@@ -264,6 +257,7 @@ static void toggleview(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
+static void updatecurrentdesktop(void);
 static void updatebarpos(Monitor *m);
 static void updatebars(void);
 static void updateclientlist(void);
@@ -298,6 +292,11 @@ void saveSmartgapsState(int state);
 int isWindowIgnored(Client *c);  // Объявление функции
 void toggle_bottGaps(const Arg *arg);  // Прототип функции
 void toggleTagBoxes(const Arg *arg);
+int read_saved_tag(void);     // Объявление функции для чтения сохранённого тега
+void save_current_tag(void);  // Объявление функции для сохранения текущего тега
+void switch_to_saved_tag(void); // Объявление функции для переключения на сохранённый тег
+void recompile_and_restart(const Arg *arg);
+
 
 /* variables */
 static Systray *systray = NULL;
@@ -341,6 +340,74 @@ unsigned int currentkey = 0;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
+
+int read_saved_tag() {
+    char filepath[256];
+    snprintf(filepath, sizeof(filepath), "%s/.cache/dwm_current_tag", getenv("HOME"));
+
+    FILE *file = fopen(filepath, "r");
+    if (!file) {
+        return -1; // Если файл не найден, возвращаем -1 (остаемся на дефолтном теге)
+    }
+
+    int tag;
+    fscanf(file, "%d", &tag);
+    fclose(file);
+    return tag;
+}
+
+
+
+
+void save_current_tag_to_file() {
+    char filepath[256];
+    snprintf(filepath, sizeof(filepath), "%s/.cache/dwm_current_tag", getenv("HOME"));
+
+    FILE *file = fopen(filepath, "w");
+    if (file) {
+        unsigned int mask = selmon->tagset[selmon->seltags];
+        int tag = 0;
+
+        // Преобразуем битовую маску в индекс
+        while (!(mask & 1)) {
+            mask >>= 1;
+            tag++;
+        }
+
+        fprintf(file, "%d\n", tag);  // Сохраняем индекс активного тега
+        fclose(file);
+        printf("Saved current tag: %d to %s\n", tag, filepath);  // Для отладки
+    } else {
+        fprintf(stderr, "Failed to save current tag to %s\n", filepath);
+    }
+}
+
+
+
+void switch_to_saved_tag() {
+    char filepath[256];
+    snprintf(filepath, sizeof(filepath), "%s/.cache/dwm_current_tag", getenv("HOME"));
+
+    FILE *file = fopen(filepath, "r");
+    if (file) {
+        int tag;
+        fscanf(file, "%d", &tag);
+        fclose(file);
+
+        printf("Restoring tag: %d\n", tag);  // Отладочное сообщение
+
+        if (tag >= 0 && tag < LENGTH(tags)) {
+            Arg arg = {.ui = 1 << tag};  // Преобразуем индекс в битовую маску
+            view(&arg);                 // Переключаемся на нужный тег
+        } else {
+            printf("Tag out of range: %d\n", tag);
+        }
+    } else {
+        fprintf(stderr, "Failed to open file for restoring tag: %s\n", filepath);
+    }
+}
+
+
 void save_bottGaps_state() {
     FILE *file = fopen(STATE_FILE_TOGGLEGAPS, "w");
     if (file) {
@@ -367,7 +434,7 @@ void toggle_bottGaps(const Arg *arg) {
 
     if (bottGaps == 0) {
         // Если отступы 0, восстанавливаем сохранённое значение (например, 160 или то, что было сохранено)
-        bottGaps = default_bottGaps;
+        bottGaps = bottgaps;
 
         // Формируем команду для запуска dock
         snprintf(command, sizeof(command), "%s &", DOCK_NAME);
@@ -1336,14 +1403,12 @@ drawbar(Monitor *m)
         /* Отрисовка названия тега */
         drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
 
-
-
-if (occ & 1 << i) {
-    // Рассчитываем отступ, чтобы линия была по центру
-    int line_width = w - 8;  // Ширина линии (уменьшаем на 8 пикселей)
+    if (occ & 1 << i) {
+        // Рассчитываем отступ, чтобы линия была по центру
+        int line_width = w - 8;  // Ширина линии (уменьшаем на 8 пикселей)
     
-    // Переключение между тремя режимами
-    if (show_tag_boxes == 1) {
+        // Переключение между тремя режимами
+        if (show_tag_boxes == 1) {
         // Режим 1: Увеличиваем ширину и высоту, сдвиг вверх на 23 пикселя
         int line_height = 1;  // Базовая высота линии
         if (m->tagset[m->seltags] & 1 << i) {
@@ -1355,7 +1420,7 @@ if (occ & 1 << i) {
         int line_offset = (w - line_width) / 2;  // Сдвиг для центрирования линии
 
         // Перемещаем линию вверх
-        int line_y_position = bh - line_height - 25;  // Сдвигаем линию вверх на 23 пикселя
+        int line_y_position = bh - line_height - 23;  // Сдвигаем линию вверх на 23 пикселя
 
         // Рисуем линию по центру с измененной высотой и новым вертикальным смещением
         drw_rect(drw, x + line_offset, line_y_position, line_width, line_height, 1, 0);  // Линия по центру
@@ -1377,7 +1442,11 @@ if (occ & 1 << i) {
     else if (show_tag_boxes == 3) {
         // Режим 3: Отображение стандартных квадратиков
         drw_rect(drw, x + 6, bh - 20, 5, 5, 1, 0);  // Стандартные квадратики
+    }else if (show_tag_boxes == 4) {
+        // Режим 4: Отображение стандартных квадратиков
+        drw_rect(drw, x + 0, bh - 0, 0, 0, 0, 0);  // Стандартные квадратики
     }
+
 }
         x += w;
     }
@@ -1451,7 +1520,10 @@ void toggleTagBoxes(const Arg *arg) {
         show_tag_boxes = 3;
     } else if (show_tag_boxes == 3) {
         show_tag_boxes = 1;
+    } else if (show_tag_boxes == 4) {
+        show_tag_boxes = 4;
     }
+
 
     // Сохраняем новое состояние
     MINIBOXsaveState(); // Функция сохранения
@@ -1667,10 +1739,15 @@ manage(Window w, XWindowAttributes *wa)
     updatewindowtype(c);
     updatesizehints(c);
     updatewmhints(c);
-	c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+    c->x = c->mon->mx + (c->mon->mw - WIDTH(c))  / 2;
 	c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
-    if (c->isfloating)
+    if (c->isfloating) {
+        c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+        c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+        XMoveWindow(dpy, c->win, c->x, c->y);
         XRaiseWindow(dpy, c->win);
+
+}
 
     if (attachbelow)
         attachBelow(c);
@@ -2301,6 +2378,17 @@ setclientstate(Client *c, long state)
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
 		PropModeReplace, (unsigned char *)data, 2);
 }
+void
+setcurrentdesktop(void){
+	long data[] = { 0 };
+	XChangeProperty(dpy, root, netatom[NetCurrentDesktop], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 1);
+}
+void setdesktopnames(void){
+	XTextProperty text;
+    Xutf8TextListToTextProperty(dpy, (char **)tags, TAGSLENGTH, XUTF8StringStyle, &text);
+
+	XSetTextProperty(dpy, root, &text, netatom[NetDesktopNames]);
+}
 
 int
 sendevent(Window w, Atom proto, int mask, long d0, long d1, long d2, long d3, long d4)
@@ -2336,6 +2424,12 @@ sendevent(Window w, Atom proto, int mask, long d0, long d1, long d2, long d3, lo
 		XSendEvent(dpy, w, False, mask, &ev);
 	}
 	return exists;
+}
+
+void
+setnumdesktops(void){
+	long data[] = { TAGSLENGTH };
+	XChangeProperty(dpy, root, netatom[NetNumberOfDesktops], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 1);
 }
 
 void
@@ -2465,6 +2559,11 @@ setup(void)
 	wmatom[WMTakeFocus] = XInternAtom(dpy, "WM_TAKE_FOCUS", False);
 	netatom[NetActiveWindow] = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
+    netatom[NetDesktopViewport] = XInternAtom(dpy, "_NET_DESKTOP_VIEWPORT", False);
+	netatom[NetNumberOfDesktops] = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
+	netatom[NetCurrentDesktop] = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);
+	netatom[NetDesktopNames] = XInternAtom(dpy, "_NET_DESKTOP_NAMES", False);
+
 	netatom[NetSystemTray] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_S0", False);
 	netatom[NetSystemTrayOP] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_OPCODE", False);
 	netatom[NetSystemTrayOrientation] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_ORIENTATION", False);
@@ -2506,6 +2605,10 @@ setup(void)
 	/* EWMH support per view */
 	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
 		PropModeReplace, (unsigned char *) netatom, NetLast);
+	setnumdesktops();
+	setcurrentdesktop();
+	setdesktopnames();
+	setviewport();
 	XDeleteProperty(dpy, root, netatom[NetClientList]);
 	XDeleteProperty(dpy, root, netatom[NetClientInfo]);
 	/* select events */
@@ -2519,6 +2622,11 @@ setup(void)
 	focus(NULL);
 	loadSystrayState();
 
+}
+void
+setviewport(void){
+	long data[] = { 0, 0 };
+	XChangeProperty(dpy, root, netatom[NetDesktopViewport], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 2);
 }
 
 
@@ -2593,6 +2701,8 @@ tag(const Arg *arg)
 		setclienttagprop(c);
 		focus(NULL);
 		arrange(selmon);
+        updatecurrentdesktop();
+
 	}
 }
 
@@ -2660,6 +2770,7 @@ toggletag(const Arg *arg)
 		focus(NULL);
 		arrange(selmon);
 	}
+	updatecurrentdesktop();
 }
 
 void
@@ -2696,6 +2807,7 @@ toggleview(const Arg *arg)
 		focus(NULL);
 		arrange(selmon);
 	}
+	updatecurrentdesktop();
 }
 
 void
@@ -2817,6 +2929,20 @@ updateclientlist(void)
 			XChangeProperty(dpy, root, netatom[NetClientList],
 				XA_WINDOW, 32, PropModeAppend,
 				(unsigned char *) &(c->win), 1);
+}
+void updatecurrentdesktop(void) {
+    unsigned long rawdata = selmon->tagset[selmon->seltags]; // Битовая маска текущих тегов
+    int i = 0;
+
+    // Поиск активного тега по битовой маске
+    while (rawdata > 1) {
+        rawdata >>= 1; // Сдвигаем битовую маску вправо
+        i++;
+    }
+
+    long data[] = { i }; // Индекс активного тега
+    XChangeProperty(dpy, root, netatom[NetCurrentDesktop], XA_CARDINAL, 32,
+                    PropModeReplace, (unsigned char *)data, 1);
 }
 
 int
@@ -3152,6 +3278,14 @@ viewprev(const Arg *arg) {
     }
 }
 
+void recompile_and_restart(const Arg *arg) {
+    int status = system(RECOMPILE_COMMAND); // Выполняем команду перекомпиляции
+    if (status != 0) {
+        fprintf(stderr, "Ошибка при выполнении команды: %s\n", RECOMPILE_COMMAND);
+        return;
+    }
+    system("make clean install"); // Перезапускаем dwm
+}
 
 void
 view(const Arg *arg)
@@ -3169,6 +3303,8 @@ view(const Arg *arg)
                 focus(prevclient);  // Восстанавливаем фокус на предыдущем окне
                 arrange(selmon);
             }
+            updatecurrentdesktop(); // Обновляем _NET_CURRENT_DESKTOP
+            save_current_tag_to_file();  // Сохраняем текущий тег
             return; // Прерываем выполнение, не переключаемся
         } else {
             // Сохраняем текущее состояние перед переходом на тег 0
@@ -3181,8 +3317,11 @@ view(const Arg *arg)
     }
 
     // Если тег уже активен, не делаем ничего
-    if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
+    if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
+        updatecurrentdesktop(); // Обновляем _NET_CURRENT_DESKTOP
+        save_current_tag_to_file();  // Сохраняем текущий тег
         return;
+    }
 
     selmon->seltags ^= 1; /* toggle sel tagset */
     if (arg->ui & TAGMASK) {
@@ -3210,6 +3349,8 @@ view(const Arg *arg)
 
     focus(selmon->pertag->sel[selmon->pertag->curtag]);
     arrange(selmon);
+    updatecurrentdesktop(); // Обновляем _NET_CURRENT_DESKTOP
+    save_current_tag_to_file();  // Сохраняем текущий тег
 }
 
 
@@ -3361,10 +3502,13 @@ main(int argc, char *argv[])
 		die("pledge");
 #endif /* __OpenBSD__ */
 	scan();
+    switch_to_saved_tag();  // Восстанавливаем сохранённый тег
 	run();
 	cleanup();
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
+    switch_to_saved_tag();
+
 }
 void togglesmartgaps(const Arg *arg) {
     smartgaps = !smartgaps;      // Переключение значения smartgaps

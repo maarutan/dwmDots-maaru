@@ -22,6 +22,10 @@ static                int showsystray    = 1 ;
 //show boxes
 int                 show_tag_boxes       = 2 ;       // Установите значение для переключателя: 1, 2, или 3
 //========================================//
+// dwm karnel dir
+#define RECOMPILE_COMMAND "cd $HOME/.suckless/dwm && make clean install || notify-send 'Ошибка при перекомпиляции dwm'"
+//========================================//
+
 //toggle_smartgaps_monocle
 int         always_smartgaps_monocle     = 1 ;       // 0 - стандартная логика, 1 - всегда включены smartgaps
 //========================================//
@@ -86,26 +90,27 @@ static const Rule rules[]            =     {
     { "kitty"           ,   NULL   , "neofetch_terminal", 1 << 0, 0, -1     },
     { "Plank"           ,   NULL   , NULL               , 0, True,   -1     },
     { "vesktop"         ,   NULL   , NULL               , 0, True,   -1     },
+    { "Mechvibes"       ,   NULL   , NULL               , 0, True,   -1     },
 
 };
 //============================================//
 // убрать обводку 
 static const char *noborder_apps[] = {
-    "Plank",       // Пример приложения
+ //   "Plank",       // Пример приложения
      NULL // Завершающий NULL для указания конца массива
 };
 
 //============================================//
 // прикрепить ко всем тегам 
 static const char *alltags_apps[] = {
-    "Plank",       // Пример: Plank
+   // "Plank",       // Пример: Plank
      NULL // Завершающий NULL
 };
 
 //============================================//
 //  Игнорировать определенное окно
 static const char *focusIgnore[] = {
-    "Plank",       // Пример: Plank
+    //"Plank",       // Пример: Plank
      NULL // Завершающий NULL
 };
 
@@ -138,6 +143,7 @@ static const Layout layouts[] = {
 };
 // Layout для тега 0 (все теги активны)
 #define TAG0_LAYOUT &layouts             [7] // "HHH" (grid)
+#define ISDOCK(c) ((c)->tags == 0 && (c)->isfloating)
 //============================================//
 // key definitions
 #define MODKEY Mod4Mask
@@ -177,7 +183,7 @@ static Keychord *keychords[]        = {
     // system [ super + s ]
     &((Keychord){2, {{MODKEY, XK_s}, {0,XK_u}} ,          spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/update.sh")  }), //update system
     &((Keychord){2, {{MODKEY, XK_s}, {0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/pushdots.sh")  }), //pushDots
-    &((Keychord){2, {{MODKEY, XK_s}, {0,XK_r}} ,  spawn,          SHCMD("$HOME/.suckless/scripts/recompiledwm.sh")  }), //recompile dwm
+    &((Keychord){2, {{MODKEY, XK_s}, {0,XK_r}} ,  recompile_and_restart,     { 0 }  }), //recompile dwm
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_p}}, spawn,           SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }), // powermenu
     &((Keychord){3, {{MODKEY, XK_s}, {0, XK_s} ,  {0, XK_t}},     toggleSystray,  { 0 }  }), // toggle systray
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_t}}, spawn,           SHCMD("$HOME/.suckless/scripts/toggle_touchpad.sh")  }), // toggle systray
