@@ -1,5 +1,6 @@
-#!/bin/bash
-
+sudo localectl set-x11-keymap us,ru pc105 '' ctrl:nocaps,grp:ctrl_alt_toggle
+$HOME/dwm_dots-maaru/.suckless/.builder/.etc/tty_fonts.sh
+echo ""
 # Баннер
 echo -e "
 
