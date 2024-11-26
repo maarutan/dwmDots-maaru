@@ -1,6 +1,4 @@
 sudo localectl set-x11-keymap us,ru pc105 '' ctrl:nocaps,grp:ctrl_alt_toggle
-$HOME/dwm_dots-maaru/.suckless/.builder/.etc/tty_fonts.sh
-echo ""
 # Баннер
 echo -e "
 
@@ -93,6 +91,7 @@ run_script "$HOME/.suckless/.builder/.etc/grub.sh"
 run_script "$HOME/.suckless/.builder/.systemctl/sddm.sh"
 
 # Перезагрузка
+$HOME/dwm_dots-maaru/.suckless/.builder/.etc/tty_fonts.sh
 read -p "Хотите перезагрузить систему сейчас? (y/n): " reboot_choice
 if [[ $reboot_choice =~ ^[yY]$ ]]; then
     sudo reboot
