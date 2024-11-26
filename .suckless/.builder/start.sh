@@ -1,4 +1,5 @@
 # Баннер
+clear
 echo -e "
 
 
