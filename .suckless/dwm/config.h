@@ -214,7 +214,6 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //changeKeyboard
     &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
-    &((Keychord){1, {{MODKEY,XK_space }}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
 //======================================================================//
 	//rofi
     &((Keychord){1, {{MODKEY, XK_r}},           spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),

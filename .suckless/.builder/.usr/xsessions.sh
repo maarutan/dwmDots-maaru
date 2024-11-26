@@ -1,64 +1,73 @@
 #!/bin/bash
 
-# Местоположение файла dwm.desktop
+# Путь к исходному файлу dwm.desktop
 dwm_desktop_src="$HOME/dwm_dots-maaru/.suckless/dwm.desktop"
-dwm_desktop_dst="/usr/share/xsessions/dwm.desktop"
 
-# Функция для проверки наличия файла в каталоге /usr/share/xsessions/
-check_dwm_desktop() {
-    if [ -f "$dwm_desktop_dst" ]; then
-        echo "Файл dwm.desktop уже существует в $dwm_desktop_dst."
-        return 0
-    else
-        echo "Файл dwm.desktop не найден в $dwm_desktop_dst."
-        return 1
-    fi
-}
+# Путь к системной директории xsession
+dwm_desktop_dst_system="/usr/share/xsessions/dwm.desktop"
 
-# Проверяем наличие каталога xsessions
-if [ -d "/usr/share/xsessions" ]; then
-    echo "Директория /usr/share/xsessions существует."
-else
-    echo "Директория /usr/share/xsessions не существует!"
+# Путь к пользовательской директории .xsessions
+xsessions_dir="$HOME/.xsessions"
+dwm_desktop_dst_user="$xsessions_dir/dwm.desktop"
+
+# Проверяем, существует ли исходный файл dwm.desktop
+if [ ! -f "$dwm_desktop_src" ]; then
+    echo "Ошибка: Исходный файл $dwm_desktop_src не найден!"
     exit 1
 fi
 
-# Проверка наличия файла dwm.desktop
-if check_dwm_desktop; then
-    # Запрос на перезапись файла
-    read -p "Вы хотите перезаписать файл dwm.desktop? (y/n): " choice
-    if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
-        echo "Перезаписываем файл dwm.desktop..."
-        sudo cp "$dwm_desktop_src" "$dwm_desktop_dst"
-        if [ $? -eq 0 ]; then
-            echo "Файл dwm.desktop успешно перезаписан в /usr/share/xsessions."
-        else
-            echo "Ошибка при перезаписи файла dwm.desktop."
-            exit 1
-        fi
+# Проверяем наличие системной директории /usr/share/xsessions
+if [ ! -d "/usr/share/xsessions" ]; then
+    echo "Ошибка: Директория /usr/share/xsessions не существует!"
+    exit 1
+fi
+
+# Проверяем наличие пользовательской директории ~/.xsessions
+if [ ! -d "$xsessions_dir" ]; then
+    echo "Директория ~/.xsessions не существует. Создаю..."
+    mkdir -p "$xsessions_dir"
+    echo "Директория ~/.xsessions создана."
+else
+    echo "Директория ~/.xsessions уже существует."
+fi
+
+# Проверяем наличие файла dwm.desktop в пользовательской директории
+if [ -f "$dwm_desktop_dst_user" ]; then
+    echo "Файл dwm.desktop уже существует в $xsessions_dir."
+    read -p "Вы хотите перезаписать его? (y/n): " choice_user
+    if [[ "$choice_user" =~ ^[yY]$ ]]; then
+        echo "Перезаписываем файл dwm.desktop в ~/.xsessions..."
+        cp "$dwm_desktop_src" "$dwm_desktop_dst_user"
+        echo "Файл dwm.desktop успешно перезаписан в ~/.xsessions."
     else
-        echo "Операция отменена. Файл не был перезаписан."
-        exit 0
+        echo "Операция отменена. Файл в ~/.xsessions не был перезаписан."
     fi
 else
-    # Проверка на наличие исходного файла
-    if [ -f "$dwm_desktop_src" ]; then
-        echo "Копируем dwm.desktop в /usr/share/xsessions..."
-        sudo cp "$dwm_desktop_src" "$dwm_desktop_dst"
-        if [ $? -eq 0 ]; then
-            echo "Файл dwm.desktop успешно добавлен в /usr/share/xsessions."
-        else
-            echo "Ошибка при копировании файла dwm.desktop."
-            exit 1
-        fi
+    echo "Копируем dwm.desktop в ~/.xsessions..."
+    cp "$dwm_desktop_src" "$dwm_desktop_dst_user"
+    echo "Файл dwm.desktop успешно добавлен в ~/.xsessions."
+fi
+
+# Проверяем наличие файла dwm.desktop в системной директории
+if [ -f "$dwm_desktop_dst_system" ]; then
+    echo "Файл dwm.desktop уже существует в /usr/share/xsessions."
+    read -p "Вы хотите перезаписать его? (y/n): " choice_system
+    if [[ "$choice_system" =~ ^[yY]$ ]]; then
+        echo "Перезаписываем файл dwm.desktop в /usr/share/xsessions..."
+        sudo cp "$dwm_desktop_src" "$dwm_desktop_dst_system"
+        echo "Файл dwm.desktop успешно перезаписан в /usr/share/xsessions."
     else
-        echo "Исходный файл $dwm_desktop_src не найден!"
-        exit 1
+        echo "Операция отменена. Файл в /usr/share/xsessions не был перезаписан."
     fi
+else
+    echo "Копируем dwm.desktop в /usr/share/xsessions..."
+    sudo cp "$dwm_desktop_src" "$dwm_desktop_dst_system"
+    echo "Файл dwm.desktop успешно добавлен в /usr/share/xsessions."
 fi
 
 echo " "
-echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-echo "dwm.desktop добавлен в xsessions!"
-echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+echo "dwm.desktop успешно обработан!"
+echo "Проверьте ~/.xsessions и /usr/share/xsessions."
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 

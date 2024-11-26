@@ -1,75 +1,86 @@
 #!/bin/bash
+
 # Переменная для домашней директории
 HOME_DIR=$HOME
 SOURCE_DIR="$HOME/dwm_dots-maaru"
 
-# Функция копирования файлов с проверкой на существование
+# Цвета для оформления
+COLOR_RESET="\033[0m"
+COLOR_GREEN="\033[32m"
+COLOR_RED="\033[31m"
+COLOR_YELLOW="\033[33m"
+COLOR_CYAN="\033[36m"
+
+# Массив файлов для копирования
+FILES_TO_COPY=(
+    "wallpapers"
+    ".current_wallpaper"
+    ".Xauthority"
+    ".xinitrc"
+    ".Xresources"
+    ".xsession"
+    ".icons"
+    ".suckless"
+    ".themes"
+    "Images"
+    "Videos"
+)
+
+# Функция создания резервной копии
+create_backup() {
+    local file=$1
+    local backup="${file}_backup_$(date +%Y%m%d%H%M%S)"
+    echo -e "${COLOR_YELLOW}Создаю резервную копию: $file -> $backup${COLOR_RESET}"
+    cp -r "$file" "$backup"
+}
+
+# Функция копирования файлов с проверками
 copy_file() {
-    local source=$1
-    local destination=$2
-    
-    # Проверка на существование исходного файла или каталога
-    if [ -e "$source" ]; then
-        # Проверяем, файл это или каталог
-        if [ -f "$source" ]; then
-            echo "Файл найден: $source"
-        elif [ -d "$source" ]; then
-            echo "Каталог найден: $source"
-        fi
+    local source="$SOURCE_DIR/$1"
+    local destination="$HOME_DIR/$1"
 
-        # Проверка, существует ли уже файл/каталог в целевой директории
-        if [ -e "$destination/$(basename $source)" ]; then
-            echo "Ошибка: $destination/$(basename $source) уже существует. Пропускаем копирование."
-            return 0
-        fi
+    # Проверяем существование источника
+    if [ ! -e "$source" ]; then
+        echo -e "${COLOR_RED}Ошибка: $source не существует!${COLOR_RESET}"
+        return 1
+    fi
 
-        # Проверка на доступность для чтения исходного файла
-        if [ -r "$source" ]; then
-            echo "Доступен для чтения: $source"
-        else
-            echo "Ошибка: $source недоступен для чтения!"
-            return 1
-        fi
-
-        # Проверка на доступность для записи в папку назначения
-        if [ -w "$destination" ] || [ -d "$destination" ]; then
-            echo "Копирование $source -> $destination"
+    # Проверяем, существует ли целевой файл/каталог
+    if [ -e "$destination" ]; then
+        echo -e "${COLOR_YELLOW}Внимание: $destination уже существует.${COLOR_RESET}"
+        read -p "$(echo -e "${COLOR_CYAN}Создать резервную копию и перезаписать? (y/n): ${COLOR_RESET}")" choice
+        if [[ "$choice" =~ ^[yY]$ ]]; then
+            create_backup "$destination"
             cp -r "$source" "$destination"
-            return 0
+            echo -e "${COLOR_GREEN}Скопировано (с резервной копией): $source -> $destination${COLOR_RESET}"
         else
-            echo "Ошибка: Нет доступа для записи в $destination!"
-            return 1
+            echo -e "${COLOR_YELLOW}Пропущено: $destination${COLOR_RESET}"
         fi
     else
-        echo "Ошибка: $source не существует!"
-        return 1
+        cp -r "$source" "$destination"
+        echo -e "${COLOR_GREEN}Скопировано: $source -> $destination${COLOR_RESET}"
     fi
 }
 
 # Флаг успешности
 success=true
 
-# Копирование файлов и каталогов
-copy_file "$SOURCE_DIR/wallpapers" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.current_wallpaper" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.Xauthority" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.xinitrc" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.Xresources" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.xsession" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.icons" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.suckless" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/.themes" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/Images" "$HOME_DIR/" || success=false
-copy_file "$SOURCE_DIR/Videos" "$HOME_DIR/" || success=false
+# Копирование всех файлов
+for file in "${FILES_TO_COPY[@]}"; do
+    copy_file "$file" || success=false
+done
 
-# Уведомление о завершении только в случае успеха
+# Финальное сообщение
 if $success; then
-    echo -e "\n \n 
+    echo -e "\n${COLOR_GREEN}
      ██████╗  ██████╗  ██████╗ ██████╗      ██████╗ ██████╗ ██████╗ ██╗   ██╗
     ██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗    ██╔════╝██╔═══██╗██╔══██╗╚██╗ ██╔╝
     ██║  ███╗██║   ██║██║   ██║██║  ██║    ██║     ██║   ██║██████╔╝ ╚████╔╝ 
     ██║   ██║██║   ██║██║   ██║██║  ██║    ██║     ██║   ██║██╔═══╝   ╚██╔╝  
     ╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝    ╚██████╗╚██████╔╝██║        ██║   
      ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝      ╚═════╝ ╚═════╝ ╚═╝        ╚═╝   
-    "
+    ${COLOR_RESET}"
+else
+    echo -e "\n${COLOR_RED}Копирование завершено с ошибками. Проверьте вышеуказанные сообщения.${COLOR_RESET}"
 fi
+sleep 1

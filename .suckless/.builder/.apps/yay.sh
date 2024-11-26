@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Проверяем, установлен ли yay
+if ! command -v yay &> /dev/null; then
+    echo "Ошибка: 'yay' не установлен. Установите его перед запуском этого скрипта." >&2
+    exit 1
+fi
+
 # Определяем категории пакетов
 comozitor=("picom-simpleanims-git")
 python=("python311")
@@ -59,14 +65,18 @@ case $1 in
 esac
 
 # Установка пакетов через yay
+echo ">>> Начинаю установку пакетов..."
 for package in "${selected_packages[@]}"; do
-    if ! yay -Qi "$package" > /dev/null 2>&1; then
-        echo "Устанавливаю $package через yay..."
-        yay -S --noconfirm "$package"
+    echo ">>> Проверяю $package..."
+    if yay -Qi "$package" > /dev/null 2>&1; then
+        echo ">>> $package уже установлен."
     else
-        echo "$package уже установлен."
+        echo ">>> Устанавливаю $package через yay..."
+        yay -S --noconfirm "$package" || {
+            echo "Ошибка: Не удалось установить $package." >&2
+            continue
+        }
     fi
 done
 
-echo "Установка завершена!"
-
+echo ">>> Установка завершена!"

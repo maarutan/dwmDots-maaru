@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Проверка на права суперпользователя
+if [[ $EUID -ne 0 ]]; then
+    echo "Ошибка: Запустите скрипт с правами суперпользователя (sudo)." >&2
+    exit 1
+fi
+
 # Определяем категории пакетов
 global=("openssh" "telegram-desktop" "flameshot" "tree")
 xorg=("xorg" "xorg-server" "xorg-xinit" "xdotool")
@@ -43,13 +49,14 @@ quickstart=(
     "${filemanager[@]}" "${editor[@]}" "${terminal[@]}" "${browsers[@]}"
     "${terminalUtils[@]}" "${colorPicker[@]}" "${filerepo[@]}"
     "${shell[@]}" "${git[@]}" "${starter[@]}"
-
 )
 
 # Проверяем наличие аргумента
 if [[ -z $1 ]]; then
     echo "Ошибка: необходимо указать параметр запуска."
-    echo "Использование: $0 [quickstart|all]"
+    echo "Доступные параметры:"
+    echo "  quickstart - минимальный набор пакетов"
+    echo "  all        - полный набор пакетов"
     exit 1
 fi
 
@@ -63,19 +70,25 @@ case $1 in
         ;;
     *)
         echo "Ошибка: неверный параметр '$1'."
-        echo "Используйте 'quickstart' для минимального набора или 'all' для полного."
+        echo "Доступные параметры:"
+        echo "  quickstart - минимальный набор пакетов"
+        echo "  all        - полный набор пакетов"
         exit 1
         ;;
 esac
 
 # Установка пакетов через pacman
+echo ">>> Начинаю установку пакетов..."
 for package in "${selected_packages[@]}"; do
-    if ! pacman -Qi "$package" > /dev/null 2>&1; then
-        echo "Устанавливаю $package через pacman..."
-        sudo pacman -S --noconfirm "$package"
+    if pacman -Qi "$package" > /dev/null 2>&1; then
+        echo ">>> $package уже установлен."
     else
-        echo "$package уже установлен."
+        echo ">>> Устанавливаю $package..."
+        sudo pacman -S --noconfirm "$package" || {
+            echo "Ошибка: Не удалось установить $package." >&2
+            continue
+        }
     fi
 done
 
-echo "Установка завершена!"
+echo ">>> Установка завершена!"

@@ -3,48 +3,49 @@
 # Путь к файлу конфигурации
 sddm_conf="/etc/sddm.conf"
 
-# Проверка, существует ли файл
-if [ ! -f "$sddm_conf" ]; then
-    # Если файл не существует, создаем новый с нужными настройками
+# Проверка прав суперпользователя
+if [[ $EUID -ne 0 ]]; then
+    echo "Ошибка: Этот скрипт должен быть запущен с правами суперпользователя." >&2
+    exit 1
+fi
+
+# Создание резервной копии файла
+if [ -f "$sddm_conf" ]; then
+    backup_file="${sddm_conf}.bak.$(date +%Y%m%d%H%M%S)"
+    cp "$sddm_conf" "$backup_file"
+    echo "Создана резервная копия файла: $backup_file"
+else
+    echo "Файл $sddm_conf не найден. Создаю новый файл с настройками..."
     echo -e "[Theme]\nCurrent=sugar-candy\nCursorTheme=Bibata-Modern-Ice\nCursorSize=48" | sudo tee "$sddm_conf" > /dev/null
-    echo -e "Файл $sddm_conf не найден. Он был создан с необходимыми параметрами."
+    echo "Файл $sddm_conf создан."
     exit 0
 fi
 
-# Проверка наличия секции [Theme] и нужных параметров
-if grep -q "\[Theme\]" "$sddm_conf"; then
-    # Проверка, есть ли уже нужные строки в файле
-    if grep -q "Current=sugar-candy" "$sddm_conf" && \
-       grep -q "CursorTheme=Bibata-Modern-Ice" "$sddm_conf" && \
-       grep -q "CursorSize=48" "$sddm_conf"; then
-        echo -e "\nЭти конфигурации уже присутствуют в файле $sddm_conf.\nСкрипт не добавил новые параметры."
-        exit 0
+# Функция для обновления или добавления параметра
+update_param() {
+    local param=$1
+    local value=$2
+
+    if grep -q "^$param=" "$sddm_conf"; then
+        sudo sed -i "s|^$param=.*|$param=$value|" "$sddm_conf"
+        echo "Обновлён параметр: $param=$value."
+    else
+        echo "$param=$value" | sudo tee -a "$sddm_conf" > /dev/null
+        echo "Добавлен параметр: $param=$value."
     fi
-else
-    # Если секции [Theme] нет, добавляем её
+}
+
+# Обновление параметров в секции [Theme]
+if ! grep -q "^\[Theme\]" "$sddm_conf"; then
     echo -e "\n[Theme]" | sudo tee -a "$sddm_conf" > /dev/null
-    echo "Секция [Theme] добавлена в $sddm_conf."
+    echo "Добавлена секция [Theme]."
 fi
 
-# Добавляем или проверяем параметры, если их нет
-if ! grep -q "Current=sugar-candy" "$sddm_conf"; then
-    echo "Current=sugar-candy" | sudo tee -a "$sddm_conf" > /dev/null
-    echo "Добавлен параметр Current=sugar-candy."
-fi
+update_param "Current" "sugar-candy"
+update_param "CursorTheme" "Bibata-Modern-Ice"
+update_param "CursorSize" "48"
 
-if ! grep -q "CursorTheme=Bibata-Modern-Ice" "$sddm_conf"; then
-    echo "CursorTheme=Bibata-Modern-Ice" | sudo tee -a "$sddm_conf" > /dev/null
-    echo "Добавлен параметр CursorTheme=Bibata-Modern-Ice."
-fi
-
-if ! grep -q "CursorSize=48" "$sddm_conf"; then
-    echo "CursorSize=48" | sudo tee -a "$sddm_conf" > /dev/null
-    echo "Добавлен параметр CursorSize=48."
-fi
-
-
-echo " "
-echo "=-=-=-=-=-=-=-=-=-=-=-=-=-"
-echo "Конфигурация SDDM обновлена."
-echo "=-=-=-=-=-=-=-=-=-=-=-=-=-"
-
+# Завершающее сообщение
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+echo "Конфигурация SDDM успешно обновлена."
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
