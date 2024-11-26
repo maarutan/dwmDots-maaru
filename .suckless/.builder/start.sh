@@ -41,7 +41,7 @@ run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.usr/share_sddm.sh"
 run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.usr/xsessions.sh"
 run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.home/home.sh"
 run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.home/config.sh"
-run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.home/local_plank.sh"
+run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.home/local_plank.sh" &
 run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.home/validate_wp.sh"
 run_script "$HOME/dwm_dots-maaru/.suckless/.builder/.systemctl/bluethooth.sh"
 
