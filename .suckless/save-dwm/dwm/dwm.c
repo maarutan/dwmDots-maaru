@@ -63,15 +63,29 @@
 #define CURRENTS_MINIBOX ".cache/dwmshowtagboxes_state"
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-
-enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
-       NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetWMWindowTypeDock,
-       NetClientList, NetNumberOfDesktops, NetCurrentDesktop,
-       NetDesktopNames, NetDesktopViewport, NetSystemTray,
-       NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
-       NetClientInfo, NetLast };
-extern Atom netatom[NetLast];
+enum { 
+    NetSupported, 
+    NetWMName, 
+    NetWMState, 
+    NetWMCheck,
+    NetSystemTray, 
+    NetSystemTrayOP, 
+    NetSystemTrayOrientation, 
+    NetSystemTrayOrientationHorz,
+    NetWMFullscreen, 
+    NetActiveWindow, 
+    NetWMWindowType,
+    NetWMWindowTypeDialog, 
+    NetWMWindowTypeDock, 
+    NetClientList, 
+    NetDesktopNames, 
+    NetDesktopViewport,
+    NetNumberOfDesktops, 
+    NetCurrentDesktop, 
+    NetWMDesktop, 
+    NetClientInfo, 
+    NetWorkarea, // Добавляем сюда
+    NetLast 
 }; /* EWMH atoms */
 enum { Manager, Xembed, XembedInfo, XLast }; /* Xembed atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
@@ -106,7 +120,6 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
-    int isdock;
 	Client *next;
 	Client *snext;
 	Monitor *mon;
@@ -302,6 +315,7 @@ int read_saved_tag(void);     // Объявление функции для чт
 void save_current_tag(void);  // Объявление функции для сохранения текущего тега
 void switch_to_saved_tag(void); // Объявление функции для переключения на сохранённый тег
 void recompile_and_restart(const Arg *arg);
+void updateworkarea(void);
 
 
 /* variables */
@@ -678,32 +692,19 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 }
 
 
+
 void
 arrange(Monitor *m)
 {
-    Client *c;
-
-    if (m)
-        showhide(m->stack);
-    else
-        for (m = mons; m; m = m->next)
-            showhide(m->stack);
-
-    // Обрабатываем DOCK окна отдельно
-    for (c = m ? m->clients : NULL; c; c = c->next) {
-        if (ISDOCK(c)) {
-            XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
-            XRaiseWindow(dpy, c->win); // Поднимаем DOCK окно наверх
-        }
-    }
-
-    if (m) {
-        arrangemon(m);
-        restack(m); // Перестраиваем стек окон
-    } else {
-        for (m = mons; m; m = m->next)
-            arrangemon(m);
-    }
+	if (m)
+		showhide(m->stack);
+	else for (m = mons; m; m = m->next)
+		showhide(m->stack);
+	if (m) {
+		arrangemon(m);
+		restack(m);
+	} else for (m = mons; m; m = m->next)
+		arrangemon(m);
 }
 
 void
@@ -1180,8 +1181,18 @@ int isWindowIgnored(Client *c) {
 }
 
 
+void updateworkarea(void) {
+    long workarea[4];
 
+    // Корректировка рабочей области для текущего монитора
+    workarea[0] = selmon->wx; // x
+    workarea[1] = selmon->wy + (selmon->showbar ? bh : 0); // y с учётом панели
+    workarea[2] = selmon->ww; // ширина
+    workarea[3] = selmon->wh - (selmon->showbar ? bh : 0); // высота с учётом панели
 
+    XChangeProperty(dpy, root, netatom[NetWorkarea], XA_CARDINAL, 32,
+                    PropModeReplace, (unsigned char *)workarea, 4);
+}
 void
 focus(Client *c)
 {
@@ -1698,6 +1709,8 @@ killclient(const Arg *arg)
 
 
 
+
+
 void
 manage(Window w, XWindowAttributes *wa)
 {
@@ -1705,22 +1718,60 @@ manage(Window w, XWindowAttributes *wa)
     Window trans = None;
     XWindowChanges wc;
 
-    // Создаём нового клиента
     c = ecalloc(1, sizeof(Client));
     c->win = w;
-
-    // Инициализация геометрии окна
+    /* geometry */
     c->x = c->oldx = wa->x;
     c->y = c->oldy = wa->y;
     c->w = c->oldw = wa->width;
     c->h = c->oldh = wa->height;
     c->oldbw = wa->border_width;
     c->cfact = 1.0;
-    c->isdock = 0; // Сбрасываем флаг isdock
 
     updatetitle(c);
 
-    // Проверка на транзитивность (transient)
+    // Проверка на _NET_WM_WINDOW_TYPE_DOCK
+    Atom type = None;
+    unsigned char *data = NULL;
+    int format;
+    unsigned long nitems, bytes_after;
+
+    if (XGetWindowProperty(dpy, w, netatom[NetWMWindowType], 0L, 1L, False, XA_ATOM,
+                           &type, &format, &nitems, &bytes_after, &data) == Success && data) {
+        if (*(Atom *)data == netatom[NetWMWindowTypeDock]) {
+            XFree(data);
+
+            // Учитываем _NET_WM_STRUT_PARTIAL, если оно есть
+            long struts[4] = {0};
+            if (XGetWindowProperty(dpy, w, XInternAtom(dpy, "_NET_WM_STRUT_PARTIAL", False),
+                                   0L, 4L, False, XA_CARDINAL, &type, &format,
+                                   &nitems, &bytes_after, (unsigned char **)&data) == Success && data) {
+                memcpy(struts, data, sizeof(long) * 4);
+                XFree(data);
+
+                // Корректируем область монитора
+                if (struts[0] > 0) selmon->wx += struts[0]; // Левый
+                if (struts[1] > 0) selmon->ww -= struts[1]; // Правый
+                if (struts[2] > 0) selmon->wy += struts[2]; // Верхний
+                if (struts[3] > 0) selmon->wh -= struts[3]; // Нижний
+            }
+
+            // Поднимаем окно наверх и отображаем
+            XRaiseWindow(dpy, w);
+            XMapWindow(dpy, w);
+
+            // Добавляем DOCK окно в _NET_CLIENT_LIST
+            XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32,
+                            PropModeAppend, (unsigned char *)&w, 1);
+
+            // DOCK окна не добавляются в общий список клиентов
+            free(c);
+            return;
+        }
+        XFree(data);
+    }
+
+    // Если это transient окно, наследуем теги
     if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
         c->mon = t->mon;
         c->tags = t->tags;
@@ -1729,22 +1780,10 @@ manage(Window w, XWindowAttributes *wa)
         applyrules(c);
     }
 
-    // Обновление типа окна и проверка на dock
-    updatewindowtype(c);
-    if (c->isdock) { // Если это окно dock
-        c->isfloating = 1; // Устанавливаем как плавающее
-        c->tags = 0;       // Отключаем привязку к тегам
-        c->bw = 0;         // Убираем бордеры
-        XMoveResizeWindow(dpy, c->win, c->mon->wx, c->mon->wy, c->mon->ww, c->h);
-        XMapWindow(dpy, c->win);
-        XRaiseWindow(dpy, c->win);
-        return; // Dock обработан, не продолжаем стандартную обработку
-    }
-
-    // Логика для восстановления сохранённых тегов
+    // Восстановление тегов и мониторинга
     {
         int format;
-        unsigned long *data = NULL, n, extra;
+        unsigned long *data, n, extra;
         Monitor *m;
         Atom atom;
 
@@ -1758,13 +1797,13 @@ manage(Window w, XWindowAttributes *wa)
                 }
             }
         }
-        if (data)
-            XFree(data); // Безопасное освобождение памяти
+        if (n > 0)
+            XFree(data);
     }
 
-    setclienttagprop(c); // Устанавливаем сохранённые теги
+    setclienttagprop(c); /* Устанавливаем сохранённые теги */
 
-    // Обработка класса окна
+    // Логика обработки класса окна
     char class[256] = "";
     XClassHint ch = { NULL, NULL };
 
@@ -1772,12 +1811,12 @@ manage(Window w, XWindowAttributes *wa)
         if (ch.res_class)
             strncpy(class, ch.res_class, sizeof(class) - 1);
 
-        // Проверка на приложения, привязанные ко всем тегам
+        // Проверка на принадлежность к alltags_apps
         if (is_alltags_app(class)) {
             c->tags = ~0; // Устанавливаем окно на все теги
         }
 
-        // Убираем бордеры, если это указано
+        // Устанавливаем бордеры
         if (is_noborder_app(class)) {
             c->bw = 0; // Убираем границы
         } else {
@@ -1789,23 +1828,25 @@ manage(Window w, XWindowAttributes *wa)
         if (ch.res_name)
             XFree(ch.res_name);
     } else {
-        c->bw = borderpx; // Если класс не определён, применяем стандартные границы
+        c->bw = borderpx; // Если класс не удалось определить, применяем стандартные границы
     }
 
     wc.border_width = c->bw;
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
     XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
-    configure(c); // Применение изменений ширины бордера
+    configure(c);
+    updatewindowtype(c);
     updatesizehints(c);
     updatewmhints(c);
 
-    // Центрирование плавающих окон
+    // Центрируем окно, если оно плавающее
     if (c->isfloating) {
         c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
         c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+        XMoveWindow(dpy, c->win, c->x, c->y);
+        XRaiseWindow(dpy, c->win);
     }
 
-    // Привязка окна
     if (attachbelow)
         attachBelow(c);
     else
@@ -1814,13 +1855,19 @@ manage(Window w, XWindowAttributes *wa)
     attachstack(c);
     XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
                     (unsigned char *)&(c->win), 1);
-    XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); // Необходимость для некоторых окон
+    XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h);
     setclientstate(c, NormalState);
+
     if (c->mon == selmon)
         unfocus(selmon->sel, 0);
+
     c->mon->sel = c;
     arrange(c->mon);
     XMapWindow(dpy, c->win);
+
+    // Обновляем _NET_CLIENT_LIST
+    updateclientlist();
+
     focus(NULL);
 }
 
@@ -2579,126 +2626,109 @@ setmfact(const Arg *arg)
 void
 setup(void)
 {
-    load_showtitle_state();
-    int i;
-    XSetWindowAttributes wa;
-    Atom utf8string;
-    struct sigaction sa;
+  load_showtitle_state();
+	int i;
+	XSetWindowAttributes wa;
+	Atom utf8string;
+	struct sigaction sa;
 
-    /* do not transform children into zombies when they terminate */
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_NOCLDSTOP | SA_NOCLDWAIT | SA_RESTART;
-    sa.sa_handler = SIG_IGN;
-    sigaction(SIGCHLD, &sa, NULL);
+	/* do not transform children into zombies when they terminate */
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_NOCLDSTOP | SA_NOCLDWAIT | SA_RESTART;
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGCHLD, &sa, NULL);
 
-    /* clean up any zombies (inherited from .xinitrc etc) immediately */
-    while (waitpid(-1, NULL, WNOHANG) > 0);
+	/* clean up any zombies (inherited from .xinitrc etc) immediately */
+	while (waitpid(-1, NULL, WNOHANG) > 0);
 
-    /* init screen */
-    screen = DefaultScreen(dpy);
-    sw = DisplayWidth(dpy, screen);
-    sh = DisplayHeight(dpy, screen);
-    root = RootWindow(dpy, screen);
-    drw = drw_create(dpy, screen, root, sw, sh);
-    if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
-        die("no fonts could be loaded.");
-    lrpad = drw->fonts->h;
-    bh = drw->fonts->h + 2;
-    updategeom();
-    sp = sidepad;
-    vp = (topbar == 1) ? vertpad : -vertpad;
+	/* init screen */
+	screen = DefaultScreen(dpy);
+	sw = DisplayWidth(dpy, screen);
+	sh = DisplayHeight(dpy, screen);
+	root = RootWindow(dpy, screen);
+	drw = drw_create(dpy, screen, root, sw, sh);
+	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
+		die("no fonts could be loaded.");
+	lrpad = drw->fonts->h;
+	bh = drw->fonts->h + 2;
+	updategeom();
+	sp = sidepad;
+	vp = (topbar == 1) ? vertpad : - vertpad;
 
-    /* init atoms */
-    utf8string = XInternAtom(dpy, "UTF8_STRING", False);
-    wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
-    wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-    wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
-    wmatom[WMTakeFocus] = XInternAtom(dpy, "WM_TAKE_FOCUS", False);
-    netatom[NetActiveWindow] = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
-    netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
+	/* init atoms */
+	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
+	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
+	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
+	wmatom[WMTakeFocus] = XInternAtom(dpy, "WM_TAKE_FOCUS", False);
+	netatom[NetActiveWindow] = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
+	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
     netatom[NetDesktopViewport] = XInternAtom(dpy, "_NET_DESKTOP_VIEWPORT", False);
-    netatom[NetNumberOfDesktops] = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
-    netatom[NetCurrentDesktop] = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);
-    netatom[NetDesktopNames] = XInternAtom(dpy, "_NET_DESKTOP_NAMES", False);
+    netatom[NetActiveWindow] = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
+	netatom[NetNumberOfDesktops] = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
+	netatom[NetCurrentDesktop] = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);
+    netatom[NetWorkarea] = XInternAtom(dpy, "_NET_WORKAREA", False);
+	netatom[NetDesktopNames] = XInternAtom(dpy, "_NET_DESKTOP_NAMES", False);
     netatom[NetWMWindowTypeDock] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DOCK", False);
-    netatom[NetSystemTray] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_S0", False);
-    netatom[NetSystemTrayOP] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_OPCODE", False);
-    netatom[NetSystemTrayOrientation] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_ORIENTATION", False);
-    netatom[NetSystemTrayOrientationHorz] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_ORIENTATION_HORZ", False);
-    netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-    netatom[NetWMState] = XInternAtom(dpy, "_NET_WM_STATE", False);
-    netatom[NetWMCheck] = XInternAtom(dpy, "_NET_SUPPORTING_WM_CHECK", False);
-    netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
-    netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
-    netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-    netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
+    netatom[NetWMDesktop] = XInternAtom(dpy, "_NET_WM_DESKTOP", False);
+	netatom[NetSystemTray] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_S0", False);
+	netatom[NetSystemTrayOP] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_OPCODE", False);
+	netatom[NetSystemTrayOrientation] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_ORIENTATION", False);
+	netatom[NetSystemTrayOrientationHorz] = XInternAtom(dpy, "_NET_SYSTEM_TRAY_ORIENTATION_HORZ", False);
+	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
+	netatom[NetWMState] = XInternAtom(dpy, "_NET_WM_STATE", False);
+	netatom[NetWMCheck] = XInternAtom(dpy, "_NET_SUPPORTING_WM_CHECK", False);
+	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
+	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
+	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
     netatom[NetClientInfo] = XInternAtom(dpy, "_NET_CLIENT_INFO", False);
-    xatom[Manager] = XInternAtom(dpy, "MANAGER", False);
-    xatom[Xembed] = XInternAtom(dpy, "_XEMBED", False);
-    xatom[XembedInfo] = XInternAtom(dpy, "_XEMBED_INFO", False);
 
-    /* init cursors */
-    cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
-    cursor[CurResize] = drw_cur_create(drw, XC_sizing);
-    cursor[CurMove] = drw_cur_create(drw, XC_fleur);
+	xatom[Manager] = XInternAtom(dpy, "MANAGER", False);
+	xatom[Xembed] = XInternAtom(dpy, "_XEMBED", False);
+	xatom[XembedInfo] = XInternAtom(dpy, "_XEMBED_INFO", False);
+	/* init cursors */
+	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
+	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
+	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
+	/* init appearance */
+	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+	for (i = 0; i < LENGTH(colors); i++)
+		scheme[i] = drw_scm_create(drw, colors[i], 3);
+	/* init system tray */
+	updatesystray();
+	/* init bars */
+	updatebars();
+	updatestatus();
+	updatebarpos(selmon);
+	/* supporting window for NetWMCheck */
+	wmcheckwin = XCreateSimpleWindow(dpy, root, 0, 0, 1, 1, 0, 0, 0);
+	XChangeProperty(dpy, wmcheckwin, netatom[NetWMCheck], XA_WINDOW, 32,
+		PropModeReplace, (unsigned char *) &wmcheckwin, 1);
+	XChangeProperty(dpy, wmcheckwin, netatom[NetWMName], utf8string, 8,
+		PropModeReplace, (unsigned char *) "dwm", 3);
+	XChangeProperty(dpy, root, netatom[NetWMCheck], XA_WINDOW, 32,
+		PropModeReplace, (unsigned char *) &wmcheckwin, 1);
+	/* EWMH support per view */
+	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
+		PropModeReplace, (unsigned char *) netatom, NetLast);
+	setnumdesktops();
+	setcurrentdesktop();
+	setdesktopnames();
+	setviewport();
+	XDeleteProperty(dpy, root, netatom[NetClientList]);
+	XDeleteProperty(dpy, root, netatom[NetClientInfo]);
+	/* select events */
+	wa.cursor = cursor[CurNormal]->cursor;
+	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
+		|ButtonPressMask|PointerMotionMask|EnterWindowMask
+		|LeaveWindowMask|StructureNotifyMask|PropertyChangeMask;
+	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
+	XSelectInput(dpy, root, wa.event_mask);
+	grabkeys();
+	focus(NULL);
+	loadSystrayState();
 
-    /* init appearance */
-    scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
-    for (i = 0; i < LENGTH(colors); i++)
-        scheme[i] = drw_scm_create(drw, colors[i], 3);
-
-    /* init system tray */
-    updatesystray();
-
-    /* init bars */
-    updatebars();
-    updatestatus();
-    updatebarpos(selmon);
-
-    /* supporting window for NetWMCheck */
-    wmcheckwin = XCreateSimpleWindow(dpy, root, 0, 0, 1, 1, 0, 0, 0);
-    XChangeProperty(dpy, wmcheckwin, netatom[NetWMCheck], XA_WINDOW, 32,
-                    PropModeReplace, (unsigned char *) &wmcheckwin, 1);
-    XChangeProperty(dpy, wmcheckwin, netatom[NetWMName], utf8string, 8,
-                    PropModeReplace, (unsigned char *) "dwm", 3);
-    XChangeProperty(dpy, root, netatom[NetWMCheck], XA_WINDOW, 32,
-                    PropModeReplace, (unsigned char *) &wmcheckwin, 1);
-
-    /* EWMH support per view */
-Atom supported[] = {
-    netatom[NetWMState],
-    netatom[NetWMWindowType],
-    netatom[NetWMWindowTypeDock], // Поддержка dock
-    netatom[NetWMName],
-    netatom[NetActiveWindow],
-    netatom[NetClientList],
-    netatom[NetDesktopViewport],
-    netatom[NetNumberOfDesktops],
-    netatom[NetCurrentDesktop],
-    netatom[NetDesktopNames],
-    netatom[NetSystemTray],
-    netatom[NetSystemTrayOrientation],
-    netatom[NetWMFullscreen],
-};
-XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
-                PropModeReplace, (unsigned char *)supported, LENGTH(supported));
-    setnumdesktops();
-    setcurrentdesktop();
-    setdesktopnames();
-    setviewport();
-    XDeleteProperty(dpy, root, netatom[NetClientList]);
-    XDeleteProperty(dpy, root, netatom[NetClientInfo]);
-
-    /* select events */
-    wa.cursor = cursor[CurNormal]->cursor;
-    wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
-                  | ButtonPressMask | PointerMotionMask | EnterWindowMask
-                  | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
-    XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
-    XSelectInput(dpy, root, wa.event_mask);
-    grabkeys();
-    focus(NULL);
-    loadSystrayState();
 }
 void
 setviewport(void){
@@ -2900,35 +2930,56 @@ unfocus(Client *c, int setfocus)
 	}
 }
 
+
+
 void
 unmanage(Client *c, int destroyed)
 {
-	int i;
-	Monitor *m = c->mon;
-	XWindowChanges wc;
+    int i;
+    Monitor *m = c->mon;
+    XWindowChanges wc;
 
-	for (i = 0; i < LENGTH(tags) + 1; i++)
-		if (c->mon->pertag->sel[i] == c)
-			c->mon->pertag->sel[i] = NULL;
+    // Удаляем клиента из перетагов
+    for (i = 0; i < LENGTH(tags) + 1; i++)
+        if (c->mon->pertag->sel[i] == c)
+            c->mon->pertag->sel[i] = NULL;
 
-	detach(c);
-	detachstack(c);
-	if (!destroyed) {
-		wc.border_width = c->oldbw;
-		XGrabServer(dpy); /* avoid race conditions */
-		XSetErrorHandler(xerrordummy);
-		XSelectInput(dpy, c->win, NoEventMask);
-		XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
-		XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-		setclientstate(c, WithdrawnState);
-		XSync(dpy, False);
-		XSetErrorHandler(xerror);
-		XUngrabServer(dpy);
-	}
-	free(c);
-	focus(NULL);
-	updateclientlist();
-	arrange(m);
+    detach(c);
+    detachstack(c);
+
+    if (!destroyed) {
+        wc.border_width = c->oldbw;
+        XGrabServer(dpy); /* avoid race conditions */
+        XSetErrorHandler(xerrordummy);
+        XSelectInput(dpy, c->win, NoEventMask);
+        XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
+        XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+        setclientstate(c, WithdrawnState);
+        XSync(dpy, False);
+        XSetErrorHandler(xerror);
+        XUngrabServer(dpy);
+    }
+
+    // Удаляем окно из _NET_CLIENT_LIST
+    int count = 0;
+    for (Client *t = selmon->clients; t; t = t->next) {
+        count++;
+    }
+    Window *windows = calloc(count, sizeof(Window)); // Динамическое выделение памяти
+    count = 0; // Сброс счётчика
+    for (Client *t = selmon->clients; t; t = t->next) {
+        if (t != c) {
+            windows[count++] = t->win;
+        }
+    }
+    XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32,
+                    PropModeReplace, (unsigned char *)windows, count);
+    free(windows);
+
+    free(c);
+    focus(NULL);
+    updateclientlist();
+    arrange(m);
 }
 
 void
@@ -2997,16 +3048,36 @@ updatebarpos(Monitor *m)
 void
 updateclientlist(void)
 {
-	Client *c;
-	Monitor *m;
+    Client *c;
+    Monitor *m;
 
-	XDeleteProperty(dpy, root, netatom[NetClientList]);
-	for (m = mons; m; m = m->next)
-		for (c = m->clients; c; c = c->next)
-			XChangeProperty(dpy, root, netatom[NetClientList],
-				XA_WINDOW, 32, PropModeAppend,
-				(unsigned char *) &(c->win), 1);
+    // Удаляем старый список
+    XDeleteProperty(dpy, root, netatom[NetClientList]);
+
+    // Добавляем все окна
+    for (m = mons; m; m = m->next) {
+        for (c = m->clients; c; c = c->next) {
+            XChangeProperty(dpy, root, netatom[NetClientList],
+                            XA_WINDOW, 32, PropModeAppend,
+                            (unsigned char *)&(c->win), 1);
+        }
+    }
 }
+
+
+void
+setactivewindow(Client *c)
+{
+    if (c) {
+        XChangeProperty(dpy, root, netatom[NetActiveWindow], XA_WINDOW, 32,
+                        PropModeReplace, (unsigned char *)&(c->win), 1);
+    } else {
+        XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
+    }
+}
+
+
+
 void updatecurrentdesktop(void) {
     unsigned long rawdata = selmon->tagset[selmon->seltags]; // Битовая маска текущих тегов
     int i = 0;
@@ -3022,86 +3093,148 @@ void updatecurrentdesktop(void) {
                     PropModeReplace, (unsigned char *)data, 1);
 }
 
+
 int
 updategeom(void)
 {
-	int dirty = 0;
+    int dirty = 0;
 
 #ifdef XINERAMA
-	if (XineramaIsActive(dpy)) {
-		int i, j, n, nn;
-		Client *c;
-		Monitor *m;
-		XineramaScreenInfo *info = XineramaQueryScreens(dpy, &nn);
-		XineramaScreenInfo *unique = NULL;
+    if (XineramaIsActive(dpy)) {
+        int i, j, n, nn;
+        Client *c;
+        Monitor *m;
+        XineramaScreenInfo *info = XineramaQueryScreens(dpy, &nn);
+        XineramaScreenInfo *unique = NULL;
 
-		for (n = 0, m = mons; m; m = m->next, n++);
-		/* only consider unique geometries as separate screens */
-		unique = ecalloc(nn, sizeof(XineramaScreenInfo));
-		for (i = 0, j = 0; i < nn; i++)
-			if (isuniquegeom(unique, j, &info[i]))
-				memcpy(&unique[j++], &info[i], sizeof(XineramaScreenInfo));
-		XFree(info);
-		nn = j;
+        for (n = 0, m = mons; m; m = m->next, n++);
+        /* only consider unique geometries as separate screens */
+        unique = ecalloc(nn, sizeof(XineramaScreenInfo));
+        for (i = 0, j = 0; i < nn; i++)
+            if (isuniquegeom(unique, j, &info[i]))
+                memcpy(&unique[j++], &info[i], sizeof(XineramaScreenInfo));
+        XFree(info);
+        nn = j;
 
-		/* new monitors if nn > n */
-		for (i = n; i < nn; i++) {
-			for (m = mons; m && m->next; m = m->next);
-			if (m)
-				m->next = createmon();
-			else
-				mons = createmon();
-		}
-		for (i = 0, m = mons; i < nn && m; m = m->next, i++)
-			if (i >= n
-			|| unique[i].x_org != m->mx || unique[i].y_org != m->my
-			|| unique[i].width != m->mw || unique[i].height != m->mh)
-			{
-				dirty = 1;
-				m->num = i;
-				m->mx = m->wx = unique[i].x_org;
-				m->my = m->wy = unique[i].y_org;
-				m->mw = m->ww = unique[i].width;
-				m->mh = m->wh = unique[i].height;
-				updatebarpos(m);
-			}
-		/* removed monitors if n > nn */
-		for (i = nn; i < n; i++) {
-			for (m = mons; m && m->next; m = m->next);
-			while ((c = m->clients)) {
-				dirty = 1;
-				m->clients = c->next;
-				detachstack(c);
-				c->mon = mons;
-                if( attachbelow )
+        /* new monitors if nn > n */
+        for (i = n; i < nn; i++) {
+            for (m = mons; m && m->next; m = m->next);
+            if (m)
+                m->next = createmon();
+            else
+                mons = createmon();
+        }
+        for (i = 0, m = mons; i < nn && m; m = m->next, i++) {
+            if (i >= n
+            || unique[i].x_org != m->mx || unique[i].y_org != m->my
+            || unique[i].width != m->mw || unique[i].height != m->mh)
+            {
+                dirty = 1;
+                m->num = i;
+                m->mx = m->wx = unique[i].x_org;
+                m->my = m->wy = unique[i].y_org;
+                m->mw = m->ww = unique[i].width;
+                m->mh = m->wh = unique[i].height;
+
+                /* Обработка окон типа dock */
+                updatebarpos(m);
+                long struts[4] = {0};
+                Atom type;
+                int format;
+                unsigned long nitems, bytes_after;
+                unsigned char *data = NULL;
+                Window root_return, parent_return, *children = NULL;
+                unsigned int nchildren;
+
+                // Получаем список всех окон
+                if (XQueryTree(dpy, root, &root_return, &parent_return, &children, &nchildren)) {
+                    for (unsigned int k = 0; k < nchildren; k++) {
+                        if (XGetWindowProperty(dpy, children[k], XInternAtom(dpy, "_NET_WM_STRUT_PARTIAL", False),
+                                               0L, 4L, False, XA_CARDINAL, &type, &format,
+                                               &nitems, &bytes_after, &data) == Success && data) {
+                            memcpy(struts, data, sizeof(long) * 4);
+                            XFree(data);
+
+                            /* Корректируем размеры монитора */
+                            if (struts[0] > 0) m->wx += struts[0]; // Левый отступ
+                            if (struts[1] > 0) m->ww -= struts[1]; // Правый отступ
+                            if (struts[2] > 0) m->wy += struts[2]; // Верхний отступ
+                            if (struts[3] > 0) m->wh -= struts[3]; // Нижний отступ
+                        }
+                    }
+                    if (children) {
+                        XFree(children);
+                    }
+                }
+            }
+        }
+        /* removed monitors if n > nn */
+        for (i = nn; i < n; i++) {
+            for (m = mons; m && m->next; m = m->next);
+            while ((c = m->clients)) {
+                dirty = 1;
+                m->clients = c->next;
+                detachstack(c);
+                c->mon = mons;
+                if (attachbelow)
                     attachBelow(c);
-				else
-					attach(c);
+                else
+                    attach(c);
 
-				attachstack(c);
-			}
-			if (m == selmon)
-				selmon = mons;
-			cleanupmon(m);
-		}
-		free(unique);
-	} else
+                attachstack(c);
+            }
+            if (m == selmon)
+                selmon = mons;
+            cleanupmon(m);
+        }
+        free(unique);
+    } else
 #endif /* XINERAMA */
-	{ /* default monitor setup */
-		if (!mons)
-			mons = createmon();
-		if (mons->mw != sw || mons->mh != sh) {
-			dirty = 1;
-			mons->mw = mons->ww = sw;
-			mons->mh = mons->wh = sh;
-			updatebarpos(mons);
-		}
-	}
-	if (dirty) {
-		selmon = mons;
-		selmon = wintomon(root);
-	}
-	return dirty;
+    { /* default monitor setup */
+        if (!mons)
+            mons = createmon();
+        if (mons->mw != sw || mons->mh != sh) {
+            dirty = 1;
+            mons->mw = mons->ww = sw;
+            mons->mh = mons->wh = sh;
+
+            /* Корректируем размеры для окон dock */
+            long struts[4] = {0};
+            Atom type;
+            int format;
+            unsigned long nitems, bytes_after;
+            unsigned char *data = NULL;
+            Window root_return, parent_return, *children = NULL;
+            unsigned int nchildren;
+
+            if (XQueryTree(dpy, root, &root_return, &parent_return, &children, &nchildren)) {
+                for (unsigned int k = 0; k < nchildren; k++) {
+                    if (XGetWindowProperty(dpy, children[k], XInternAtom(dpy, "_NET_WM_STRUT_PARTIAL", False),
+                                           0L, 4L, False, XA_CARDINAL, &type, &format,
+                                           &nitems, &bytes_after, &data) == Success && data) {
+                        memcpy(struts, data, sizeof(long) * 4);
+                        XFree(data);
+
+                        if (struts[0] > 0) mons->wx += struts[0]; // Левый отступ
+                        if (struts[1] > 0) mons->ww -= struts[1]; // Правый отступ
+                        if (struts[2] > 0) mons->wy += struts[2]; // Верхний отступ
+                        if (struts[3] > 0) mons->wh -= struts[3]; // Нижний отступ
+                    }
+                }
+                if (children) {
+                    XFree(children);
+                }
+            }
+            updatebarpos(mons);
+        }
+    }
+    if (dirty) {
+        selmon = mons;
+        selmon = wintomon(root);
+    }
+    //updateworkarea();
+    return dirty;
+
 }
 
 void
@@ -3301,8 +3434,6 @@ updatetitle(Client *c) {
         strcpy(c->name, broken);
 }
 
-
-
 void
 updatewindowtype(Client *c)
 {
@@ -3314,7 +3445,6 @@ updatewindowtype(Client *c)
 	if (wtype == netatom[NetWMWindowTypeDialog])
 		c->isfloating = 1;
 }
-
 
 void
 updatewmhints(Client *c)
@@ -3377,29 +3507,28 @@ view(const Arg *arg)
     if (arg->ui == ~0) {
         if (selmon->pertag->curtag == 0) {
             // Если мы уже находимся на теге 0, восстанавливаем прежнее состояние
-            if (prevtags != 0) {  // Проверяем, что состояние было сохранено
-                selmon->tagset[selmon->seltags] = prevtags;  // Восстанавливаем предыдущий тег
-                setlayout(&((Arg) { .v = prevlayout }));     // Восстанавливаем layout
-                focus(prevclient);  // Восстанавливаем фокус на предыдущем окне
+            if (prevtags != 0) {
+                selmon->tagset[selmon->seltags] = prevtags;
+                setlayout(&((Arg) { .v = prevlayout }));
+                focus(prevclient);
                 arrange(selmon);
             }
             updatecurrentdesktop(); // Обновляем _NET_CURRENT_DESKTOP
-            save_current_tag_to_file();  // Сохраняем текущий тег
-            return; // Прерываем выполнение, не переключаемся
+            save_current_tag_to_file(); // Сохраняем текущий тег
+            return;
         } else {
-            // Сохраняем текущее состояние перед переходом на тег 0
-            prevtags = selmon->tagset[selmon->seltags];   // Сохраняем предыдущий тег
-            prevclient = selmon->sel;                      // Сохраняем текущее окно
-            prevlayout = selmon->lt[selmon->sellt];        // Сохраняем текущий layout
-            selmon->pertag->curtag = 0; // Переключаем на тег 0
-            setlayout(&((Arg) { .v = TAG0_LAYOUT }));      // Устанавливаем layout для тега 0
+            prevtags = selmon->tagset[selmon->seltags];
+            prevclient = selmon->sel;
+            prevlayout = selmon->lt[selmon->sellt];
+            selmon->pertag->curtag = 0;
+            setlayout(&((Arg) { .v = TAG0_LAYOUT }));
         }
     }
 
     // Если тег уже активен, не делаем ничего
     if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
-        updatecurrentdesktop(); // Обновляем _NET_CURRENT_DESKTOP
-        save_current_tag_to_file();  // Сохраняем текущий тег
+        updatecurrentdesktop();
+        save_current_tag_to_file();
         return;
     }
 
@@ -3409,7 +3538,7 @@ view(const Arg *arg)
         selmon->pertag->prevtag = selmon->pertag->curtag;
 
         if (arg->ui != ~0) {
-            for (i = 0; !(arg->ui & 1 << i); i++) ;
+            for (i = 0; !(arg->ui & 1 << i); i++);
             selmon->pertag->curtag = i + 1;
         }
     } else {
@@ -3427,10 +3556,17 @@ view(const Arg *arg)
     if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
         togglebar(NULL);
 
+    // Поднимаем DOCK окна при переключении тегов
+    for (Client *dock = selmon->clients; dock; dock = dock->next) {
+        if (ISDOCK(dock)) {
+            XRaiseWindow(dpy, dock->win);
+        }
+    }
+
     focus(selmon->pertag->sel[selmon->pertag->curtag]);
     arrange(selmon);
     updatecurrentdesktop(); // Обновляем _NET_CURRENT_DESKTOP
-    save_current_tag_to_file();  // Сохраняем текущий тег
+    save_current_tag_to_file(); // Сохраняем текущий тег
 }
 
 

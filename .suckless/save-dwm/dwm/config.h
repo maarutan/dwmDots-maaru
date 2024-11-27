@@ -38,7 +38,7 @@ static                int smartgaps      = 1  ;       // 1 means no outer gap wh
 static const unsigned int single_gappov  = 150;       // Вертикальный внешний отступ при одном окне
 static const unsigned int single_gappoh  = 40 ;       // Горизонтальный внешний отступ при одном окне
 //=======================================//
-static                int bottgaps       = 30 ;       // нижние отступы для dock 
+static                int bottgaps       = 20 ;       // нижние отступы для dock 
 #define               DOCK_NAME          "plank"      // class твоего дока
 //========================================//
 //awesome title
@@ -88,7 +88,6 @@ static const Rule rules[]            =     {
     { "telegram-desktop",   NULL   , NULL               , 1 << 3, 0, -1     },
     { "TelegramDesktop" ,   NULL   , NULL               , 1 << 3, 0, -1     },
     { "kitty"           ,   NULL   , "neofetch_terminal", 1 << 0, 0, -1     },
-    { "Plank"           ,   NULL   , NULL               , 0, True,   -1     },
     { "vesktop"         ,   NULL   , NULL               , 0, True,   -1     },
     { "Mechvibes"       ,   NULL   , NULL               , 0, True,   -1     },
 
@@ -143,6 +142,7 @@ static const Layout layouts[] = {
 };
 // Layout для тега 0 (все теги активны)
 #define TAG0_LAYOUT &layouts             [7] // "HHH" (grid)
+#define ISDOCK(c) ((c)->tags == 0 && (c)->isfloating)
 //============================================//
 // key definitions
 #define MODKEY Mod4Mask

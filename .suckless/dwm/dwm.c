@@ -3030,19 +3030,19 @@ updatebars(void)
 	}
 }
 
-
 void
 updatebarpos(Monitor *m)
 {
     m->wy = m->my;
     m->wh = m->mh;
-
     if (m->showbar) {
-        m->wh -= bh; // Уменьшаем высоту на высоту панели
-        m->wy += bh; // Сдвигаем рабочую область вниз
+        m->wh -= bh + 2 * vp; /* Уменьшаем высоту на высоту панели и вертикальные отступы */
+        m->by = m->topbar ? m->wy : m->wy + m->wh + vp;
+        m->wy = m->topbar ? m->wy + bh + vp : m->wy;
+    } else {
+        m->by = -bh - vp; /* Если панель скрыта */
     }
 }
-
 
 
 void
