@@ -32,11 +32,11 @@ int         always_smartgaps_monocle     = 1 ;       // 0 - стандартна
 //gap
 static const unsigned int gappiv         = 20 ;       // vert inner gap between windows 
 static const unsigned int gappih         = 20 ;       // horiz inner gap between windows 
-static const unsigned int gappoh         = 50 ;       // horiz outer gap between windows and screen edge 
+static const unsigned int gappoh         = 20 ;       // horiz outer gap between windows and screen edge 
 static const unsigned int gappov         = 20 ;       // vert outer gap between windows and screen edge 
 static                int smartgaps      = 1  ;       // 1 means no outer gap when there is only one window 
 static const unsigned int single_gappov  = 150;       // Вертикальный внешний отступ при одном окне
-static const unsigned int single_gappoh  = 80 ;       // Горизонтальный внешний отступ при одном окне
+static const unsigned int single_gappoh  = 40 ;       // Горизонтальный внешний отступ при одном окне
 //=======================================//
 static                int bottgaps       = 30 ;       // нижние отступы для dock 
 #define               DOCK_NAME          "plank"      // class твоего дока

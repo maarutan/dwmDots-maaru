@@ -692,19 +692,43 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 }
 
 
-
 void
 arrange(Monitor *m)
 {
-	if (m)
-		showhide(m->stack);
-	else for (m = mons; m; m = m->next)
-		showhide(m->stack);
-	if (m) {
-		arrangemon(m);
-		restack(m);
-	} else for (m = mons; m; m = m->next)
-		arrangemon(m);
+    Client *c;
+
+    // Если указан конкретный монитор, показываем или скрываем окна его стека
+    if (m) {
+        showhide(m->stack);
+    } else {
+        // Если монитор не указан, проходим по всем мониторам
+        for (m = mons; m; m = m->next)
+            showhide(m->stack);
+    }
+
+    // Поднимаем DOCK окна, если они есть
+    if (m) {
+        for (c = m->clients; c; c = c->next) {
+            if (ISDOCK(c)) {
+                XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); // Обновляем размеры и позицию
+                XRaiseWindow(dpy, c->win); // Поднимаем DOCK окно наверх
+            }
+        }
+    }
+
+    // Применяем раскладку окон и перестраиваем стек
+    if (m) {
+        arrangemon(m);
+        restack(m);
+    } else {
+        for (m = mons; m; m = m->next) {
+            arrangemon(m);
+            restack(m);
+        }
+    }
+
+    // Обновляем рабочую область (_NET_WORKAREA)
+    updateworkarea();
 }
 
 void
@@ -1181,18 +1205,24 @@ int isWindowIgnored(Client *c) {
 }
 
 
-void updateworkarea(void) {
+
+void
+updateworkarea(void)
+{
     long workarea[4];
 
-    // Корректировка рабочей области для текущего монитора
-    workarea[0] = selmon->wx; // x
-    workarea[1] = selmon->wy + (selmon->showbar ? bh : 0); // y с учётом панели
-    workarea[2] = selmon->ww; // ширина
-    workarea[3] = selmon->wh - (selmon->showbar ? bh : 0); // высота с учётом панели
+    // Учитываем DOCK окна и панель (бар)
+    workarea[0] = selmon->wx;
+    workarea[1] = selmon->wy + (selmon->showbar ? bh : 0); // Учёт панели
+    workarea[2] = selmon->ww;
+    workarea[3] = selmon->wh - (selmon->showbar ? bh : 0); // Учёт панели
 
+    // Обновляем свойство _NET_WORKAREA
     XChangeProperty(dpy, root, netatom[NetWorkarea], XA_CARDINAL, 32,
                     PropModeReplace, (unsigned char *)workarea, 4);
 }
+
+
 void
 focus(Client *c)
 {
