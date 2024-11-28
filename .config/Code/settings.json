@@ -183,7 +183,7 @@
 	"warmUp.changeCount": "15",
 	"git.confirmSync": false,
 	"git.autofetch": true,
-	"window.zoomLevel": 3,
+	"window.zoomLevel": 2.5,
 	"git.openRepositoryInParentFolders": "always",
 	"security.workspace.trust.startupPrompt": "never",
 	"security.workspace.trust.banner": "never",
@@ -238,14 +238,6 @@
 		},
 		{
 			"before": ["j", "k"],
-			"after": ["<Esc>"]
-		},
-		{
-			"before": ["о", "л"],
-			"after": ["<Esc>"]
-		},
-		{
-			"before": ["л", "л"],
 			"after": ["<Esc>"]
 		}
 	], // комбинации в режиме вставки
@@ -360,5 +352,8 @@
 		"{git,gitlens}:/**/*.{md,csv,svg}": "default"
 	},
 	"liveServer.settings.donotVerifyTags": true,
-	"chat.editing.alwaysSaveWithGeneratedChanges": true
+	"chat.editing.alwaysSaveWithGeneratedChanges": true,
+	"database-client.autoSync": true,
+	"sqlite3-editor.telemetry": "allow",
+	"sqlite3-editor.ui.minimizePanel": true
 }

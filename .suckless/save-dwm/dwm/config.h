@@ -98,21 +98,18 @@ static const char *noborder_apps[] = {
  //   "Plank",       // Пример приложения
      NULL // Завершающий NULL для указания конца массива
 };
-
 //============================================//
 // прикрепить ко всем тегам 
 static const char *alltags_apps[] = {
    // "Plank",       // Пример: Plank
      NULL // Завершающий NULL
 };
-
 //============================================//
 //  Игнорировать определенное окно
 static const char *focusIgnore[] = {
     //"Plank",       // Пример: Plank
      NULL // Завершающий NULL
 };
-
 //============================================//
 
 /* layout(s) */
@@ -370,6 +367,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //reload && exit
     &((Keychord){1, {{MODKEY|ALTKEY, XK_q}}, quit, { 0 } }  ),
+    &((Keychord){1, {{MODKEY, XK_q}}, spawn, SHCMD("sudo systemctl restart display-manager") }  ),
 //======================================================================//
     //Gaps 
     &((Keychord){0, {{0, 0}}, incrgaps,   { .i = +1 } }     ),

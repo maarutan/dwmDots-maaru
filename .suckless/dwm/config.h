@@ -98,21 +98,18 @@ static const char *noborder_apps[] = {
  //   "Plank",       // Пример приложения
      NULL // Завершающий NULL для указания конца массива
 };
-
 //============================================//
 // прикрепить ко всем тегам 
 static const char *alltags_apps[] = {
    // "Plank",       // Пример: Plank
      NULL // Завершающий NULL
 };
-
 //============================================//
 //  Игнорировать определенное окно
 static const char *focusIgnore[] = {
     //"Plank",       // Пример: Plank
      NULL // Завершающий NULL
 };
-
 //============================================//
 
 /* layout(s) */
@@ -193,6 +190,7 @@ static Keychord *keychords[]        = {
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_d}}, spawn,  SHCMD("vesktop")  }), //vesktop
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_c}}, spawn,  {.v = codeEditor } }),//vscode
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_m}}, spawn,  SHCMD("$HOME/.suckless/scripts/open_mechvibes.sh")  }), //telegram
 //======================================================================//
     //screen [super + p ]
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}},  spawn,  SHCMD("$HOME/.suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
@@ -370,6 +368,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //reload && exit
     &((Keychord){1, {{MODKEY|ALTKEY, XK_q}}, quit, { 0 } }  ),
+    &((Keychord){1, {{MODKEY, XK_q}}, spawn, SHCMD("sudo systemctl restart display-manager") }  ),
 //======================================================================//
     //Gaps 
     &((Keychord){0, {{0, 0}}, incrgaps,   { .i = +1 } }     ),
