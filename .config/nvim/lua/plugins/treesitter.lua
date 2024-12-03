@@ -1,33 +1,52 @@
-require("nvim-treesitter.configs").setup({
-    ensure_installed = { -- Языки, которые ты используешь
+require'nvim-treesitter.configs'.setup {
+  -- Список языков для установки парсеров
+  ensure_installed = { 
+        "c",
+        "lua",
+        "vim",
+        "vimdoc",
+        "query",
+        "markdown",
+        "markdown_inline",
         "python",
         "javascript",
         "typescript",
         "html",
         "css",
-        "lua",
         "bash",
-        "c",
-        "cpp",
-        "dockerfile",
         "json",
-        "yaml",
-    },
-    highlight = {
-        enable = true, -- Включить подсветку
-        additional_vim_regex_highlighting = false,
-    },
-    indent = {
-        enable = true, -- Автоотступы (работает не для всех языков)
-    },
-    incremental_selection = {
-        enable = true, -- Выделение кода блоками
-        keymaps = {
-            init_selection = "gnn",
-            node_incremental = "grn",
-            scope_incremental = "grc",
-            node_decremental = "grm",
-        },
-    },
-})
+  },
 
+  -- Асинхронная установка парсеров
+  sync_install = false,
+
+  -- Автоматическая установка недостающих парсеров при открытии файла
+  auto_install = true,
+
+  -- Языки, для которых не будут установлены парсеры
+  ignore_install = { "javascript" },
+
+  highlight = {
+    enable = true,  -- Включаем подсветку синтаксиса с помощью Tree-sitter
+
+    -- Отключаем подсветку для определённых языков (если необходимо)
+    disable = { "" },
+
+    -- Функция для отключения подсветки для больших файлов (если необходимо)
+    disable = function(lang, buf)
+      local max_filesize = 100 * 1024  -- 100 KB
+      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
+    end,
+
+    -- Включаем стандартную подсветку синтаксиса для улучшения совместимости с другими плагинами
+    additional_vim_regex_highlighting = false,
+  },
+
+  -- Опциональные настройки для других функций (например, автоотступы или текстовые объекты)
+  indent = {
+    enable = true,  -- Включаем автоотступы
+  },
+}

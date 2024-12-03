@@ -6,7 +6,7 @@
 ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝██╗██║  ██║
  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝ ╚═╝╚═╝  ╚═╝
 //==========================================================*/
-
+#define EWMH_SUPPORT 1
 
 // appearance 
 static const unsigned int borderpx       = 7 ;       // border pixel of windows 
@@ -90,6 +90,7 @@ static const Rule rules[]            =     {
     { "kitty"           ,   NULL   , "neofetch_terminal", 1 << 0, 0, -1     },
     { "vesktop"         ,   NULL   , NULL               , 0, True,   -1     },
     { "Mechvibes"       ,   NULL   , NULL               , 0, True,   -1     },
+    { "steam"           ,   NULL   , NULL               , 0, True,   -1     },
 
 };
 //============================================//
@@ -190,7 +191,7 @@ static Keychord *keychords[]        = {
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_d}}, spawn,  SHCMD("vesktop")  }), //vesktop
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_c}}, spawn,  {.v = codeEditor } }),//vscode
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
-    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_m}}, spawn,  SHCMD("$HOME/.suckless/scripts/open_mechvibes.sh")  }), //telegram
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_b}}, spawn,  SHCMD("kitty -e btop")  }), //btop
 //======================================================================//
     //screen [super + p ]
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}},  spawn,  SHCMD("$HOME/.suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
@@ -368,7 +369,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //reload && exit
     &((Keychord){1, {{MODKEY|ALTKEY, XK_q}}, quit, { 0 } }  ),
-    &((Keychord){1, {{MODKEY, XK_q}}, spawn, SHCMD("sudo systemctl restart display-manager") }  ),
+    &((Keychord){1, {{MODKEY|ControlMask, XK_q}}, spawn, SHCMD("pkill -f dwm") }  ),
 //======================================================================//
     //Gaps 
     &((Keychord){0, {{0, 0}}, incrgaps,   { .i = +1 } }     ),

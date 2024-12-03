@@ -16,7 +16,7 @@ APPLICATIONS=(
     "$HOME/.suckless/scripts/dwmbScripts/blocks.sh"
     "blueman-applet"
     "telegram-desktop"
-    "plank"
+    # "plank"
     "kitty --title \"neofetch_terminal\" -e bash -c 'neofetch --config $HOME/.config/neofetch/myProfile.conf; exec bash'"
 )
 

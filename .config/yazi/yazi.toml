@@ -37,7 +37,7 @@ extract = [
 edit = [
 	{ run = 'nvim "$@"', block = true, for = "unix" },
         { run = 'code "$@"', block = true, for = "unix" },
-        { run = 'kitty "$@"',block = true, for = "unix" },
+        { run = 'source "$@"',block = true, for = "unix" },
 ]
 play = [
 	{ run = 'mpv "$@"', orphan = true, for = "unix" },

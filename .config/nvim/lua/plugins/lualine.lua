@@ -1,17 +1,16 @@
 require('lualine').setup {
   options = {
-    icons_enabled = true,
-    theme = 'auto',
-    component_separators = { left = '', right = ''},
-    section_separators = { left = '', right = ''},
+    icons_enabled = true,        -- Включить иконки
+    theme = 'auto',              -- Тема
+    component_separators = { left = '', right = '' },
+    section_separators = { left = '', right = '' },
     disabled_filetypes = {
-      statusline = {},
-      winbar = {},
+      winbar = {},               -- Отключённые типы для winbar
     },
-    ignore_focus = {},
+    ignore_focus = {'neo-tree'}, -- Игнорируем фокус в neo-tree
     always_divide_middle = true,
     always_show_tabline = true,
-    globalstatus = false,
+    globalstatus = true,         -- Включаем общую статус-линию
     refresh = {
       statusline = 100,
       tabline = 100,
@@ -20,9 +19,27 @@ require('lualine').setup {
   },
   sections = {
     lualine_a = {'mode'},
-    lualine_b = {'branch', 'diagnostics'}, -- Убрали diff
-    lualine_c = {'filename'},
-    lualine_x = {'fileformat', 'filetype'},
+    lualine_b = {
+      { 'branch', icon = '' },
+      { 'diff', icon = '' },
+      { 'diagnostics', icon = '' }
+    },
+    lualine_c = {
+      'filename',
+      function()
+        return '🌊🌊🌊'
+      end,
+    },
+    lualine_x = {
+      function()
+        return  "🌊🌊🌊" -- Пример
+      end,
+      function()
+        return  " " -- Пример
+      end,
+
+      'fileformat', 'filetype'
+    },
     lualine_y = {'progress'},
     lualine_z = {'location'}
   },

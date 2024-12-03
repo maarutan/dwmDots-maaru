@@ -1,25 +1,23 @@
 -- Настройка nvim-notify
-local notify = require("notify")
-
-notify.setup({
-    stages = "fade_in_slide_out",
-    timeout = 1500,
-    fps = 144,
-    icons = {
-        ERROR = "",
-        WARN = "",
-        INFO = "",
-        DEBUG = "",
-        TRACE = "✎",
-    },
+require("notify").setup({
+  stages = "fade_in_slide_out",  -- Этапы анимации
+  timeout = 1000,                -- Время отображения уведомления (в миллисекундах)
+  minimum_width = 20,            -- Минимальная ширина уведомления
+  max_width = 40,                -- Максимальная ширина уведомления
+  max_height = 8,                -- Максимальная высота уведомления
+  icons = {
+    ERROR = "",                 -- Иконка для ошибок
+    WARN = "",                  -- Иконка для предупреждений
+    INFO = "",                  -- Иконка для информации
+    DEBUG = "",                 -- Иконка для отладочных сообщений
+    TRACE = "✎"                  -- Иконка для трассировки
+  },
+  level = vim.log.levels.WARN,   -- Показывать только ERROR и WARN
 })
 
--- Перехват vim.notify
-vim.notify = function(msg, level, opts)
-    -- Проверяем, какое сообщение выводится
-    if msg:match("written") then
-        return -- Пропускаем уведомление о сохранении
-    end
-    notify(msg, level, opts)
-end
+-- Переопределяем vim.notify для использования nvim-notify
+vim.notify = require("notify")
+
+-- Создаём отдельное окно для уведомлений (горячая клавиша)
+
 

@@ -3,6 +3,8 @@
 	"editor.suggestSelection": "first",
 	"editor.detectIndentation": true,
 	"terminal.integrated.showExitAlert": false,
+	"telemetry.enableTelemetry": false,
+	"telemetry.enableCrashReporter": false,
 	"editor.minimap.enabled": false,
 	"editor.smoothScrolling": true,
 	"editor.folding": true,
@@ -28,7 +30,6 @@
 	"window.density.editorTabHeight": "compact",
 	//cursor
 	"editor.cursorBlinking": "expand",
-	"editor.cursorStyle": "line",
 	"editor.cursorSmoothCaretAnimation": "on",
 	"editor.hideCursorInOverviewRuler": true,
 	//font
@@ -113,58 +114,9 @@
 	"js/ts.implicitProjectConfig.experimentalDecorators": true,
 
 	"git.enableSmartCommit": true,
-	"fiveServer.browser": ["stable-google-chrome"],
-	"open-in-browser.default": "stable-google-chrome",
-	//neovim
-	// "extensions.experimental.affinity": {
-	// "asvetliakov.vscode-neovim": 1
-	// },
-	"vscode-neovim.neovimInitVimPaths.linux": "/home/maaru/suckless/nvim/init.lua",
-	"vscode-neovim.afterInitConfig": [
-		"set clipboard=unnamedplus",
-		"set relativenumber",
-		"set wrap = false"
-	],
-	"vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
-	"vscode-neovim.compositeKeys": {
-		"jk": {
-			// Use lua to execute any logic
-			"command": "vscode-neovim.lua",
-			"args": [
-				[
-					"local code = require('vscode')",
-					"code.action('vscode-neovim.escape')"
-					// "code.action('workbench.action.files.save')"
-				]
-			]
-		},
-		"jj": {
-			// Use lua to execute any logic
-			"command": "vscode-neovim.lua",
-			"args": [
-				[
-					"local code = require('vscode')",
-					"code.action('vscode-neovim.escape')"
-					// "code.action('workbench.action.files.save')"
-				]
-			]
-		}
-	},
 
 	"prettier.useTabs": true,
 	"prettier.tabWidth": 4,
-	//линия таба
-	"indentRainbow.indicatorStyle": "light",
-	"indentRainbow.colorOnWhiteSpaceOnly": true,
-	"indentRainbow.lightIndicatorStyleLineWidth": 1.4,
-	"indentRainbow.errorColor": "rgba(128,32,32,1)",
-	"indentRainbow.tabmixColor": "rgba(128,32,96,1)",
-	"indentRainbow.colors": [
-		"rgba(255,255,64,1)",
-		"rgba(127,255,127,1)",
-		"rgba(255,127,255,1)",
-		"rgba(79,236,236,1)"
-	],
 	"editor.renderWhitespace": "none",
 	// "workbench.editor.tabSizingFixedMaxWidth": 100,
 	"notebook.defaultFormatter": "esbenp.prettier-vscode",
@@ -178,19 +130,13 @@
 	},
 	"python.analysis.autoImportCompletions": false,
 	"security.workspace.trust.untrustedFiles": "open",
-	"glassit.alpha": 220,
-	"warmUp.changeTypingMode": "code snippets",
-	"warmUp.changeCount": "15",
 	"git.confirmSync": false,
 	"git.autofetch": true,
-	"window.zoomLevel": 2.5,
+	"window.zoomLevel": 3,
 	"git.openRepositoryInParentFolders": "always",
 	"security.workspace.trust.startupPrompt": "never",
 	"security.workspace.trust.banner": "never",
 	"security.workspace.trust.enabled": false,
-	"inline-parameters.fontSize": "0.75em",
-	"inline-parameters.hideRedundantAnnotations": false,
-	"inline-parameters.enabled": false,
 	"inline-parameters.python.ignoreFunctions": [
 		"print",
 		"input",
@@ -353,7 +299,11 @@
 	},
 	"liveServer.settings.donotVerifyTags": true,
 	"chat.editing.alwaysSaveWithGeneratedChanges": true,
-	"database-client.autoSync": true,
 	"sqlite3-editor.telemetry": "allow",
-	"sqlite3-editor.ui.minimizePanel": true
+	"database-client.autoSync": true,
+	"sqlite3-editor.ui.minimizePanel": true,
+	"search.followSymlinks": false,
+	"search.useIgnoreFiles": false,
+	"editor.fontSize": 13,
+	"errorLens.codeLensEnabled": true
 }
