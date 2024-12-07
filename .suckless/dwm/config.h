@@ -97,19 +97,22 @@ static const Rule rules[]            =     {
 // убрать обводку 
 static const char *noborder_apps[] = {
  //   "Plank",       // Пример приложения
+    "polybar",
      NULL // Завершающий NULL для указания конца массива
 };
 //============================================//
 // прикрепить ко всем тегам 
 static const char *alltags_apps[] = {
    // "Plank",       // Пример: Plank
+    "polybar",
      NULL // Завершающий NULL
 };
 //============================================//
 //  Игнорировать определенное окно
 static const char *focusIgnore[] = {
     //"Plank",       // Пример: Plank
-     NULL // Завершающий NULL
+    "polybar",
+    //NULL // Завершающий NULL
 };
 //============================================//
 
@@ -189,8 +192,8 @@ static Keychord *keychords[]        = {
     // aplication [ super + a ] 
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_f}}, spawn,  {.v = browser } }),   //firefox
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_d}}, spawn,  SHCMD("vesktop")  }), //vesktop
-    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_c}}, spawn,  {.v = codeEditor } }),//vscode
-    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_v}}, spawn,  {.v = codeEditor } }),//vscode
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_c}}, spawn,   SHCMD("kitty --hold sh -c 'nvim'") }), //nvim
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_b}}, spawn,  SHCMD("kitty -e btop")  }), //btop
 //======================================================================//
     //screen [super + p ]
@@ -218,6 +221,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //changeKeyboard
     &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
+    &((Keychord){1, {{ControlMask, 0x60 }}, spawn,  SHCMD("$HOME/.suckless/scripts/caps.sh")  }),
 //======================================================================//
 	//rofi
     &((Keychord){1, {{MODKEY, XK_r}},           spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),

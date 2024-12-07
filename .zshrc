@@ -21,6 +21,7 @@ export VISUAL=nvim;
 export EDITOR=nvim;
 eval "$(zoxide init zsh)"
 export PATH=$HOME/.local/bin:$PATH
+export PATH="$PATH:/home/maaru/.local/share/gem/ruby/3.3.0/bin"
 
 
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -73,7 +74,7 @@ bindkey -v
  alias teri="yetris"
  alias vim="nvim"
  alias nzsh="nvim ~/.zshrc"
- alias neo="$HOME/.config/neofetch/startFetch.sh"
+ alias neo="$HOME/.config/neofetch/.startFetch.sh"
  alias fetch="$HOME/.suckless/scripts/fetch.sh"
  alias cls="clear"
  alias ex="exit"

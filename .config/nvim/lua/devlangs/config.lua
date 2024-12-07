@@ -1,11 +1,15 @@
--- Подключаем lua-lsp
-require("devlangs.lsp.lua")
--- Подключаем css-lsp
-require("devlangs.lsp.css")
--- Подключаем html-lsp
-require("devlangs.lsp.html")
--- Подключаем typescript
-require("devlangs.lsp.typescript")
--- Подключаем pyright
-require("devlangs.lsp.python")
+-- lsp:
+require("devlangs.lsp.lua") -- lua-lsp
+require("devlangs.lsp.css") -- css-lsp
+require("devlangs.lsp.html") -- html-lsp
+require("devlangs.lsp.typescript") -- tsserver
+require("devlangs.lsp.python") -- pyright
 
+-- formatting:
+require("devlangs.formatters.null-ls")
+
+-- linting:
+require("devlangs.linters.linters")
+
+-- mason:
+require("devlangs.mason")

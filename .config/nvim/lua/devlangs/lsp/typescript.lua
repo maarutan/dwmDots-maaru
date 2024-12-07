@@ -1,10 +1,15 @@
 local lspconfig = require("lspconfig")
 
--- Настройка tsserver для TypeScript и JavaScript
+-- Настройка ts_ls для TypeScript и JavaScript
 lspconfig.ts_ls.setup({
   capabilities = require("cmp_nvim_lsp").default_capabilities(), -- Для автодополнения
+  on_attach = function(client, bufnr)
+    -- Отключение встроенного форматирования, если используешь внешний форматтер (например, Prettier)
+    client.server_capabilities.documentFormattingProvider = false
+
+    print("TypeScript LSP подключен к буферу " .. bufnr)
+  end,
   settings = {
-    -- Можно добавить дополнительные настройки для TypeScript или JavaScript
     javascript = {
       format = {
         semicolons = "insert", -- Добавить точки с запятой
@@ -16,6 +21,13 @@ lspconfig.ts_ls.setup({
       },
     },
   },
-  filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact", "javascript.jsx", "typescript.tsx" }, -- Поддерживаемые типы файлов
+  filetypes = { 
+    "typescript", 
+    "javascript", 
+    "typescriptreact", 
+    "javascriptreact", 
+    "javascript.jsx", 
+    "typescript.tsx" 
+  }, -- Поддерживаемые типы файлов
 })
 

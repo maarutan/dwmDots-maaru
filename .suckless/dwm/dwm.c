@@ -2535,17 +2535,20 @@ setnumdesktops(void){
 	long data[] = { TAGSLENGTH };
 	XChangeProperty(dpy, root, netatom[NetNumberOfDesktops], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 1);
 }
-
 void
 setfocus(Client *c)
 {
-	if (!c->neverfocus) {
-		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-		XChangeProperty(dpy, root, netatom[NetActiveWindow],
-			XA_WINDOW, 32, PropModeReplace,
-			(unsigned char *) &(c->win), 1);
-	}
-	sendevent(c->win, wmatom[WMTakeFocus], NoEventMask, wmatom[WMTakeFocus], CurrentTime, 0, 0, 0);
+    if (!c->neverfocus) {
+        XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+        XChangeProperty(dpy, root, netatom[NetActiveWindow],
+            XA_WINDOW, 32, PropModeReplace,
+            (unsigned char *) &(c->win), 1);
+    }
+
+    /* Проверка на поддержку WM_TAKE_FOCUS */
+    if (sendevent(c->win, wmatom[WMTakeFocus], NoEventMask, CurrentTime, 0, 0, 0, 0) == 0) {
+        printf("Window does not support WM_TAKE_FOCUS: %ld\n", c->win);
+    }
 }
 
 void

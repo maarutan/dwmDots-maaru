@@ -73,8 +73,8 @@ cmp.setup({
                 nvim_lsp = "[LSP]",
                 buffer = "[Buffer]",
                 path = "[Path]",
-                luasnip = "[Snippet]",
                 codeium = "[Codeium]",  -- Добавляем метку для Codeium
+                luasnip = "[Snippet]",
             })[entry.source.name]
             return vim_item
         end
@@ -95,4 +95,3 @@ cmp.setup.cmdline({ '/', '?' }, {
 
 -- Исключение `:` из автодополнения
 -- Просто не добавляем cmp.setup.cmdline для ':'
-

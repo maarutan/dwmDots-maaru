@@ -3,7 +3,7 @@
 --------------------------------------------------------
 -- Настройка для Catppuccin
 --------------------------------------------------------
-vim.g.catppuccin_flavour = "mocha"  -- Опции: "latte", "frappe", "macchiato", "mocha"
+vim.g.catppuccin_flavour = "mocha" -- Опции: "latte", "frappe", "macchiato", "mocha"
 vim.cmd([[colorscheme catppuccin]])
 
 --------------------------------------------------------
@@ -22,9 +22,9 @@ vim.cmd([[colorscheme catppuccin]])
 --------------------------------------------------------
 -- Настройка для One Dark
 --------------------------------------------------------
-require('onedark').setup {
-    style = 'deep'  -- Опции: 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer', 'light'
-}
+require("onedark").setup({
+	style = "deep", -- Опции: 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer', 'light'
+})
 -- vim.cmd([[colorscheme onedark]])
 
 --------------------------------------------------------
@@ -59,7 +59,6 @@ require('onedark').setup {
 -- Настройка для Nightfox
 --------------------------------------------------------
 require("nightfox").setup({
-    style = "nightfox"  -- Возможные стили: "nightfox", "dayfox", "dawnfox", "nordfox", "terafox"
+	style = "nightfox", -- Возможные стили: "nightfox", "dayfox", "dawnfox", "nordfox", "terafox"
 })
 -- vim.cmd([[colorscheme dayfox]])  -- Активируем Nightfox тему
-

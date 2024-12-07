@@ -236,3 +236,58 @@
       })
       -- Пример настройки вкладок с Neo-tree
 
+
+      vim.api.nvim_create_autocmd("FileType", {
+  pattern = "neo-tree",
+  callback = function()
+    vim.opt_local.buflisted = false -- Убираем буфер из списка
+  end,
+})
+function CloseBufferWithoutFocusingNeoTree()
+  local bufs = vim.api.nvim_list_bufs()
+  local other_buf = nil
+
+  -- Найти другой буфер, кроме neo-tree
+  for _, buf in ipairs(bufs) do
+    if vim.fn.buflisted(buf) == 1 and vim.api.nvim_buf_get_option(buf, 'filetype') ~= 'neo-tree' then
+      other_buf = buf
+      break
+    end
+  end
+
+  -- Если найден другой буфер, переключиться на него
+  if other_buf then
+    vim.cmd('buffer ' .. other_buf)
+  else
+    -- Если нет других буферов, создать новый пустой
+    vim.cmd('enew')
+  end
+
+  -- Закрыть текущий буфер
+  vim.cmd('bd')
+end
+
+
+function CloseBufferWithoutFocusingNeoTree()
+  local bufs = vim.api.nvim_list_bufs()
+  local other_buf = nil
+
+  -- Найти другой буфер, кроме neo-tree
+  for _, buf in ipairs(bufs) do
+    if vim.fn.buflisted(buf) == 1 and vim.api.nvim_buf_get_option(buf, 'filetype') ~= 'neo-tree' then
+      other_buf = buf
+      break
+    end
+  end
+
+  -- Если найден другой буфер, переключиться на него
+  if other_buf then
+    vim.cmd('buffer ' .. other_buf)
+  else
+    -- Если нет других буферов, создать новый пустой
+    vim.cmd('enew')
+  end
+
+  -- Закрыть текущий буфер
+  vim.cmd('bd')
+end

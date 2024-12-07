@@ -1,13 +1,13 @@
 --core
-require("core.keymaps") 
+require("core.keymaps")
 require("core.lazyplug.config")
-require('core.options')
+require("core.options")
 require("core.colorscheme")
 
 -- plugins configure
 require("plugins.telescope")
 require("plugins.treesitter")
-require("plugins.neotree") 
+require("plugins.neotree")
 require("plugins.lualine")
 --require("plugins.multicursor")
 require("plugins.bufferline")
@@ -28,11 +28,12 @@ require("plugins.indentLine")
 require("plugins.yazinvim")
 require("plugins.treesitter-context")
 require("plugins.lazygit")
-require("plugins.mason")
 require("plugins.scope")
 require("plugins.cmp")
 require("plugins.scrollview")
 require("plugins.dashboard")
+-- sql
+require("plugins.dadbod")
 --ai-helper
 require("plugins.codeium")
 

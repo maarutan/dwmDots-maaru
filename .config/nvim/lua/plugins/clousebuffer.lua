@@ -1,7 +1,3 @@
--- Храним оригинальное значение timeoutlen
-local original_timeoutlen = vim.opt.timeoutlen:get()
-
--- Функция для логики закрытия буфера или окна без задержки
 function CloseBufferWithNoDelay()
   -- Временно устанавливаем timeoutlen = 0 для ускорения работы с клавишами
   vim.opt.timeoutlen = 0
@@ -14,9 +10,10 @@ function CloseBufferWithNoDelay()
     end
   end
 
-  -- Если буферов больше одного, закрываем только текущий
+  -- Если буферов больше одного, закрываем текущий
   if buf_count > 1 then
-    vim.cmd('silent! bd')  -- Закрыть текущий буфер
+    vim.cmd('silent! bnext')  -- Переключиться на следующий буфер
+    vim.cmd('silent! bd')     -- Закрыть текущий буфер
   else
     -- Если только один буфер, закрываем окно
     vim.cmd('quit')  -- Закрыть окно, завершить сессию
