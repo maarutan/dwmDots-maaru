@@ -1,38 +1,83 @@
--- Конфигурация для плагина vim-visual-multi
--- visual_multi_config.lua
+-- Включение подсветки совпадений
+vim.g.VM_highlight_matches = "underline" -- Стиль отображения
+vim.g.VM_cursor = "block" -- Установить курсор-блок во всех режимах
+vim.g.VM_set_statusline = 0 -- Отключает обновление статусной строки в vim-visual-multi
+vim.g.VM_silent_exit = 1 -- Отключает сообщения при выходе из режима мультикурсов
 
--- Горячие клавиши для vim-visual-multi
+-- Установить тему для vim-visual-multi
+vim.cmd("VMTheme auto")
+
+-- Настройки горячих клавиш для vim-visual-multi
 vim.g.VM_maps = {
-    -- Поиск под курсором
-    ['Find Under']         = '<C-S-d>',  -- Поиск под курсором
-    ['Find Subword Under'] = '<C-S-f>', -- Поиск под-слов
+	-- Добавление курсоров вверх и вниз
+	["Add Cursor Below"] = "<S-C-j>", -- Добавить курсор ниже
+	["Add Cursor Above"] = "<S-C-k>", -- Добавить курсор выше
 
-    -- Добавление курсоров
-    ['Add Cursor Below']   = '<A-S-j>',  -- Добавить курсор ниже
-    ['Add Cursor Above']   = '<A-S-k>',  -- Добавить курсор выше
-    ['Add Cursor At Pos']  = '<A-S-C-l>',  -- Добавить курсор в текущей позиции
+	-- Добавление курсора в текущую позицию
+	["Add Cursor At Pos"] = "<S-C-l>", -- Добавить курсор в текущей позиции
 
-    -- Переключение маппинга для курсоров
-    ['Toggle Cursor Mappings'] = '<A-h>',  -- Переключить курсоры
- 
-    -- Выделить все курсоры
-    ['Select All Cursors'] = '<C-a>', -- Выделить все курсоры
+	-- Выбрать все совпадения в документе
+	["Select All"] = "<A-S-a>", -- Выбрать все совпадения
 
-    -- Выход из режима мульти-курсора
-    ['Escape'] = '<Esc>',    -- Выход из режима
+	-- Поиск слов в текущей строкеmulti
+	["Find Under"] = "<A-S-d>", -- Найти слово под курсором и двигаться вниз
+	["Find Prev"] = "<A-S-u>", -- Найти слово под курсором и двигаться вверх
+
+	-- Пропуск курсора при поиске
+	["Skip Region"] = "<A-S-s>", -- Пропустить текущее слово
+
+	-- Навигация с использованием hjkl
+	["Move Left"] = "h",
+	["Move Down"] = "j",
+	["Move Up"] = "k",
+	["Move Right"] = "l",
 }
 
--- Настройки горячих клавиш для управления курсорами
 vim.keymap.set(
-    "n",
-    "<leader>I",
-    "<A-l><A-h>",  -- Два действия: добавить курсор и переключить маппинг
-    { noremap = false, silent = true, desc = "Initial additional cursor " }
+	"n",
+	"<A-S-d>",
+	"<Plug>(VM-Find-Under)",
+	{ noremap = true, silent = true, desc = "Найти слово под курсором" }
 )
-
-vim.keymap.set("n", "<A-l>", "<Plug>(VM-Add-Cursor-At-Pos)", { noremap = true, silent = true, desc = "Add cursor at position" })
-vim.keymap.set("n", "<A-h>", "<Plug>(VM-Toggle-Mappings)", { noremap = true, silent = true, desc = "Toggle cursor mappings" })
-vim.keymap.set("n", "<A-k>", "<Plug>(VM-Add-Cursor-Up)", { noremap = true, silent = true, desc = "Add cursor up" })
-vim.keymap.set("n", "<A-j>", "<Plug>(VM-Add-Cursor-Down)", { noremap = true, silent = true, desc = "Add cursor down" })
-vim.keymap.set("n", "<C-S-n>", "<Plug>(VM-Select-Next-Word)", { noremap = true, silent = true, desc = "Select next word" })
-
+-- Привязка дополнительных клавиш
+vim.keymap.set(
+	"n",
+	"<S-C-l>",
+	"<Plug>(VM-Add-Cursor-At-Pos)",
+	{ noremap = true, silent = true, desc = "Добавить курсор в текущую позицию" }
+)
+vim.keymap.set(
+	"n",
+	"<S-C-j>",
+	"<Plug>(VM-Add-Cursor-Down)",
+	{ noremap = true, silent = true, desc = "Добавить курсор ниже" }
+)
+vim.keymap.set(
+	"n",
+	"<S-C-k>",
+	"<Plug>(VM-Add-Cursor-Up)",
+	{ noremap = true, silent = true, desc = "Добавить курсор выше" }
+)
+vim.keymap.set(
+	"n",
+	"<CR>",
+	"<Plug>(VM-Toggle-Mappings)",
+	{ noremap = true, silent = true, desc = "Переключить режим мульти-курсоров" }
+)
+vim.keymap.set(
+	"n",
+	"<A-S-a>",
+	"<Plug>(VM-Select-All)",
+	{ noremap = true, silent = true, desc = "Выбрать все совпадения в документе" }
+)
+vim.keymap.set("n", "<A-S-u>", "<Plug>(VM-Select-Prev)", {
+	noremap = true,
+	silent = true,
+	desc = "Найти предыдущее совпадение и двигаться вверх",
+})
+vim.keymap.set(
+	"n",
+	"<A-S-s>",
+	"<Plug>(VM-Skip-Region)",
+	{ noremap = true, silent = true, desc = "Пропустить текущую область при поиске" }
+)

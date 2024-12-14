@@ -5,14 +5,15 @@ return {
 	{ "folke/tokyonight.nvim" },
 	{ "navarasu/onedark.nvim" },
 	{ "rebelot/kanagawa.nvim" },
-	{ "projekt0n/github-nvim-theme" },
 	{ "Mofiqul/vscode.nvim" },
-	{ "EdenEast/nightfox.nvim" },
+	{ "sainnhe/everforest" },
 	-- treesitter
 	{ "nvim-treesitter/nvim-treesitter" },
 	-- telescope
 	{ "nvim-telescope/telescope.nvim" },
 	{ "nvim-lua/plenary.nvim" },
+	{ "debugloop/telescope-undo.nvim" },
+	{ "nvim-telescope/telescope-file-browser.nvim" },
 	-- lua line
 	{ "nvim-lualine/lualine.nvim" },
 	-- devicons
@@ -23,7 +24,7 @@ return {
 	-- colorizer
 	{ "norcalli/nvim-colorizer.lua" },
 	-- multi cursor
-	{ "mg979/vim-visual-multi", branch = "master", event = "BufRead" },
+	{ "maarutan/nvim-visual-multi", branch = "main" },
 	-- Bufferline
 	{ "akinsho/bufferline.nvim" },
 	-- smoothcursor
@@ -42,7 +43,7 @@ return {
 	{ "CRAG666/code_runner.nvim" },
 	-- yazi for nvim
 	{ "mikavilpas/yazi.nvim" },
-	-- TODO
+	--TODO:
 	{ "folke/todo-comments.nvim" },
 	-- autopairs
 	{ "windwp/nvim-autopairs", event = "InsertEnter", config = true },
@@ -92,4 +93,20 @@ return {
 	{ "tpope/vim-dadbod" },
 	{ "kristijanhusak/vim-dadbod-ui" },
 	{ "kristijanhusak/vim-dadbod-completion" },
+	-- surround
+	{ "tpope/vim-surround" },
+	-- delete no cut
+	{ "svermeulen/vim-cutlass" },
+	-- matchup
+	{ "andymass/vim-matchup" },
+	-- illuminate
+	{ "RRethy/vim-illuminate" },
+	--rename
+	{ "filipdutescu/renamer.nvim" },
+	--filename
+	{ "tpope/vim-eunuch" },
+	--swhicher color theme
+	{ "gagbo/circadian.nvim" },
+	--pacman animshttps://github.com/maarutan/pacman-anims-nvim?tab=readme-ov-file
+	{ "maarutan/pacman-anims-nvim" },
 }

@@ -17,11 +17,11 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 #----- default -----
-export VISUAL=nvim;
-export EDITOR=nvim;
+export VISUAL=neovide;
+export EDITOR=neovide;
 eval "$(zoxide init zsh)"
+export PATH=$PATH:$HOME/.local/bin
 export PATH=$HOME/.local/bin:$PATH
-export PATH="$PATH:/home/maaru/.local/share/gem/ruby/3.3.0/bin"
 
 
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -72,8 +72,9 @@ bindkey -v
  alias g="z"
  alias matrix="unimatrix -b -s 95  -c blue"
  alias teri="yetris"
- alias vim="nvim"
- alias nzsh="nvim ~/.zshrc"
+ alias vim="neovide"
+ alias nzsh="neovide ~/.zshrc"
+ alias nvim="neovide"
  alias neo="$HOME/.config/neofetch/.startFetch.sh"
  alias fetch="$HOME/.suckless/scripts/fetch.sh"
  alias cls="clear"

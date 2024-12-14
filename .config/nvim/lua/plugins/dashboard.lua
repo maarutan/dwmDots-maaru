@@ -1,3 +1,42 @@
+local M = {}
+-- Функция для создания нового буфера
+function M.create_new_buffer()
+	local new_name = vim.fn.input("New file name: ", "")
+	if new_name == "" then
+		vim.notify("Создание буфера отменено.", vim.log.levels.WARN, {
+			icon = "ℹ️",
+			title = "NewBuffer",
+		})
+		return
+	end
+
+	if vim.fn.filereadable(new_name) == 1 then
+		vim.notify("Ошибка: Файл уже существует.", vim.log.levels.ERROR, {
+			icon = "🚨",
+			title = "NewBuffer",
+		})
+		return
+	end
+
+	local ok, err = pcall(function()
+		vim.cmd("edit " .. new_name)
+		vim.cmd("setlocal buftype=")
+	end)
+
+	if not ok then
+		vim.notify("Ошибка при создании буфера: " .. err, vim.log.levels.ERROR, {
+			icon = "🚨",
+			title = "NewBuffer",
+		})
+		return
+	end
+
+	vim.notify("Новый буфер успешно создан: " .. new_name, vim.log.levels.INFO, {
+		icon = "✅",
+		title = "NewBuffer",
+	})
+end
+
 local function default_header()
 	return {
 		"",
@@ -21,35 +60,74 @@ require("dashboard").setup({
 		header = default_header(),
 		center = {
 			{
-				icon = "󰙅 ",
+				icon = "󰉖 ",
 				icon_hl = "Title",
-				desc = "Open tree",
+				desc = "Open Directory",
 				desc_hl = "String",
-				key = "e",
-				keymap = "            SPC e _",
+				key = "d",
+				keymap = "              SPC w d",
 				key_hl = "Number",
-				action = ":NeoTreeFocus",
+				action = function()
+					require("telescope").extensions.file_browser.file_browser({
+						prompt_title = "Select Directory",
+						cwd = "~", -- Начальная директория
+						attach_mappings = function(_, map)
+							local actions = require("telescope.actions")
+							map("i", "<CR>", function(prompt_bufnr)
+								local selected_path = require("telescope.actions.state").get_selected_entry().path
+								actions.close(prompt_bufnr)
+								vim.cmd("cd " .. selected_path)
+								vim.cmd("edit .")
+							end)
+							return true
+						end,
+					})
+				end,
 			},
+
 			{
 				icon = "󰈞 ",
 				icon_hl = "Title",
-				desc = "Find files",
+				desc = "Find and open file",
 				desc_hl = "String",
 				key = "f",
-				keymap = "              SPC f f",
+				keymap = "SPC f f",
 				key_hl = "Number",
-				action = ":Telescope find_files",
+				action = function()
+					require("telescope.builtin").find_files({
+						find_command = { "fd", "--type", "f" },
+						attach_mappings = function(_, map)
+							local actions = require("telescope.actions")
+							local action_state = require("telescope.actions.state")
+
+							map("i", "<CR>", function(prompt_bufnr)
+								local selected_entry = action_state.get_selected_entry()
+
+								if not selected_entry then
+									print("No file selected!")
+									return
+								end
+
+								local filepath = selected_entry.path
+								actions.close(prompt_bufnr)
+
+								-- Открываем файл
+								vim.cmd("edit " .. vim.fn.fnameescape(filepath))
+
+								-- Открываем file_browser в директории файла
+								local file_dir = vim.fn.fnamemodify(filepath, ":p:h")
+								require("telescope").extensions.file_browser.file_browser({
+									cwd = file_dir,
+									respect_gitignore = false,
+									hidden = true,
+								})
+							end)
+							return true
+						end,
+					})
+				end,
 			},
-			{
-				icon = " ",
-				icon_hl = "Title",
-				desc = "Find text",
-				desc_hl = "String",
-				key = "w",
-				keymap = "              SPC f w",
-				key_hl = "Number",
-				action = ":Telescope live_grep",
-			},
+
 			{
 				icon = " ",
 				icon_hl = "Title",
@@ -58,8 +136,18 @@ require("dashboard").setup({
 				key = "b",
 				keymap = "              SPC g b",
 				key_hl = "Number",
-				action = ":Telescope git_branches",
+				action = function()
+					if vim.fn.isdirectory(".git") == 1 then
+						require("telescope.builtin").git_branches()
+					else
+						vim.notify("У вас нет репозитория", vim.log.levels.WARN, {
+							title = "Git",
+							icon = "󰊢",
+						})
+					end
+				end,
 			},
+
 			{
 				icon = "󰄛 ",
 				icon_hl = "Title",
@@ -76,10 +164,11 @@ require("dashboard").setup({
 				desc = "New file",
 				desc_hl = "String",
 				key = "n",
-				keymap = "            SPC n _",
+				keymap = "            SPC b n",
 				key_hl = "Number",
-				action = ":ene | startinsert",
+				action = M.create_new_buffer,
 			},
+
 			{
 				icon = " ",
 				icon_hl = "Title",
@@ -100,6 +189,12 @@ require("dashboard").setup({
 				action = ":qa", -- Команда выхода из Neovim
 			},
 		},
-		footer = { "Welcome to Neovim 🚀" }, -- Футер
+		-- Запускаем анимацию
+		footer = function()
+			local pacman = require("pacman").get_pacman_text()
+			local text = "Welcome to neovim 🚀 "
+			return { text, pacman }
+		end,
 	},
 })
+return M

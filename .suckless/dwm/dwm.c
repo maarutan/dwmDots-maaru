@@ -49,6 +49,7 @@
 #define XEMBED_WINDOW_ACTIVATE      1
 #define XEMBED_FOCUS_IN             4
 #define XEMBED_MODALITY_ON         10
+#define NUMTAGS 9 // Обычно количество тегов в dwm — 9
 #define XEMBED_MAPPED              (1 << 0)
 #define XEMBED_WINDOW_ACTIVATE      1
 #define XEMBED_WINDOW_DEACTIVATE    2
@@ -316,12 +317,15 @@ void save_current_tag(void);  // Объявление функции для со
 void switch_to_saved_tag(void); // Объявление функции для переключения на сохранённый тег
 void recompile_and_restart(const Arg *arg);
 void updateworkarea(void);
-
+void hidewin(const Arg *arg);
+void restorewin(const Arg *arg);
+void showall(const Arg *arg);
 
 /* variables */
 static Systray *systray = NULL;
 static const char broken[] = "broken";
 static char stext[256];
+static Client *hidden_windows[NUMTAGS];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh;               /* bar height */
@@ -403,6 +407,77 @@ void save_current_tag_to_file() {
 }
 
 
+
+
+void hidewin(const Arg *arg) {
+    Client *c = selmon->sel;
+
+    if (!c || c->isfullscreen)
+        return;
+
+    unsigned int tag = selmon->tagset[selmon->seltags]; // Текущий тег
+
+    // Убираем окно из стека монитора
+    detach(c);
+    detachstack(c);
+
+    // Добавляем окно в список скрытых для текущего тега
+    c->next = hidden_windows[tag];
+    hidden_windows[tag] = c;
+
+    // Убираем окно с экрана
+    XUnmapWindow(dpy, c->win);
+
+    // Обновляем монитор
+    focus(NULL);
+    arrange(selmon);
+}
+
+
+
+
+void restorewin(const Arg *arg) {
+    unsigned int tag = selmon->tagset[selmon->seltags]; // Текущий тег
+
+    if (!hidden_windows[tag])
+        return;
+
+    // Достаем первое скрытое окно для текущего тега
+    Client *c = hidden_windows[tag];
+    hidden_windows[tag] = c->next;
+
+    // Возвращаем окно в стек
+    attach(c);
+    attachstack(c);
+
+    // Делаем окно видимым
+    XMapWindow(dpy, c->win);
+
+    // Обновляем монитор
+    focus(c);
+    arrange(selmon);
+}
+
+
+
+void showall(const Arg *arg) {
+    unsigned int tag = selmon->tagset[selmon->seltags]; // Текущий тег
+    Client *c;
+
+    while (hidden_windows[tag]) {
+        c = hidden_windows[tag];
+        hidden_windows[tag] = c->next;
+
+        // Возвращаем окно в стек и делаем его видимым
+        attach(c);
+        attachstack(c);
+        XMapWindow(dpy, c->win);
+    }
+
+    // Обновляем монитор
+    focus(NULL);
+    arrange(selmon);
+}
 
 void switch_to_saved_tag() {
     char filepath[256];

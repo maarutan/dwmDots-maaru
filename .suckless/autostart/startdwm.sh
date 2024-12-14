@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Настройка qt5
@@ -65,7 +64,9 @@ done
 # Запуск оконного менеджера dwm в бесконечном цикле
 echo "Запуск оконного менеджера dwm..."
 while true; do
-    dwm 2>~/.dwm.log
-    setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps' &
+    setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'
+    export PATH=$PATH:$HOME/.local/bin 
+    dwm 2>~/.dwm.log 
+
 done
 

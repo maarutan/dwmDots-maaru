@@ -6,10 +6,10 @@
 ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝██╗██║  ██║
  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝ ╚═╝╚═╝  ╚═╝
 //==========================================================*/
-
+#define EWMH_SUPPORT 1
 
 // appearance 
-static const unsigned int borderpx       = 7 ;       // border pixel of windows 
+static const unsigned int borderpx       = 4 ;       // border pixel of windows 
 static const unsigned int snap           = 0 ;       // snap pixel 
 //========================================//
 //systray
@@ -23,17 +23,17 @@ static                int showsystray    = 1 ;
 int                 show_tag_boxes       = 2 ;       // Установите значение для переключателя: 1, 2, или 3
 //========================================//
 // dwm karnel dir
-#define RECOMPILE_COMMAND "cd $HOME/.suckless/dwm && make clean install || notify-send 'Ошибка при перекомпиляции dwm'"
+#define RECOMPILE_COMMAND "cd $HOME/.suckless/dwm && make clean install; pgrep -x dwm | xargs -r kill || notify-send 'Ошибка при перекомпиляции dwm'"
 //========================================//
 
 //toggle_smartgaps_monocle
 int         always_smartgaps_monocle     = 1 ;       // 0 - стандартная логика, 1 - всегда включены smartgaps
 //========================================//
 //gap
-static const unsigned int gappiv         = 20 ;       // vert inner gap between windows 
-static const unsigned int gappih         = 20 ;       // horiz inner gap between windows 
-static const unsigned int gappoh         = 20 ;       // horiz outer gap between windows and screen edge 
-static const unsigned int gappov         = 20 ;       // vert outer gap between windows and screen edge 
+static const unsigned int gappiv         = 13 ;       // vert inner gap between windows 
+static const unsigned int gappih         = 13 ;       // horiz inner gap between windows 
+static const unsigned int gappoh         = 13 ;       // horiz outer gap between windows and screen edge 
+static const unsigned int gappov         = 13 ;       // vert outer gap between windows and screen edge 
 static                int smartgaps      = 1  ;       // 1 means no outer gap when there is only one window 
 static const unsigned int single_gappov  = 150;       // Вертикальный внешний отступ при одном окне
 static const unsigned int single_gappoh  = 40 ;       // Горизонтальный внешний отступ при одном окне
@@ -49,11 +49,11 @@ static const          int showbar        = 1  ;       // 0 means no bar
 static const          int topbar         = 1  ;       // 0 means bottom bar 
 //========================================//
 //bar paddings
-static const          int vertpad        = 20 ;       // vertical padding of bar 
-static const          int sidepad        = 20 ;       // horizontal padding of bar 
+static const          int vertpad        = 10 ;       // vertical padding of bar 
+static const          int sidepad        = 10 ;       // horizontal padding of bar 
 //========================================//
 // font
-static const char *fonts[]               = {  "FiraCode Nerd Font:size=13" }      ;
+static const char *fonts[]               = {  "FiraCode Nerd Font:size=12" }      ;
 //========================================//
 // color
 static const char col_noActiveFG[]       =  "#bbbbbb"   ;
@@ -68,8 +68,8 @@ static const char *colors[][3]           = {
 	[SchemeNorm]     = { col_noActiveFG  ,  background  , col_noActive,    },
 	[SchemeSel]      = { col_activeFG    ,  background2 , col_borderActive },
 	[SchemeTitle]    = { col_noActiveFG  ,  background  , col_noActive     }, // Цвет заголовков окон
-    [SchemeTitleSel] = { col_activeFG    ,  background2 , col_borderActive }, // Цвет активного окна
-    [SchemeLine]     = { col_borderActive,  background2 , col_borderActive },
+  [SchemeTitleSel] = { col_activeFG    ,  background2 , col_borderActive }, // Цвет активного окна
+  [SchemeLine]     = { col_borderActive,  background2 , col_borderActive },
 };
 // tagging 
 static const char *tags[] = {   " 󱍢 ", "  ", " 󰈹 ", "  ", " 󰣇 ", "  ", "  ", "  ", "  " };
@@ -84,31 +84,35 @@ static Client *prevclient            = NULL;     // Хранение преды�
 static const Layout *prevlayout      = NULL;     // Переменная для хранения предыдущего layout
 static const Rule rules[]            =     {
 	// class            instance   title        tags maskis | floating | monitor 
-	{ "firefox"         ,   NULL   , NULL               , 1 << 2, 0, -1     },
+    { "firefox"         ,   NULL   , NULL               , 1 << 2, 0, -1     },
     { "telegram-desktop",   NULL   , NULL               , 1 << 3, 0, -1     },
     { "TelegramDesktop" ,   NULL   , NULL               , 1 << 3, 0, -1     },
     { "kitty"           ,   NULL   , "neofetch_terminal", 1 << 0, 0, -1     },
     { "vesktop"         ,   NULL   , NULL               , 0, True,   -1     },
     { "Mechvibes"       ,   NULL   , NULL               , 0, True,   -1     },
+    { "steam"           ,   NULL   , NULL               , 0, True,   -1     },
 
 };
 //============================================//
 // убрать обводку 
 static const char *noborder_apps[] = {
  //   "Plank",       // Пример приложения
+    "polybar",
      NULL // Завершающий NULL для указания конца массива
 };
 //============================================//
 // прикрепить ко всем тегам 
 static const char *alltags_apps[] = {
    // "Plank",       // Пример: Plank
+    "polybar",
      NULL // Завершающий NULL
 };
 //============================================//
 //  Игнорировать определенное окно
 static const char *focusIgnore[] = {
     //"Plank",       // Пример: Plank
-     NULL // Завершающий NULL
+    "polybar",
+    //NULL // Завершающий NULL
 };
 //============================================//
 
@@ -188,8 +192,11 @@ static Keychord *keychords[]        = {
     // aplication [ super + a ] 
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_f}}, spawn,  {.v = browser } }),   //firefox
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_d}}, spawn,  SHCMD("vesktop")  }), //vesktop
-    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_c}}, spawn,  {.v = codeEditor } }),//vscode
-    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_t}}, spawn,  SHCMD("telegram-desktop")  }), //telegram-desktop
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_v}}, spawn,  {.v = codeEditor } }),//vscode
+    /* &((Keychord){2, {{MODKEY, XK_a}, {0,XK_c}}, spawn,   SHCMD("kitty --hold sh -c 'nvim'") }), //nvim */
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_c}}, spawn,   SHCMD("$HOME/.local/bin/neovide") }), //nvim
+    &((Keychord){2, {{MODKEY, XK_a}, {0,XK_b}}, spawn,  SHCMD("kitty -e btop")  }), //btop
 //======================================================================//
     //screen [super + p ]
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}},  spawn,  SHCMD("$HOME/.suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
@@ -216,6 +223,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //changeKeyboard
     &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
+    &((Keychord){1, {{ControlMask, 0x60 }}, spawn,  SHCMD("$HOME/.suckless/scripts/caps.sh")  }),
 //======================================================================//
 	//rofi
     &((Keychord){1, {{MODKEY, XK_r}},           spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),
@@ -346,6 +354,9 @@ static Keychord *keychords[]        = {
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_m},{0|ShiftMask, XK_g}}, toggle_always_smartgaps_monocle, { 0 } }),// toggle_smartgaps_monocle
     //awesome bar
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_t}}, toggleshowtitle,   { 0 } }),// toggleshowtitle 
+    &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_h}}, hidewin,   { 0 } }),        // hidewin 
+    &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_s}}, restorewin,   { 0 } }),     // restorewin 
+    &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0|ShiftMask, XK_s}}, showall,   { 0 } }),     // restorewin 
 
     //===================================================================================//
     // click mouse
@@ -367,7 +378,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //reload && exit
     &((Keychord){1, {{MODKEY|ALTKEY, XK_q}}, quit, { 0 } }  ),
-    &((Keychord){1, {{MODKEY, XK_q}}, spawn, SHCMD("sudo systemctl restart display-manager") }  ),
+    &((Keychord){1, {{MODKEY|ControlMask, XK_q}}, spawn, SHCMD("pkill -f dwm") }  ),
 //======================================================================//
     //Gaps 
     &((Keychord){0, {{0, 0}}, incrgaps,   { .i = +1 } }     ),

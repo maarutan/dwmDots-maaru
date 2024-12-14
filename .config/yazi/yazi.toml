@@ -35,9 +35,10 @@ extract = [
 	{ run = 'ouch d -y "$@"', desc = "Extract here with ouch", for = "unix" },
 ]
 edit = [
-	{ run = 'nvim "$@"', block = true, for = "unix" },
-        { run = 'code "$@"', block = true, for = "unix" },
-        { run = 'source "$@"',block = true, for = "unix" },
+  { run = 'nvim "$@"', block = true, for = "unix" },
+  { run = '~/.local/bin/neovide "$@"', block = true, for = "unix" },
+  { run = 'code "$@"', block = true, for = "unix" },
+  { run = 'source "$@"',block = true, for = "unix" },
 ]
 play = [
 	{ run = 'mpv "$@"', orphan = true, for = "unix" },
