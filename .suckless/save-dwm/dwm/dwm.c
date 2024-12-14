@@ -1143,6 +1143,7 @@ createmon(void)
 	return m;
 }
 
+
 void
 destroynotify(XEvent *e)
 {
@@ -1783,9 +1784,6 @@ killclient(const Arg *arg)
 }
 
 
-
-
-
 void
 manage(Window w, XWindowAttributes *wa)
 {
@@ -1855,27 +1853,6 @@ manage(Window w, XWindowAttributes *wa)
         applyrules(c);
     }
 
-    // Восстановление тегов и мониторинга
-    {
-        int format;
-        unsigned long *data, n, extra;
-        Monitor *m;
-        Atom atom;
-
-        if (XGetWindowProperty(dpy, c->win, netatom[NetClientInfo], 0L, 2L, False, XA_CARDINAL,
-                               &atom, &format, &n, &extra, (unsigned char **)&data) == Success && n == 2) {
-            c->tags = *data;
-            for (m = mons; m; m = m->next) {
-                if (m->num == *(data + 1)) {
-                    c->mon = m;
-                    break;
-                }
-            }
-        }
-        if (n > 0)
-            XFree(data);
-    }
-
     setclienttagprop(c); /* Устанавливаем сохранённые теги */
 
     // Логика обработки класса окна
@@ -1911,16 +1888,17 @@ manage(Window w, XWindowAttributes *wa)
     XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
     configure(c);
     updatewindowtype(c);
+
+    // Обновляем размерные подсказки перед центрированием
     updatesizehints(c);
     updatewmhints(c);
 
-    // Центрируем окно, если оно плавающее
-    if (c->isfloating) {
-        c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
-        c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
-        XMoveWindow(dpy, c->win, c->x, c->y);
-        XRaiseWindow(dpy, c->win);
-    }
+    // Центрируем окно (убрали условия, чтобы центрировать всегда)
+    c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+    c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+
+    // Устанавливаем координаты
+    XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 
     if (attachbelow)
         attachBelow(c);
@@ -1930,7 +1908,6 @@ manage(Window w, XWindowAttributes *wa)
     attachstack(c);
     XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
                     (unsigned char *)&(c->win), 1);
-    XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h);
     setclientstate(c, NormalState);
 
     if (c->mon == selmon)

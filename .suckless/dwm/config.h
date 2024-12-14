@@ -11,6 +11,10 @@
 // appearance 
 static const unsigned int borderpx       = 4 ;       // border pixel of windows 
 static const unsigned int snap           = 0 ;       // snap pixel 
+
+//========================================//
+static int floatposgrid_x           = 5;        /* float grid columns */
+static int floatposgrid_y           = 5;        /* float grid rows */
 //========================================//
 //systray
 static const unsigned int systraypinning = 0 ;       // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
@@ -82,16 +86,15 @@ static const char *tags[] = {   " 󱍢 ", "  ", " 󰈹 ", "  ", " 󰣇 ", 
 static unsigned int prevtags         = 0   ;     // Хранение предыдущего тега
 static Client *prevclient            = NULL;     // Хранение предыдущего окна
 static const Layout *prevlayout      = NULL;     // Переменная для хранения предыдущего layout
-static const Rule rules[]            =     {
-	// class            instance   title        tags maskis | floating | monitor 
-    { "firefox"         ,   NULL   , NULL               , 1 << 2, 0, -1     },
-    { "telegram-desktop",   NULL   , NULL               , 1 << 3, 0, -1     },
-    { "TelegramDesktop" ,   NULL   , NULL               , 1 << 3, 0, -1     },
-    { "kitty"           ,   NULL   , "neofetch_terminal", 1 << 0, 0, -1     },
-    { "vesktop"         ,   NULL   , NULL               , 0, True,   -1     },
-    { "Mechvibes"       ,   NULL   , NULL               , 0, True,   -1     },
-    { "steam"           ,   NULL   , NULL               , 0, True,   -1     },
-
+static const Rule rules[] = {
+    /* class            instance   title              tags mask | isfloating | floatpos | monitor */
+    { "firefox"         , NULL   , NULL               , 1 << 2,       0,        NULL     , -1 },
+    { "TelegramDesktop" , NULL   , NULL               , 0,            1,        "75% 50% 570W 944H"         , -1 },
+    { "WebApp-monkey5058" , NULL   , NULL             , 0,            1,        "30% 50% 570W 844H"         , -1 },
+    { "kitty"           , NULL   , "neofetch_terminal", 1 << 0,       0,        NULL     , -1 },
+    { "vesktop"         , NULL   , NULL               , 0,            1,        "30% 50% 1012W 576H"        , -1 },
+    { "Mechvibes"       , NULL   , NULL               , 0,            1,        NULL     , -1 },
+    { "steam"           , NULL   , NULL               , 0,            1,        NULL     , -1 },
 };
 //============================================//
 // убрать обводку 
@@ -398,7 +401,48 @@ static Keychord *keychords[]        = {
     &((Keychord){0, {{0, 0}}, togglegaps, { 0       } }     ),
     &((Keychord){0, {{0, 0}}, defaultgaps,{ 0       } }     ),
     //===================================================================================//
-};
+    /* Client position is limited to monitor window area */
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26x -26y" } }), // ↖
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "  0x -26y" } }), // ↑
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26x -26y" } }), // ↗
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26x   0y" } }), // ←
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26x   0y" } }), // →
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26x  26y" } }), // ↙
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "  0x  26y" } }), // ↓
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26x  26y" } }), // ↘
+    
+    /* Absolute positioning (allows moving windows between monitors) */
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26a -26a" } }), // ↖
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "  0a -26a" } }), // ↑
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26a -26a" } }), // ↗
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26a   0a" } }), // ←
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26a   0a" } }), // →
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26a  26a" } }), // ↙
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "  0a  26a" } }), // ↓
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26a  26a" } }), // ↘
+    
+    /* Resize client, client center position is fixed which means that client expands in all directions */
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26w -26h" } }), // ↖
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "  0w -26h" } }), // ↑
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26w -26h" } }), // ↗
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26w   0h" } }), // ←
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "800W 800H" } }), // ·
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26w   0h" } }), // →
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-26w  26h" } }), // ↙
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "  0w  26h" } }), // ↓
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 26w  26h" } }), // ↘
+    
+    /* Client is positioned in a floating grid, movement is relative to client's current position */
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-1p -1p" } }), // ↖
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 0p -1p" } }), // ↑
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 1p -1p" } }), // ↗
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-1p  0p" } }), // ←
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 0p  0p" } }), // ·
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 1p  0p" } }), // →
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = "-1p  1p" } }), // ↙
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 0p  1p" } }), // ↓
+    &((Keychord){1, {{0, 0}}, floatpos, {.v = " 1p  1p" } }), // ↘
+    };
 // button definitions 
 // click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin 
 //======================================================================//

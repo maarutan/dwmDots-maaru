@@ -121,6 +121,8 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
+  int hasfloatpos; // Флаг, указывающий на наличие позиции floatpos
+	int ignoresizehints;
 	Client *next;
 	Client *snext;
 	Monitor *mon;
@@ -179,6 +181,7 @@ typedef struct {
 	const char *title;
 	unsigned int tags;
 	int isfloating;
+	const char *floatpos;
 	int monitor;
 } Rule;
 
@@ -214,11 +217,13 @@ static void drawbar(Monitor *m);
 static void drawbars(void);
 static void enternotify(XEvent *e);
 static void expose(XEvent *e);
+static void floatpos(const Arg *arg);
 static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
+static void getfloatpos(int pos, char pCh, int size, char sCh, int min_p, int max_s, int cp, int cs, int cbw, int defgrid, int *out_p, int *out_s);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
 static unsigned int getsystraywidth();
@@ -321,11 +326,13 @@ void hidewin(const Arg *arg);
 void restorewin(const Arg *arg);
 void showall(const Arg *arg);
 
+
 /* variables */
 static Systray *systray = NULL;
 static const char broken[] = "broken";
 static char stext[256];
 static Client *hidden_windows[NUMTAGS];
+void setfloatpos(Client *c, const char *floatpos);
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh;               /* bar height */
@@ -689,6 +696,8 @@ applyrules(Client *c)
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
+			if (c->isfloating && r->floatpos)
+				setfloatpos(c, r->floatpos);
 		}
 	}
 	if (ch.res_class)
@@ -730,9 +739,10 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 		*h = bh;
 	if (*w < bh)
 		*w = bh;
-	if (resizehints || c->isfloating || !c->mon->lt[c->mon->sellt]->arrange) {
+	if (!c->ignoresizehints && (resizehints || c->isfloating || !c->mon->lt[c->mon->sellt]->arrange)) {
 		if (!c->hintsvalid)
 			updatesizehints(c);
+
 		/* see last two sentences in ICCCM 4.1.2.3 */
 		baseismin = c->basew == c->minw && c->baseh == c->minh;
 		if (!baseismin) { /* temporarily remove base dimensions */
@@ -1143,6 +1153,7 @@ createmon(void)
 	return m;
 }
 
+
 void
 destroynotify(XEvent *e)
 {
@@ -1165,6 +1176,21 @@ detach(Client *c)
 
 	for (tc = &c->mon->clients; *tc && *tc != c; tc = &(*tc)->next);
 	*tc = c->next;
+}
+
+void
+floatpos(const Arg *arg)
+{
+	Client *c = selmon->sel;
+
+	if (!c || (selmon->lt[selmon->sellt]->arrange && !c->isfloating))
+		return;
+
+	setfloatpos(c, (char *)arg->v);
+	resizeclient(c, c->x, c->y, c->w, c->h);
+
+	XRaiseWindow(dpy, c->win);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w/2, c->h/2);
 }
 
 void
@@ -1431,6 +1457,124 @@ getsystraywidth()
 	if(showsystray)
 		for(i = systray->icons; i; w += i->w + systrayspacing, i = i->next) ;
 	return w ? w + systrayspacing : 1;
+}
+
+void
+getfloatpos(int pos, char pCh, int size, char sCh, int min_p, int max_s, int cp, int cs, int cbw, int defgrid, int *out_p, int *out_s)
+{
+	int abs_p, abs_s, i, delta, rest;
+
+	abs_p = pCh == 'A' || pCh == 'a';
+	abs_s = sCh == 'A' || sCh == 'a';
+
+	cs += 2*cbw;
+
+	switch(pCh) {
+	case 'A': // absolute position
+		cp = pos;
+		break;
+	case 'a': // absolute relative position
+		cp += pos;
+		break;
+	case 'y':
+	case 'x': // client relative position
+		cp = MIN(cp + pos, min_p + max_s);
+		break;
+	case 'Y':
+	case 'X': // client position relative to monitor
+		cp = min_p + MIN(pos, max_s);
+		break;
+	case 'S': // fixed client position (sticky)
+	case 'C': // fixed client position (center)
+	case 'Z': // fixed client right-hand position (position + size)
+		if (pos == -1)
+			break;
+		pos = MAX(MIN(pos, max_s), 0);
+		if (pCh == 'Z')
+			cs = abs((cp + cs) - (min_p + pos));
+		else if (pCh == 'C')
+			cs = abs((cp + cs / 2) - (min_p + pos));
+		else
+			cs = abs(cp - (min_p + pos));
+		cp = min_p + pos;
+		sCh = 0; // size determined by position, override defined size
+		break;
+	case 'G': // grid
+		if (pos <= 0)
+			pos = defgrid; // default configurable
+		if (size == 0 || pos < 2 || (sCh != 'p' && sCh != 'P'))
+			break;
+		delta = (max_s - cs) / (pos - 1);
+		rest = max_s - cs - delta * (pos - 1);
+		if (sCh == 'P') {
+			if (size < 1 || size > pos)
+				break;
+			cp = min_p + delta * (size - 1);
+		} else {
+			for (i = 0; i < pos && cp >= min_p + delta * i + (i > pos - rest ? i + rest - pos + 1 : 0); i++);
+			cp = min_p + delta * (MAX(MIN(i + size, pos), 1) - 1) + (i > pos - rest ? i + rest - pos + 1 : 0);
+		}
+		break;
+	}
+
+	switch(sCh) {
+	case 'A': // absolute size
+		cs = size;
+		break;
+	case 'a': // absolute relative size
+		cs = MAX(1, cs + size);
+		break;
+	case '%': // client size percentage in relation to monitor window area size
+		if (size <= 0)
+			break;
+		size = max_s * MIN(size, 100) / 100;
+		/* falls through */
+	case 'h':
+	case 'w': // size relative to client
+		if (sCh == 'w' || sCh == 'h') {
+			if (size == 0)
+				break;
+			size += cs;
+		}
+		/* falls through */
+	case 'H':
+	case 'W': // normal size, position takes precedence
+		if (pCh == 'S' && cp + size > min_p + max_s)
+			size = min_p + max_s - cp;
+		else if (size > max_s)
+			size = max_s;
+
+		if (pCh == 'C') { // fixed client center, expand or contract client
+			delta = size - cs;
+			if (delta < 0 || (cp - delta / 2 + size <= min_p + max_s))
+				cp -= delta / 2;
+			else if (cp - delta / 2 < min_p)
+				cp = min_p;
+			else if (delta)
+				cp = min_p + max_s;
+		} else if (pCh == 'Z')
+			cp -= size - cs;
+
+		cs = size;
+		break;
+	}
+
+	if (pCh == '%') // client mid-point position in relation to monitor window area size
+		cp = min_p + max_s * MAX(MIN(pos, 100), 0) / 100 - (cs) / 2;
+	if (pCh == 'm' || pCh == 'M')
+		cp = pos - cs / 2;
+
+	if (!abs_p && cp < min_p)
+		cp = min_p;
+	if (cp + cs > min_p + max_s && !(abs_p && abs_s)) {
+		if (abs_p || cp == min_p)
+			cs = min_p + max_s - cp;
+		else
+			cp = min_p + max_s - cs;
+	}
+
+	*out_p = cp;
+	*out_s = MAX(cs - 2*cbw, 1);
 }
 
 int
@@ -1783,9 +1927,6 @@ killclient(const Arg *arg)
 }
 
 
-
-
-
 void
 manage(Window w, XWindowAttributes *wa)
 {
@@ -1794,143 +1935,75 @@ manage(Window w, XWindowAttributes *wa)
     XWindowChanges wc;
 
     c = ecalloc(1, sizeof(Client));
+    c->hasfloatpos = 0; // По умолчанию позиция не задана
     c->win = w;
+
     /* geometry */
     c->x = c->oldx = wa->x;
     c->y = c->oldy = wa->y;
     c->w = c->oldw = wa->width;
     c->h = c->oldh = wa->height;
     c->oldbw = wa->border_width;
-    c->cfact = 1.0;
+    c->ignoresizehints = 0; // Для плавающих окон
 
     updatetitle(c);
+    c->bw = borderpx; // Устанавливаем ширину границы
 
-    // Проверка на _NET_WM_WINDOW_TYPE_DOCK
-    Atom type = None;
-    unsigned char *data = NULL;
-    int format;
-    unsigned long nitems, bytes_after;
-
-    if (XGetWindowProperty(dpy, w, netatom[NetWMWindowType], 0L, 1L, False, XA_ATOM,
-                           &type, &format, &nitems, &bytes_after, &data) == Success && data) {
-        if (*(Atom *)data == netatom[NetWMWindowTypeDock]) {
-            XFree(data);
-
-            // Учитываем _NET_WM_STRUT_PARTIAL, если оно есть
-            long struts[4] = {0};
-            if (XGetWindowProperty(dpy, w, XInternAtom(dpy, "_NET_WM_STRUT_PARTIAL", False),
-                                   0L, 4L, False, XA_CARDINAL, &type, &format,
-                                   &nitems, &bytes_after, (unsigned char **)&data) == Success && data) {
-                memcpy(struts, data, sizeof(long) * 4);
-                XFree(data);
-
-                // Корректируем область монитора
-                if (struts[0] > 0) selmon->wx += struts[0]; // Левый
-                if (struts[1] > 0) selmon->ww -= struts[1]; // Правый
-                if (struts[2] > 0) selmon->wy += struts[2]; // Верхний
-                if (struts[3] > 0) selmon->wh -= struts[3]; // Нижний
-            }
-
-            // Поднимаем окно наверх и отображаем
-            XRaiseWindow(dpy, w);
-            XMapWindow(dpy, w);
-
-            // Добавляем DOCK окно в _NET_CLIENT_LIST
-            XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32,
-                            PropModeAppend, (unsigned char *)&w, 1);
-
-            // DOCK окна не добавляются в общий список клиентов
-            free(c);
-            return;
-        }
-        XFree(data);
-    }
-
-    // Если это transient окно, наследуем теги
+    // Проверяем, является ли окно transient, и наследуем теги
     if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
         c->mon = t->mon;
         c->tags = t->tags;
     } else {
         c->mon = selmon;
-        applyrules(c);
+        applyrules(c); // Применяем правила
     }
 
-    // Восстановление тегов и мониторинга
-    {
-        int format;
-        unsigned long *data, n, extra;
-        Monitor *m;
-        Atom atom;
-
-        if (XGetWindowProperty(dpy, c->win, netatom[NetClientInfo], 0L, 2L, False, XA_CARDINAL,
-                               &atom, &format, &n, &extra, (unsigned char **)&data) == Success && n == 2) {
-            c->tags = *data;
-            for (m = mons; m; m = m->next) {
-                if (m->num == *(data + 1)) {
-                    c->mon = m;
-                    break;
-                }
-            }
-        }
-        if (n > 0)
-            XFree(data);
-    }
-
-    setclienttagprop(c); /* Устанавливаем сохранённые теги */
-
-    // Логика обработки класса окна
-    char class[256] = "";
-    XClassHint ch = { NULL, NULL };
-
-    if (XGetClassHint(dpy, c->win, &ch)) {
-        if (ch.res_class)
-            strncpy(class, ch.res_class, sizeof(class) - 1);
-
-        // Проверка на принадлежность к alltags_apps
-        if (is_alltags_app(class)) {
-            c->tags = ~0; // Устанавливаем окно на все теги
-        }
-
-        // Устанавливаем бордеры
-        if (is_noborder_app(class)) {
-            c->bw = 0; // Убираем границы
-        } else {
-            c->bw = borderpx; // Устанавливаем стандартные границы
-        }
-
-        if (ch.res_class)
-            XFree(ch.res_class);
-        if (ch.res_name)
-            XFree(ch.res_name);
-    } else {
-        c->bw = borderpx; // Если класс не удалось определить, применяем стандартные границы
-    }
+    // Ограничиваем окно размером монитора
+    if (c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
+        c->x = c->mon->mx + c->mon->mw - WIDTH(c);
+    if (c->y + HEIGHT(c) > c->mon->my + c->mon->mh)
+        c->y = c->mon->my + c->mon->mh - HEIGHT(c);
+    c->x = MAX(c->x, c->mon->wx);
+    c->y = MAX(c->y, c->mon->wy);
 
     wc.border_width = c->bw;
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
     XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
+
     configure(c);
     updatewindowtype(c);
     updatesizehints(c);
     updatewmhints(c);
 
-    // Центрируем окно, если оно плавающее
+    // Устанавливаем позицию floatpos или центрируем окно
+
     if (c->isfloating) {
-        c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
-        c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
-        XMoveWindow(dpy, c->win, c->x, c->y);
-        XRaiseWindow(dpy, c->win);
+        if (c->hasfloatpos == 0) {
+            // Центрируем окно, если floatpos не задан
+            c->x = c->mon->wx + (c->mon->ww - WIDTH(c)) / 2;
+            c->y = c->mon->wy + (c->mon->wh - HEIGHT(c)) / 2;
+        }
+        // Если c->hasfloatpos == 1, используем позицию из floatpos (ничего не делаем)
+    } else {
+        // Центрируем окно, если оно не плавающее
+        c->x = c->mon->wx + (c->mon->ww - WIDTH(c)) / 2;
+        c->y = c->mon->wy + (c->mon->wh - HEIGHT(c)) / 2;
     }
 
+    // Перемещаем и изменяем размеры окна
+    XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+
+    // Присоединяем окно
     if (attachbelow)
         attachBelow(c);
     else
         attach(c);
 
     attachstack(c);
+
+    // Добавляем клиента в _NET_CLIENT_LIST
     XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
                     (unsigned char *)&(c->win), 1);
-    XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h);
     setclientstate(c, NormalState);
 
     if (c->mon == selmon)
@@ -1940,10 +2013,9 @@ manage(Window w, XWindowAttributes *wa)
     arrange(c->mon);
     XMapWindow(dpy, c->win);
 
-    // Обновляем _NET_CLIENT_LIST
-    updateclientlist();
+    updateclientlist(); // Обновляем список клиентов
 
-    focus(NULL);
+    focus(NULL); // Фокусируем окно
 }
 
 
@@ -2009,6 +2081,63 @@ motionnotify(XEvent *e)
 		focus(NULL);
 	}
 	mon = m;
+}
+
+void
+setfloatpos(Client *c, const char *floatpos)
+{
+    char xCh, yCh, wCh, hCh;
+    int x, y, w, h, wx, ww, wy, wh;
+
+    if (!c || !floatpos)
+        return;
+
+    c->hasfloatpos = 1; // Устанавливаем флаг floatpos
+
+    // Проверка на плавающее окно
+    if (selmon->lt[selmon->sellt]->arrange && !c->isfloating)
+        return;
+
+    // Разбор строки позиции
+    switch (sscanf(floatpos, "%d%c %d%c %d%c %d%c", &x, &xCh, &y, &yCh, &w, &wCh, &h, &hCh)) {
+    case 4:
+        if (xCh == 'w' || xCh == 'W') { // Относительные размеры окна
+            w = x; wCh = xCh;
+            h = y; hCh = yCh;
+            x = -1; xCh = 'C';
+            y = -1; yCh = 'C';
+        } else if (xCh == 'p' || xCh == 'P') { // Процентные размеры
+            w = x; wCh = xCh;
+            h = y; hCh = yCh;
+            x = 0; xCh = 'G';
+            y = 0; yCh = 'G';
+        } else if (xCh == 'm' || xCh == 'M') { // Абсолютное положение мыши
+            getrootptr(&x, &y);
+        } else { // Если ничего не совпало
+            w = 0; wCh = 0;
+            h = 0; hCh = 0;
+        }
+        break;
+    case 8:
+        if (xCh == 'm' || xCh == 'M') // Мышь для абсолютных координат
+            getrootptr(&x, &y);
+        break;
+    default:
+        return; // Если ничего не подходит
+    }
+
+    // Область монитора
+    wx = c->mon->wx;
+    wy = c->mon->wy;
+    ww = c->mon->ww;
+    wh = c->mon->wh;
+
+    // Игнорировать подсказки по размеру
+    c->ignoresizehints = 1;
+
+    // Установка позиции и размера окна
+    getfloatpos(x, xCh, w, wCh, wx, ww, c->x, c->w, c->bw, floatposgrid_x, &c->x, &c->w);
+    getfloatpos(y, yCh, h, hCh, wy, wh, c->y, c->h, c->bw, floatposgrid_y, &c->y, &c->h);
 }
 
 void

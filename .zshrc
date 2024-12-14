@@ -101,3 +101,4 @@ function yazi() {
 
     rm -f -- "$tmp"
 }
+export PATH=~/.npm-global/bin:$PATH

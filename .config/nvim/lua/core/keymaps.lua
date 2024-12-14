@@ -131,3 +131,5 @@ vim.cmd([[
 vim.keymap.set("n", "<leader>oc", function()
 	vim.cmd("edit ~/.config/nvim/init.lua")
 end, { noremap = true, silent = true, desc = "Открыть init.lua" })
+vim.keymap.set("n", "l", "<right>", { noremap = true, silent = true })
+vim.keymap.set("v", "l", "<right>", { noremap = true, silent = true })
