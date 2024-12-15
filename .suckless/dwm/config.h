@@ -108,6 +108,7 @@ static const char *noborder_apps[] = {
 static const char *alltags_apps[] = {
    // "Plank",       // Пример: Plank
     "polybar",
+    /* "TelegramDesktop", */
      NULL // Завершающий NULL
 };
 //============================================//
@@ -118,7 +119,13 @@ static const char *focusIgnore[] = {
     //NULL // Завершающий NULL
 };
 //============================================//
-
+static const char *nosavetags_classes[] = {
+    "TelegramDesktop", // Пример класса, который не будет сохраняться
+    "vesktop",
+    "steam",
+    NULL
+};
+//============================================//
 /* layout(s) */
 static const float mfact             = 0.55 ;    // factor of master area size [0.05..0.95] 
 static const int nmaster             = 1    ;    // number of clients in master area 

@@ -325,6 +325,8 @@ void updateworkarea(void);
 void hidewin(const Arg *arg);
 void restorewin(const Arg *arg);
 void showall(const Arg *arg);
+void saveclienttags(Client *c);
+void restoreclienttags(Client *c);
 
 
 /* variables */
@@ -1692,7 +1694,7 @@ drawbar(Monitor *m)
         int line_offset = (w - line_width) / 2;  // Сдвиг для центрирования линии
 
         // Перемещаем линию вверх
-        int line_y_position = bh - line_height - 23;  // Сдвигаем линию вверх на 23 пикселя
+        int line_y_position = bh - line_height - 19;  // Сдвигаем линию вверх на 19 пикселя
 
         // Рисуем линию по центру с измененной высотой и новым вертикальным смещением
         drw_rect(drw, x + line_offset, line_y_position, line_width, line_height, 1, 0);  // Линия по центру
@@ -1927,6 +1929,7 @@ killclient(const Arg *arg)
 }
 
 
+
 void
 manage(Window w, XWindowAttributes *wa)
 {
@@ -1944,9 +1947,52 @@ manage(Window w, XWindowAttributes *wa)
     c->w = c->oldw = wa->width;
     c->h = c->oldh = wa->height;
     c->oldbw = wa->border_width;
+    c->cfact = 1.0;
     c->ignoresizehints = 0; // Для плавающих окон
 
     updatetitle(c);
+
+    // Проверка на _NET_WM_WINDOW_TYPE_DOCK
+    Atom type = None;
+    unsigned char *data = NULL;
+    int format;
+    unsigned long nitems, bytes_after;
+
+    if (XGetWindowProperty(dpy, w, netatom[NetWMWindowType], 0L, 1L, False, XA_ATOM,
+                           &type, &format, &nitems, &bytes_after, &data) == Success && data) {
+        if (*(Atom *)data == netatom[NetWMWindowTypeDock]) {
+            XFree(data);
+
+            // Учитываем _NET_WM_STRUT_PARTIAL, если оно есть
+            long struts[4] = {0};
+            if (XGetWindowProperty(dpy, w, XInternAtom(dpy, "_NET_WM_STRUT_PARTIAL", False),
+                                   0L, 4L, False, XA_CARDINAL, &type, &format,
+                                   &nitems, &bytes_after, (unsigned char **)&data) == Success && data) {
+                memcpy(struts, data, sizeof(long) * 4);
+                XFree(data);
+
+                // Корректируем область монитора
+                if (struts[0] > 0) selmon->wx += struts[0]; // Левый
+                if (struts[1] > 0) selmon->ww -= struts[1]; // Правый
+                if (struts[2] > 0) selmon->wy += struts[2]; // Верхний
+                if (struts[3] > 0) selmon->wh -= struts[3]; // Нижний
+            }
+
+            // Поднимаем окно наверх и отображаем
+            XRaiseWindow(dpy, w);
+            XMapWindow(dpy, w);
+
+            // Добавляем DOCK окно в _NET_CLIENT_LIST
+            XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32,
+                            PropModeAppend, (unsigned char *)&w, 1);
+
+            // DOCK окна не добавляются в общий список клиентов
+            free(c);
+            return;
+        }
+        XFree(data);
+    }
+
     c->bw = borderpx; // Устанавливаем ширину границы
 
     // Проверяем, является ли окно transient, и наследуем теги
@@ -1958,6 +2004,8 @@ manage(Window w, XWindowAttributes *wa)
         applyrules(c); // Применяем правила
     }
 
+    restoreclienttags(c); // Восстанавливаем теги клиента при управлении
+
     // Ограничиваем окно размером монитора
     if (c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
         c->x = c->mon->mx + c->mon->mw - WIDTH(c);
@@ -1965,6 +2013,34 @@ manage(Window w, XWindowAttributes *wa)
         c->y = c->mon->my + c->mon->mh - HEIGHT(c);
     c->x = MAX(c->x, c->mon->wx);
     c->y = MAX(c->y, c->mon->wy);
+
+    // Логика обработки класса окна
+    char class[256] = "";
+    XClassHint ch = { NULL, NULL };
+
+    if (XGetClassHint(dpy, c->win, &ch)) {
+        if (ch.res_class)
+            strncpy(class, ch.res_class, sizeof(class) - 1);
+
+        // Проверка на принадлежность к alltags_apps
+        if (is_alltags_app(class)) {
+            c->tags = ~0; // Устанавливаем окно на все теги
+        }
+
+        // Устанавливаем бордеры
+        if (is_noborder_app(class)) {
+            c->bw = 0; // Убираем границы
+        } else {
+            c->bw = borderpx; // Устанавливаем стандартные границы
+        }
+
+        if (ch.res_class)
+            XFree(ch.res_class);
+        if (ch.res_name)
+            XFree(ch.res_name);
+    } else {
+        c->bw = borderpx; // Если класс не удалось определить, применяем стандартные границы
+    }
 
     wc.border_width = c->bw;
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
@@ -1976,14 +2052,12 @@ manage(Window w, XWindowAttributes *wa)
     updatewmhints(c);
 
     // Устанавливаем позицию floatpos или центрируем окно
-
     if (c->isfloating) {
         if (c->hasfloatpos == 0) {
             // Центрируем окно, если floatpos не задан
             c->x = c->mon->wx + (c->mon->ww - WIDTH(c)) / 2;
             c->y = c->mon->wy + (c->mon->wh - HEIGHT(c)) / 2;
         }
-        // Если c->hasfloatpos == 1, используем позицию из floatpos (ничего не делаем)
     } else {
         // Центрируем окно, если оно не плавающее
         c->x = c->mon->wx + (c->mon->ww - WIDTH(c)) / 2;
@@ -2013,10 +2087,89 @@ manage(Window w, XWindowAttributes *wa)
     arrange(c->mon);
     XMapWindow(dpy, c->win);
 
+    saveclienttags(c); // Сохраняем теги клиента
+
     updateclientlist(); // Обновляем список клиентов
 
     focus(NULL); // Фокусируем окно
 }
+
+int is_nosavetags_class(const char *class) {
+    for (int i = 0; nosavetags_classes[i]; i++) {
+        if (strcmp(class, nosavetags_classes[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+void saveclienttags(Client *c) {
+    char class[256] = "";
+    XClassHint ch = { NULL, NULL };
+
+    if (XGetClassHint(dpy, c->win, &ch)) {
+        if (ch.res_class) {
+            strncpy(class, ch.res_class, sizeof(class) - 1);
+            if (is_nosavetags_class(class)) {
+                // Если класс в списке исключений, выходим
+                XFree(ch.res_class);
+                if (ch.res_name)
+                    XFree(ch.res_name);
+                return;
+            }
+        }
+        if (ch.res_class)
+            XFree(ch.res_class);
+        if (ch.res_name)
+            XFree(ch.res_name);
+    }
+
+    // Сохраняем теги и монитор
+    long data[2] = { c->tags, c->mon->num };
+    XChangeProperty(dpy, c->win, netatom[NetClientInfo], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 2);
+}
+
+void restoreclienttags(Client *c) {
+    char class[256] = "";
+    XClassHint ch = { NULL, NULL };
+
+    if (XGetClassHint(dpy, c->win, &ch)) {
+        if (ch.res_class) {
+            strncpy(class, ch.res_class, sizeof(class) - 1);
+            if (is_nosavetags_class(class)) {
+                // Если класс в списке исключений, выходим
+                XFree(ch.res_class);
+                if (ch.res_name)
+                    XFree(ch.res_name);
+                return;
+            }
+        }
+        if (ch.res_class)
+            XFree(ch.res_class);
+        if (ch.res_name)
+            XFree(ch.res_name);
+    }
+
+    // Восстанавливаем теги и монитор
+    Atom actual_type;
+    int actual_format;
+    unsigned long nitems, bytes_after;
+    unsigned long *data = NULL;
+
+    if (XGetWindowProperty(dpy, c->win, netatom[NetClientInfo], 0L, 2L, False, XA_CARDINAL,
+                           &actual_type, &actual_format, &nitems, &bytes_after, (unsigned char **)&data) == Success && nitems == 2) {
+        c->tags = data[0];
+        for (Monitor *m = mons; m; m = m->next) {
+            if (m->num == data[1]) {
+                c->mon = m;
+                break;
+            }
+        }
+    }
+    if (data)
+        XFree(data);
+}
+
+
 
 
 int is_noborder_app(const char *class) {

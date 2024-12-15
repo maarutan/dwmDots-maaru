@@ -1,6 +1,6 @@
 require("pacman").setup({
-	width = 30,
-	delay = 600,
+	width = 24,
+	delay = 400,
 	pacman_open = "C",
 	pacman_closed = "c",
 	path_food = "",
