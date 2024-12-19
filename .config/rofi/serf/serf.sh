@@ -1,12 +1,21 @@
+#
+# ███████╗███████╗██████╗ ███████╗    ██████╗  ██████╗ ███████╗██╗
+# ██╔════╝██╔════╝██╔══██╗██╔════╝    ██╔══██╗██╔═══██╗██╔════╝██║
+# ███████╗█████╗  ██████╔╝█████╗      ██████╔╝██║   ██║█████╗  ██║
+# ╚════██║██╔══╝  ██╔══██╗██╔══╝      ██╔══██╗██║   ██║██╔══╝  ██║
+# ███████║███████╗██║  ██║██║         ██║  ██║╚██████╔╝██║     ██║
+# ╚══════╝╚══════╝╚═╝  ╚═╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝
+#
+#
 #!/usr/bin/env bash
-
+#
 DEFAULT_PLATFORM="duckduckgo"  # Set the default platform (e.g., google, duckduckgo, list)
 DEFAULT_BROWSER="xdg-open"     # Set the browser: firefox, brave, google-chrome, or leave as xdg-open.
 HISTORY_FILE="$HOME/.config/rofi/serf/.history.txt"
 THEME_FILE="$HOME/.config/rofi/serf/config.rasi"
-
+#
 declare -A URLS
-
+#
 URLS=(
   ["google"]="https://www.google.com/search?q="
   ["bing"]="https://www.bing.com/search?q="
@@ -28,9 +37,9 @@ URLS=(
   ["vimawesome"]="http://vimawesome.com/?q="
   ["aur"]="https://aur.archlinux.org/packages/?K="
 )
-
+#
 [ ! -f "$HISTORY_FILE" ] && touch "$HISTORY_FILE"
-
+#
 check_browser_support() {
   if "$DEFAULT_BROWSER" --new-tab "about:blank" &>/dev/null; then
     echo "supports_new_tab"
@@ -38,42 +47,42 @@ check_browser_support() {
     echo "no_new_tab_support"
   fi
 }
-
+#
 gen_list() {
   for i in $(echo "${!URLS[@]}" | tr ' ' '\n' | sort); do
     echo "$i"
   done
 }
-
+#
 open_search() {
   local platform="$1"
   local search="$2"
   local url="${URLS[$platform]}$search"
-
+#
   echo "$search" >> "$HISTORY_FILE"
   sort -u -o "$HISTORY_FILE" "$HISTORY_FILE"
-
+#
   if [[ "$DEFAULT_BROWSER" == "firefox" ]] || [[ "$(check_browser_support)" == "supports_new_tab" ]]; then
     "$DEFAULT_BROWSER" --new-tab "$url" &>/dev/null &
   else
     "$DEFAULT_BROWSER" "$url" &>/dev/null &
   fi
 }
-
+#
 get_search() {
-  search=$( (cat "$HISTORY_FILE"; echo "/list"; echo "/remove") | rofi -dmenu -matching fuzzy -p " Search > " -theme "$THEME_FILE" )
+  search=$( (cat "$HISTORY_FILE"; echo "/list"; echo "/remove") | rofi -dmenu -matching fuzzy -p " Search > " -theme "$THEME_FILE" )
   echo "$search"
 }
-
+#
 main() {
   trap "notify-send 'Web Search' 'Exiting search.' -u low; exit 0" SIGINT SIGTERM
-
+#
   search=$(get_search)
-
+#
   if [[ "$search" == "/list" ]]; then
-    platform=$( (gen_list) | rofi -dmenu -matching fuzzy -no-custom -p " Search Platform > " -theme "$THEME_FILE" )
+    platform=$( (gen_list) | rofi -dmenu -matching fuzzy -no-custom -p " Search Platform > " -theme "$THEME_FILE" )
     if [[ -n "$platform" && -n "${URLS[$platform]}" ]]; then
-      search=$( (echo ) | rofi -dmenu -matching fuzzy -p " Enter search > " -theme "$THEME_FILE" )
+      search=$( (echo ) | rofi -dmenu -matching fuzzy -p " Enter search > " -theme "$THEME_FILE" )
       if [[ -n "$search" ]]; then
         open_search "$platform" "$search"
       else
@@ -91,5 +100,5 @@ main() {
     notify-send "Web Search" "No search entered!" -u critical
   fi
 }
-
+#
 main

@@ -59,7 +59,7 @@ entry {
     margin: 20px 0px 0px 10px;
     text-color: @fg-col;
     background-color: @bg-col;
-    placeholder:"search ...";
+    placeholder:"...";
 }
 
 listview {
