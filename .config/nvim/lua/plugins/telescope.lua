@@ -37,11 +37,10 @@ vim.keymap.set("n", "<leader>cs", builtin.colorscheme, { desc = "Выбор цв
 vim.keymap.set("n", "<leader>u", "<cmd>Telescope undo<CR>", { desc = "Открыть дерево undo" })
 vim.keymap.set("n", "<leader>fn", "<cmd>Telescope notify<CR>", { desc = "История уведомлений" })
 
--- Файловый браузер
 local function open_file_browser()
 	telescope.extensions.file_browser.file_browser({
 		prompt_title = "Select Directory",
-		cwd = "~",
+		cwd = vim.fn.getcwd(), -- Используем текущую рабочую директорию
 		attach_mappings = function(_, map)
 			local actions = require("telescope.actions")
 			local action_state = require("telescope.actions.state")
@@ -57,7 +56,6 @@ local function open_file_browser()
 end
 
 vim.keymap.set("n", "<leader>wd", open_file_browser, { desc = "Открыть file_browser" })
-
 -- Настройка Telescope
 telescope.setup({
 	defaults = {

@@ -6,7 +6,6 @@
 ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝██╗██║  ██║
  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝ ╚═╝╚═╝  ╚═╝
 //==========================================================*/
-#define EWMH_SUPPORT 1
 
 // appearance 
 static const unsigned int borderpx       = 4 ;       // border pixel of windows 
@@ -17,21 +16,21 @@ static int floatposgrid_x           = 5;        /* float grid columns */
 static int floatposgrid_y           = 5;        /* float grid rows */
 //========================================//
 //systray
-static const unsigned int systraypinning = 0 ;       // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
-static const unsigned int systrayonleft  = 0 ;       // 0: systray in the right corner, >0: systray on left of status text 
-static const unsigned int systrayspacing = 12;       // systray spacing 
-static const int systraypinningfailfirst = 1 ;       // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
-static                int showsystray    = 1 ;
+static const unsigned int systraypinning     =  0 ;       // 0: sloppy systray follows selected monitor, >0: pin systray to monitor X 
+static const unsigned int systrayonleft      =  0 ;       // 0: systray in the right corner, >0: systray on left of status text 
+static const unsigned int systrayspacing     =  12;       // systray spacing 
+static const int systraypinningfailfirst     =  1 ;       // 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor
+static                int showsystray        =  1 ;
+static const unsigned int systraybarspacing  = -8 ;       // Отступ между bar и systray
 //========================================//
 //show boxes
 int                 show_tag_boxes       = 2 ;       // Установите значение для переключателя: 1, 2, или 3
 //========================================//
-// dwm karnel dir
-#define RECOMPILE_COMMAND "cd $HOME/.suckless/dwm && make clean install; pgrep -x dwm | xargs -r kill || notify-send 'Ошибка при перекомпиляции dwm'"
-//========================================//
-
 //toggle_smartgaps_monocle
 int         always_smartgaps_monocle     = 1 ;       // 0 - стандартная логика, 1 - всегда включены smartgaps
+//========================================//
+// border bar
+static const char col_borderbar[] = "#2F2F49"; // Цвет рамки бара
 //========================================//
 //gap
 static const unsigned int gappiv         = 13 ;       // vert inner gap between windows 
@@ -42,7 +41,7 @@ static                int smartgaps      = 1  ;       // 1 means no outer gap wh
 static const unsigned int single_gappov  = 150;       // Вертикальный внешний отступ при одном окне
 static const unsigned int single_gappoh  = 40 ;       // Горизонтальный внешний отступ при одном окне
 //=======================================//
-static                int bottgaps       = 20 ;       // нижние отступы для dock 
+static                int bottgaps       = 30 ;       // нижние отступы для dock 
 #define               DOCK_NAME          "plank"      // class твоего дока
 //========================================//
 //awesome title
@@ -53,11 +52,11 @@ static const          int showbar        = 1  ;       // 0 means no bar
 static const          int topbar         = 1  ;       // 0 means bottom bar 
 //========================================//
 //bar paddings
-static const          int vertpad        = 10 ;       // vertical padding of bar 
-static const          int sidepad        = 10 ;       // horizontal padding of bar 
+static const          int vertpad        = 15 ;       // vertical padding of bar 
+static const          int sidepad        = 15 ;       // horizontal padding of bar 
 //========================================//
 // font
-static const char *fonts[]               = {  "FiraCode Nerd Font:size=12" }      ;
+static const char *fonts[]               = {  "FiraCode Nerd Font:size=11" }      ;
 //========================================//
 // color
 static const char col_noActiveFG[]       =  "#bbbbbb"   ;
@@ -73,7 +72,7 @@ static const char *colors[][3]           = {
 	[SchemeSel]      = { col_activeFG    ,  background2 , col_borderActive },
 	[SchemeTitle]    = { col_noActiveFG  ,  background  , col_noActive     }, // Цвет заголовков окон
   [SchemeTitleSel] = { col_activeFG    ,  background2 , col_borderActive }, // Цвет активного окна
-  [SchemeLine]     = { col_borderActive,  background2 , col_borderActive },
+  /* [SchemeLine]     = { col_borderActive,  background2 , col_borderActive }, */
 };
 // tagging 
 static const char *tags[] = {   " 󱍢 ", "  ", " 󰈹 ", "  ", " 󰣇 ", "  ", "  ", "  ", "  " };
@@ -89,9 +88,11 @@ static const Layout *prevlayout      = NULL;     // Переменная для 
 static const Rule rules[] = {
     /* class            instance   title              tags mask | isfloating | floatpos | monitor */
     { "firefox"         , NULL   , NULL               , 1 << 2,       0,        NULL     , -1 },
-    { "TelegramDesktop" , NULL   , NULL               , 0,            1,        "75% 50% 570W 944H"         , -1 },
+    { "TelegramDesktop" , NULL   , NULL               , 0,            1,        "80% 50% 570W 944H"         , -1 },
+    { "Blueman-manager" , NULL   , NULL               , 0,            1,        "25% 20% 800W 400H"         , -1 },
     { "WebApp-monkey5058" , NULL   , NULL             , 0,            1,        "30% 50% 570W 844H"         , -1 },
     { "kitty"           , NULL   , "neofetch_terminal", 1 << 0,       0,        NULL     , -1 },
+    { "kitty"           , NULL   , "nmtui"            , 0,            1,        "75% 35% 750W 800H"         , -1 },
     { "vesktop"         , NULL   , NULL               , 0,            1,        "30% 50% 1012W 576H"        , -1 },
     { "Mechvibes"       , NULL   , NULL               , 0,            1,        NULL     , -1 },
     { "steam"           , NULL   , NULL               , 0,            1,        NULL     , -1 },
@@ -158,11 +159,13 @@ static const Layout layouts[] = {
 // key definitions
 #define MODKEY Mod4Mask
 #define ALTKEY Mod1Mask
+#define SHIFT  ShiftMask 
+#define CTRL   ControlMask 
 #define TAGKEYS(KEY,TAG)                                                                                     \
        &((Keychord){1, {{MODKEY, KEY}},                                 view,           {.ui = 1 << TAG} }), \
-       &((Keychord){1, {{MODKEY|ControlMask, KEY}},                     toggleview,     {.ui = 1 << TAG} }), \
-       &((Keychord){1, {{MODKEY|ShiftMask, KEY}},                       tag,            {.ui = 1 << TAG} }), \
-       &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, KEY}},           toggletag,      {.ui = 1 << TAG} }),
+       &((Keychord){1, {{MODKEY|CTRL, KEY}},                     toggleview,     {.ui = 1 << TAG} }), \
+       &((Keychord){1, {{MODKEY|SHIFT, KEY}},                       tag,            {.ui = 1 << TAG} }), \
+       &((Keychord){1, {{MODKEY|CTRL|SHIFT, KEY}},           toggletag,      {.ui = 1 << TAG} }),
 ////======================================================================//
 ////======================================================================//
 ////======================================================================//
@@ -192,12 +195,14 @@ static Keychord *keychords[]        = {
 //======================================================================//
     // system [ super + s ]
     &((Keychord){2, {{MODKEY, XK_s}, {0,XK_u}} ,          spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/update.sh")  }), //update system
-    &((Keychord){2, {{MODKEY, XK_s}, {0|ShiftMask,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/pushdots.sh")  }), //pushDots
+    &((Keychord){2, {{MODKEY, XK_s}, {0|SHIFT,XK_p}}, spawn,  SHCMD("kitty -e  $HOME/.suckless/scripts/pushdots.sh")  }), //pushDots
     &((Keychord){2, {{MODKEY, XK_s}, {0,XK_r}} ,  recompile_and_restart,     { 0 }  }), //recompile dwm
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_p}}, spawn,           SHCMD("$HOME/.config/rofi/powermenu/type-2/powermenu.sh")  }), // powermenu
     &((Keychord){3, {{MODKEY, XK_s}, {0, XK_s} ,  {0, XK_t}},     toggleSystray,  { 0 }  }), // toggle systray
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_t}}, spawn,           SHCMD("$HOME/.suckless/scripts/toggle_touchpad.sh")  }), // toggle systray
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_d}}, toggle_bottGaps, {0}  }), // toggle bottGaps
+    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_b}}, spawn,           SHCMD("pgrep blueman-manager && pkill blueman-manager || blueman-manager &")  }), // blueman-manager
+    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_n}}, spawn,           SHCMD("pgrep -fx 'kitty --title nmtui nmtui-connect' && pkill -fx 'kitty --title nmtui nmtui-connect' || kitty --title nmtui nmtui-connect &") }), // network-manager
 //======================================================================//
     // aplication [ super + a ] 
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_f}}, spawn,  {.v = browser } }),   //firefox
@@ -211,7 +216,7 @@ static Keychord *keychords[]        = {
     //screen [super + p ]
     &((Keychord){2, {{MODKEY, XK_p}, {0,XK_c}},  spawn,  SHCMD("$HOME/.suckless/scripts/xcolor-picker.sh")  }),//	colorpicer
     &((Keychord){2, {{MODKEY, XK_p}, {0, XK_s}}, spawn,  SHCMD("flameshot gui")  }), //screen shot
-    &((Keychord){2, {{MODKEY, XK_p}, {0|ShiftMask, XK_c}}, spawn, SHCMD("$HOME/.suckless/scripts/clock.sh") }), //clock
+    &((Keychord){2, {{MODKEY, XK_p}, {0|SHIFT, XK_c}}, spawn, SHCMD("$HOME/.suckless/scripts/clock.sh") }), //clock
     &((Keychord){4, {{MODKEY, XK_p}, {0, XK_p},{0, XK_b},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh default; $HOME/.config/kitty/.other/toggle_config.sh default && $HOME/.config/dunst/.other/toggle_config.sh default") }), // picom blur
     &((Keychord){4, {{MODKEY, XK_p}, {0, XK_p},{0, XK_g},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh glass; $HOME/.config/kitty/.other/toggle_config.sh default && $HOME/.config/dunst/.other/toggle_config.sh default") }), // picom glass
     &((Keychord){4, {{MODKEY, XK_p}, {0, XK_p},{0, XK_o},{0,XK_t}}, spawn, SHCMD("$HOME/.config/picom/toggle_config.sh nOpacity; $HOME/.config/kitty/.other/toggle_config.sh nOpacity && $HOME/.config/dunst/.other/toggle_config.sh nOpacity") }), // picom no opacity
@@ -222,8 +227,8 @@ static Keychord *keychords[]        = {
     &((Keychord){2, {{MODKEY, XK_e}, {0, XK_n}}, spawn,  SHCMD("nemo")  }), // nemo
 //======================================================================//
     // web apps
-    &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_m}}, spawn,  SHCMD("firefox --class WebApp-monkey3985 --name WebApp-monkey3985 --profile $HOME/.local/share/ice/firefox/monkey3985 --no-remote 'https://monkeytype.com'")  }), //monkeytype
-    &((Keychord){2, {{MODKEY|ShiftMask, XK_f},{0,XK_g}}, spawn,  SHCMD("firefox --class WebApp-chatG2444 --name WebApp-chatG2444 --profile /home/maaru/.local/share/ice/firefox/chatG2444 --no-remote 'https://chatgpt.com/'")  }), //chat gpt
+    &((Keychord){2, {{MODKEY|SHIFT, XK_f},{0,XK_m}}, spawn,  SHCMD("firefox --class WebApp-monkey3985 --name WebApp-monkey3985 --profile $HOME/.local/share/ice/firefox/monkey3985 --no-remote 'https://monkeytype.com'")  }), //monkeytype
+    &((Keychord){2, {{MODKEY|SHIFT, XK_f},{0,XK_g}}, spawn,  SHCMD("firefox --class WebApp-chatG2444 --name WebApp-chatG2444 --profile /home/maaru/.local/share/ice/firefox/chatG2444 --no-remote 'https://chatgpt.com/'")  }), //chat gpt
 //======================================================================//
     //kitty 
     &((Keychord){1, {{MODKEY, XK_Return}},   spawn,          { .v = termcmd } }),
@@ -232,22 +237,22 @@ static Keychord *keychords[]        = {
     &((Keychord){1, {{MODKEY, XK_q}},       killclient,     {0} }),
 //======================================================================//
     //changeKeyboard
-    &((Keychord){1, {{ControlMask, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
-    &((Keychord){1, {{ControlMask, 0x60 }}, spawn,  SHCMD("$HOME/.suckless/scripts/caps.sh")  }),
+    &((Keychord){1, {{CTRL, 0xffe9}}, spawn,  SHCMD("pkill -RTMIN+1 dwmblocks; $HOME/.suckless/scripts/changeKeyboard.sh; setxkbmap -layout us,ru -option 'grp:ctrl_alt_toggle' -option 'ctrl:nocaps'")  }),
+    &((Keychord){1, {{CTRL, 0x60 }}, spawn,  SHCMD("$HOME/.suckless/scripts/caps.sh")  }),
 //======================================================================//
 	//rofi
     &((Keychord){1, {{MODKEY, XK_r}},           spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/launcher.sh")  }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_a}}, spawn,  SHCMD("$HOME/.config/rofi/launchers/type-3/launcher_1.sh")  }),
     &((Keychord){1, {{MODKEY, XK_v}},           spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/bufer.sh") }),
     &((Keychord){1, {{MODKEY|ALTKEY, XK_a}},    spawn,  SHCMD("$HOME/.config/rofi/launchers/type-2/emoji.sh")  }),
 //======================================================================//
     //wallpapers control
-    &((Keychord){1, {{MODKEY|ControlMask, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/change_wallpaper.sh left" ) }),
-    &((Keychord){1, {{MODKEY|ControlMask, 0x5d}}, spawn, SHCMD("$HOME/.suckless/scripts/change_wallpaper.sh right") }),
+    &((Keychord){1, {{MODKEY|CTRL, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/change_wallpaper.sh left" ) }),
+    &((Keychord){1, {{MODKEY|CTRL, 0x5d}}, spawn, SHCMD("$HOME/.suckless/scripts/change_wallpaper.sh right") }),
 //======================================================================//
 	// Управление Ярсотью 
-    &((Keychord){1, {{MODKEY|ShiftMask, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/brightnessControl.sh up") }),
-    &((Keychord){1, {{MODKEY|ShiftMask, 0x5d}}, spawn, SHCMD("$HOME/.suckless/scripts/brightnessControl.sh down") }),
+    &((Keychord){1, {{MODKEY|SHIFT, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/brightnessControl.sh up") }),
+    &((Keychord){1, {{MODKEY|SHIFT, 0x5d}}, spawn, SHCMD("$HOME/.suckless/scripts/brightnessControl.sh down") }),
 //======================================================================//
     // Управление Громкостью 
     &((Keychord){1, {{MODKEY, 0x5b}}, spawn, SHCMD("$HOME/.suckless/scripts/volume.sh up"  ) }),
@@ -261,48 +266,52 @@ static Keychord *keychords[]        = {
     &((Keychord){1, {{MODKEY, XK_h}}, moveresize, { .v = "-45x 0y 0w 0h" } }),
 //======================================================================//
     //resize flouting widnow
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 45h"  } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -45h" } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 45w 0h"  } }),
-    &((Keychord){1, {{MODKEY|ShiftMask|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -45w 0h" } }),
+    &((Keychord){1, {{MODKEY|SHIFT|ALTKEY, XK_j}}, moveresize, { .v = "0x 0y 0w 45h"  } }),
+    &((Keychord){1, {{MODKEY|SHIFT|ALTKEY, XK_k}}, moveresize, { .v = "0x 0y 0w -45h" } }),
+    &((Keychord){1, {{MODKEY|SHIFT|ALTKEY, XK_l}}, moveresize, { .v = "0x 0y 45w 0h"  } }),
+    &((Keychord){1, {{MODKEY|SHIFT|ALTKEY, XK_h}}, moveresize, { .v = "0x 0y -45w 0h" } }),
 //======================================================================//
     // move flouting window ALTKEY
-    &((Keychord){1, {{MODKEY|ControlMask, XK_k}}, moveresizeedge, { .v = "t" } }),
-    &((Keychord){1, {{MODKEY|ControlMask, XK_j}}, moveresizeedge, { .v = "b" } }),
-    &((Keychord){1, {{MODKEY|ControlMask, XK_h}}, moveresizeedge, { .v = "l" } }),
-    &((Keychord){1, {{MODKEY|ControlMask, XK_l}}, moveresizeedge, { .v = "r" } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_k}}, moveresizeedge, { .v = "t" } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_j}}, moveresizeedge, { .v = "b" } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_h}}, moveresizeedge, { .v = "l" } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_l}}, moveresizeedge, { .v = "r" } }),
 //======================================================================//
     //move flouting wondow
-    &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_k}}, moveresizeedge, { .v = "T" } }),
-    &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_j}}, moveresizeedge, { .v = "B" } }),
-    &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_h}}, moveresizeedge, { .v = "L" } }),
-    &((Keychord){1, {{MODKEY|ControlMask|ShiftMask, XK_l}}, moveresizeedge, { .v = "R" } }),
+    &((Keychord){1, {{MODKEY|CTRL|SHIFT, XK_k}}, moveresizeedge, { .v = "T" } }),
+    &((Keychord){1, {{MODKEY|CTRL|SHIFT, XK_j}}, moveresizeedge, { .v = "B" } }),
+    &((Keychord){1, {{MODKEY|CTRL|SHIFT, XK_h}}, moveresizeedge, { .v = "L" } }),
+    &((Keychord){1, {{MODKEY|CTRL|SHIFT, XK_l}}, moveresizeedge, { .v = "R" } }),
 //======================================================================//
 	//toggleBar 
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_w}}, togglebar, { 0 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_w}}, togglebar, { 0 } }),
 //======================================================================//
 	//focusStack 
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_j}}, focusstack, { .i = +1 } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_k}}, focusstack, { .i = -1 } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_h}}, focusstack, { .i = -0.05 } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_l}}, focusstack, { .i = +0.05 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_j}}, focusstack, { .i = +1 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_k}}, focusstack, { .i = -1 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_h}}, focusstack, { .i = -0.05 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_l}}, focusstack, { .i = +0.05 } }),
 //======================================================================//
     //resizeStack
-    &((Keychord){1, {{MODKEY|ControlMask, XK_l}}, setmfact, { .f = +0.05 } }),
-    &((Keychord){1, {{MODKEY|ControlMask, XK_h}}, setmfact, { .f = -0.05 } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_l}}, setmfact, { .f = +0.05 } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_h}}, setmfact, { .f = -0.05 } }),
 //======================================================================//
 	// tileStack modes I, D 
     &((Keychord){1, {{MODKEY, XK_u}}, incnmaster, { .i = +1 } }),
     &((Keychord){1, {{MODKEY, XK_d}}, incnmaster, { .i = -1 } }),
 //======================================================================//
 	//MoveStack 
-    &((Keychord){1, {{MODKEY|ControlMask, XK_j}}     , movestack, { .i = +1 } }),
-    &((Keychord){1, {{MODKEY|ControlMask, XK_k}}     , movestack, { .i = -1 } }),
-    &((Keychord){1, {{MODKEY|ControlMask, XK_Return}}, zoom, { 0 } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_j}}     , movestack, { .i = +1 } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_k}}     , movestack, { .i = -1 } }),
+    &((Keychord){1, {{MODKEY|CTRL, XK_Return}}, zoom, { 0 } }),
 //======================================================================//
 	//MoveWorkSpace
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_h}}, viewprev,  { 0 } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_l}}, viewnext,  { 0 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_h}}, viewprev,  { 0 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_l}}, viewnext,  { 0 } }),
+//======================================================================//
+  //MoveWorkSpaceWithMove
+    &((Keychord){1, {{MODKEY|SHIFT|CTRL, XK_h}}, viewprevwithmove, { 0 } }),
+    &((Keychord){1, {{MODKEY|SHIFT|CTRL, XK_l}}, viewnextwithmove, { 0 } }),
 //======================================================================//
 	//fullscreen
     &((Keychord){1, {{MODKEY, XK_f}}, togglefullscr, { 0 } }),
@@ -321,11 +330,11 @@ static Keychord *keychords[]        = {
     &((Keychord){1, {{MODKEY, XK_o}}, winview, { 0 } }),
 //======================================================================//
     // pin window
-    &((Keychord){1, {{MODKEY|ShiftMask   , XK_0}}, tag, { .ui = ~0 } }),
+    &((Keychord){1, {{MODKEY|SHIFT   , XK_0}}, tag, { .ui = ~0 } }),
     &((Keychord){1, {{MODKEY, XK_comma}} , focusmon, { .i = -1 } }),
     &((Keychord){1, {{MODKEY, XK_period}}, focusmon, { .i = +1 } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_comma}} , tagmon, { .i = -1 } }),
-    &((Keychord){1, {{MODKEY|ShiftMask, XK_period}}, tagmon, { .i = +1 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_comma}} , tagmon, { .i = -1 } }),
+    &((Keychord){1, {{MODKEY|SHIFT, XK_period}}, tagmon, { .i = +1 } }),
     //===================================================================================//
 	//layouts 
 	// 0 { "[@]",      spiral  /* first entry is default */    
@@ -359,14 +368,14 @@ static Keychord *keychords[]        = {
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_Tab}}, toggleAttachBelow       ,  { 0 } }), //toggleAttachBelow
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_w}},   togglefloating          ,  { 0 } }), //toggle floating
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_l}},   setlayout               ,  { 0 } }),// setlayout
-    &((Keychord){2, {{MODKEY, XK_w},{0|ShiftMask, XK_g}}, togglesmartgaps,  { 0 } }),// togglesmartgaps
+    &((Keychord){2, {{MODKEY, XK_w},{0|SHIFT, XK_g}}, togglesmartgaps,  { 0 } }),// togglesmartgaps
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_t}},   toggleTagBoxes          ,  { 0 } }),// toggle_tag_boxes
-    &((Keychord){3, {{MODKEY, XK_w},{0,XK_m},{0|ShiftMask, XK_g}}, toggle_always_smartgaps_monocle, { 0 } }),// toggle_smartgaps_monocle
-    //awesome bar
+    &((Keychord){3, {{MODKEY, XK_w},{0,XK_m},{0|SHIFT, XK_g}}, toggle_always_smartgaps_monocle, { 0 } }),// toggle_smartgaps_monocle
+    //awesome key
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_t}}, toggleshowtitle,   { 0 } }),// toggleshowtitle 
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_h}}, hidewin,   { 0 } }),        // hidewin 
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_s}}, restorewin,   { 0 } }),     // restorewin 
-    &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0|ShiftMask, XK_s}}, showall,   { 0 } }),     // restorewin 
+    &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0|SHIFT, XK_s}}, showall,   { 0 } }),     // restorewin 
 
     //===================================================================================//
     // click mouse
@@ -388,7 +397,7 @@ static Keychord *keychords[]        = {
 //======================================================================//
     //reload && exit
     &((Keychord){1, {{MODKEY|ALTKEY, XK_q}}, quit, { 0 } }  ),
-    &((Keychord){1, {{MODKEY|ControlMask, XK_q}}, spawn, SHCMD("pkill -f dwm") }  ),
+    &((Keychord){1, {{MODKEY|CTRL, XK_q}}, spawn, SHCMD("pkill -f dwm") }  ),
 //======================================================================//
     //Gaps 
     &((Keychord){0, {{0, 0}}, incrgaps,   { .i = +1 } }     ),
@@ -454,17 +463,26 @@ static Keychord *keychords[]        = {
 // click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin 
 //======================================================================//
 static const Button buttons[]        =      {
-	// click                event mask      button          function        argument 
-	{ ClkLtSymbol,          0     ,         Button1,        setlayout     , {0} },
-	{ ClkClientWin,         MODKEY,         Button1,        movemouse     , {0} },
-	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         MODKEY,         Button3,        resizemouse   , {0} },
-	{ ClkTagBar,            0     ,         Button1,        view          , {0} },
-	{ ClkTagBar,            0     ,         Button3,        toggleview    , {0} },
-	{ ClkTagBar,            MODKEY,         Button1,        tag           , {0} },
-	{ ClkTagBar,            MODKEY,         Button3,        toggletag     , {0} },
-	{ ClkLtSymbol,          0     ,         Button3,        setlayout     , {.v = &layouts[2]} },
-	{ ClkStatusText,        0     ,         Button2,        spawn         , {.v = termcmd } },
-
+	// click                event mask         button          function        argument 
+	{ ClkLtSymbol,          0     ,            Button1,        setlayout           ,   {0} },
+	{ ClkClientWin,         MODKEY,            Button1,        movemouse           ,   {0} },
+	{ ClkClientWin,         MODKEY,            Button2,        togglefloating      ,   {0} },
+	{ ClkClientWin,         MODKEY,            Button3,        resizemouse         ,   {0} },
+	{ ClkTagBar,            0     ,            Button1,        view                ,   {0} },
+	{ ClkTagBar,            0     ,            Button3,        toggleview          ,   {0} },
+	{ ClkTagBar,            MODKEY,            Button1,        tag                 ,   {0} },
+	{ ClkTagBar,            MODKEY,            Button3,        toggletag           ,   {0} },
+	{ ClkLtSymbol,          0     ,            Button3,        setlayout           ,   {.v = &layouts[2]} },
+	{ ClkStatusText,        0     ,            Button2,        spawn               ,   {.v = termcmd } },
+  { ClkRootWin,            MODKEY|SHIFT,     Button4,        viewnext            ,   {0} }, // Scroll Up
+  { ClkRootWin,            MODKEY|SHIFT,     Button5,        viewprev            ,   {0} }, // Scroll Down
+  { ClkRootWin,            MODKEY,           Button4,        viewactivescrollnext,   {0} }, // Scroll Up (active only)
+  { ClkRootWin,            MODKEY,           Button5,        viewactivescrollprev,   {0} }, // Scroll Down (active only)
 };
 //======================================================================//
+// dwm karnel dir
+#define RECOMPILE_COMMAND "cd \"$HOME/.suckless/dwm\" && " \
+                          "make clean install && " \
+                          "pgrep -x dwm | xargs -r kill || " \
+                          "notify-send 'Ошибка при перекомпиляции dwm'"
+

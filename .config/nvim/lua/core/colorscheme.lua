@@ -5,7 +5,7 @@
 -- require("core.lazyplug.colorscheme.gruvbox")
 --
 --DONE:tokyonight
-require("core.lazyplug.colorscheme.tokyonight")
+-- require("core.lazyplug.colorscheme.tokyonight")
 --
 --DONE:onedark
 -- require("core.lazyplug.colorscheme.onedark")
@@ -19,6 +19,8 @@ require("core.lazyplug.colorscheme.tokyonight")
 --DONE:everforest
 -- require("core.lazyplug.colorscheme.everforest")
 --
+--DONE:dracula
+require("core.lazyplug.colorscheme.dracula")
 ---------------------------------------------------------------
 --cursor theme
 if vim.o.background == "light" then

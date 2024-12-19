@@ -7,6 +7,7 @@ return {
 	{ "rebelot/kanagawa.nvim" },
 	{ "Mofiqul/vscode.nvim" },
 	{ "sainnhe/everforest" },
+	{ "binhtran432k/dracula.nvim" },
 	-- treesitter
 	{ "nvim-treesitter/nvim-treesitter" },
 	-- telescope

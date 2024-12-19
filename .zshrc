@@ -4,6 +4,7 @@ echo "       /)＿/)☆
     |￣∪￣  ￣|＼／
     |＿＿_＿＿|／
 "
+
 #ufetch
 #cowsay "welcome maaru^^"
 tabs 4
@@ -29,6 +30,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 export XMODIFIERS="@im=none"
 export ZSH="$HOME/.oh-my-zsh"
+# export TERM=xterm-256color
 
 #----- theme -----
 source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
@@ -72,9 +74,11 @@ bindkey -v
  alias g="z"
  alias matrix="unimatrix -b -s 95  -c blue"
  alias teri="yetris"
- alias vim="neovide"
- alias nzsh="neovide ~/.zshrc"
- alias nvim="neovide"
+ # alias vim="neovide"
+ alias vim="nvim"
+ # alias nzsh="neovide ~/.zshrc"
+ alias nzsh="nvim ~/.zshrc"
+ # alias nvim="neovide"
  alias neo="$HOME/.config/neofetch/.startFetch.sh"
  alias fetch="$HOME/.suckless/scripts/fetch.sh"
  alias cls="clear"
@@ -102,3 +106,7 @@ function yazi() {
     rm -f -- "$tmp"
 }
 export PATH=~/.npm-global/bin:$PATH
+#
+# if [ -z "$TMUX" ]; then
+#     exec tmux
+# fi
