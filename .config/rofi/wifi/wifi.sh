@@ -14,7 +14,7 @@ get_status_info() {
     fi
 
     name=$(echo "$wifi_info" | cut -d: -f2)
-    name=${name:-"<UdFind>"}
+    name=${name:-"[Null]"}
     if [ ${#name} -lt 6 ]; then
         name=$(printf "%-8s" "$name")
     fi
@@ -38,7 +38,7 @@ get_status_info() {
 show_networks() {
     connected_network=$(nmcli -t -f IN-USE,SSID,SIGNAL,CHAN,FREQ,SECURITY dev wifi list | grep "^*" | awk -F: '
     {
-        name = ($2 == "" || $2 ~ /^\s*$/) ? "<UdFind>" : $2;
+        name = ($2 == "" || $2 ~ /^\s*$/) ? "[Null]" : $2;
         if (length(name) < 6) {
             name = sprintf("%-8s", name);
         }
@@ -46,7 +46,7 @@ show_networks() {
 
     available_networks=$(nmcli -t -f IN-USE,SSID,SIGNAL,CHAN,FREQ,SECURITY dev wifi list | grep -v "^*" | awk -F: '
     {
-        name = ($2 == "" || $2 ~ /^\s*$/) ? "<UdFind>" : substr($2, 1, 6) (length($2) > 6 ? ".." : "");
+        name = ($2 == "" || $2 ~ /^\s*$/) ? "[Null]" : substr($2, 1, 6) (length($2) > 6 ? ".." : "");
         if (length(name) < 6) {
             name = sprintf("%-8s", name);
         }
