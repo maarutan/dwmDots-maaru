@@ -21,6 +21,7 @@ URLS=(
   ["bing"]="https://www.bing.com/search?q="
   ["yahoo"]="https://search.yahoo.com/search?p="
   ["duckduckgo"]="https://www.duckduckgo.com/?q="
+  ["url"]=""
   ["yandex"]="https://yandex.ru/yandsearch?text="
   ["github"]="https://github.com/search?q="
   ["goodreads"]="https://www.goodreads.com/search?q="
