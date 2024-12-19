@@ -203,6 +203,8 @@ static Keychord *keychords[]        = {
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_d}}, toggle_bottGaps, {0}  }), // toggle bottGaps
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_b}}, spawn,           SHCMD("pgrep blueman-manager && pkill blueman-manager || blueman-manager &")  }), // blueman-manager
     &((Keychord){2, {{MODKEY, XK_s}, {0, XK_n}}, spawn,           SHCMD("pgrep -fx 'kitty --title nmtui nmtui-connect' && pkill -fx 'kitty --title nmtui nmtui-connect' || kitty --title nmtui nmtui-connect &") }), // network-manager
+    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_p}}, spawn,           SHCMD("$HOME/.config/rofi/powermenu/powermenu.sh") }), //powermenu
+    &((Keychord){2, {{MODKEY, XK_s}, {0, XK_l}}, spawn,           SHCMD("$HOME/.config/rofi/powermenu/.screen-lock.sh") }), //lockfullscreen
 //======================================================================//
     // aplication [ super + a ] 
     &((Keychord){2, {{MODKEY, XK_a}, {0,XK_f}}, spawn,  {.v = browser } }),   //firefox
@@ -284,7 +286,7 @@ static Keychord *keychords[]        = {
     &((Keychord){1, {{MODKEY|CTRL|SHIFT, XK_l}}, moveresizeedge, { .v = "R" } }),
 //======================================================================//
 	//toggleBar 
-    &((Keychord){1, {{MODKEY|SHIFT, XK_w}}, togglebar, { 0 } }),
+    &((Keychord){2, {{MODKEY, XK_w},{0,XK_b}}, togglebar, { 0 } }),
 //======================================================================//
 	//focusStack 
     &((Keychord){1, {{MODKEY|SHIFT, XK_j}}, focusstack, { .i = +1 } }),
@@ -371,6 +373,7 @@ static Keychord *keychords[]        = {
     &((Keychord){2, {{MODKEY, XK_w},{0|SHIFT, XK_g}}, togglesmartgaps,  { 0 } }),// togglesmartgaps
     &((Keychord){2, {{MODKEY, XK_w},{0,XK_t}},   toggleTagBoxes          ,  { 0 } }),// toggle_tag_boxes
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_m},{0|SHIFT, XK_g}}, toggle_always_smartgaps_monocle, { 0 } }),// toggle_smartgaps_monocle
+    &((Keychord){1, {{MODKEY|SHIFT, XK_w}}, spawn, SHCMD("$HOME/.config/rofi/wifi/wifi.sh") }),// killclient
     //awesome key
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_t}}, toggleshowtitle,   { 0 } }),// toggleshowtitle 
     &((Keychord){3, {{MODKEY, XK_w},{0,XK_a},{0, XK_h}}, hidewin,   { 0 } }),        // hidewin 

@@ -13,6 +13,7 @@ APPLICATIONS=(
     "feh --bg-scale \"$(head -n 1 ~/.current_wallpaper)\""
     "dwmblocks"
     "$HOME/.suckless/scripts/dwmbScripts/blocks.sh"
+    "$HOME/.suckless/scripts/battery-alert.sh"
     "blueman-applet"
     "telegram-desktop"
     # "plank"

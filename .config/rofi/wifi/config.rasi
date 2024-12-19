@@ -1,7 +1,7 @@
 configuration{
     modi: "run,drun,window";
     lines: 5;
-    font: "NerdFont Nerd Font 14";
+    font: "JetBrainsMono Nerd Font 14";
     show-icons: true;
     icon-theme: "Papirus-dark";
     terminal: "alacritty";
@@ -15,13 +15,10 @@ configuration{
     display-Network: " 󰤨  Network";
     sidebar-mode: true;
 
-    kb-row-up: "Up,Control+k,Shift+Tab,Shift+ISO_Left_Tab";
-    kb-row-down: "Down,Control+j";
-    kb-accept-entry: "Control+m,Return,KP_Enter";
-    terminal: "mate-terminal";
-    kb-remove-to-eol: "Control+Shift+e";
-    kb-mode-previous: "Shift+Left,Control+Shift+Tab,Control+h";
-    kb-remove-char-back: "BackSpace";
+    kb-row-down:  "j";
+    kb-row-up:    "k";
+    kb-row-left:  "h";
+    kb-row-right: "l";
 }
 
 @theme "catppuccin"

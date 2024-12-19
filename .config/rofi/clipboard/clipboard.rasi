@@ -6,7 +6,7 @@ configuration {
 	drun-display-format:        "{name}";
     kb-row-up: "k";                /* Клавиша для перемещения вверх */
     kb-row-down: "j";              /* Клавиша для перемещения вниз */
-    kb-accept-entry: "l";          /* Клавиша для подтверждения */
+    kb-accept-entry: "l,Return,KP_Enter";
     terminal: "mate-terminal";
     kb-remove-to-eol: "Control+Shift+e";
     kb-mode-previous: "h";         /* Клавиша для возврата в предыдущий режим */

@@ -12,7 +12,12 @@
     notification_limit = 5
     corner_radius = 15
     icon_position = left
+    max_icon_size= 60
+    sticky_history = no
     alignment = left
+    title = Dunst
+    class = Dunst
+    history_length = 6
     enable_recursive_icon_lookup = true
     gap_size = 30
     line_height = 10
@@ -30,3 +35,6 @@
 [ignore_flameshot_warning]
     body = "grim's screenshot component is implemented based on wlroots, it may not be used in GNOME or similar desktop environments"
     format = ""
+
+
+
